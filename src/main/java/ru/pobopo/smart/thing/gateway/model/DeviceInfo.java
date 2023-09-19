@@ -2,12 +2,15 @@ package ru.pobopo.smart.thing.gateway.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
@@ -25,5 +28,26 @@ public class DeviceInfo {
             return null;
         }
         return new DeviceInfo(splited[0], splited[1]);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj == null || obj.getClass() != getClass()) {
+            return false;
+        }
+
+        DeviceInfo comp = (DeviceInfo) obj;
+        return StringUtils.equals(comp.getIp(), getIp()) && StringUtils.equals(comp.getName(), getName());
+    }
+
+    @Override
+    public int hashCode() {
+        int hashCode = ip.hashCode();
+        hashCode = 31 * hashCode + name.hashCode();
+        return hashCode;
     }
 }

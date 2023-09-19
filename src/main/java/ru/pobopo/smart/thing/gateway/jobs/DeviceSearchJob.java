@@ -5,10 +5,14 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.charset.StandardCharsets;
+import java.time.temporal.ChronoUnit;
+import java.util.Set;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smart.thing.gateway.cache.ConcurrentSetCache;
 import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 
 @Component
@@ -18,6 +22,7 @@ public class DeviceSearchJob implements Runnable {
 
     private final static String GROUP = "224.1.1.1";
     private final static int PORT = 7778;
+    private final ConcurrentSetCache<DeviceInfo> cache = new ConcurrentSetCache<>(2, ChronoUnit.SECONDS);
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -62,11 +67,17 @@ public class DeviceSearchJob implements Runnable {
                         DEVICES_SEARCH_TOPIC,
                         deviceInfo
                     );
+                    cache.put(deviceInfo);
                 }
             }
         } finally {
             s.leaveGroup(group);
             s.close();
         }
+    }
+
+    @NonNull
+    public Set<DeviceInfo> getRecentFoundDevices() {
+        return cache.getValues();
     }
 }
