@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smart.thing.gateway.model.BackgroundJob;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
 import ru.pobopo.smart.thing.gateway.model.GatewayQueueInfo;
 import ru.pobopo.smart.thing.gateway.rabbitmq.MessageConsumer;
@@ -22,7 +23,7 @@ import ru.pobopo.smart.thing.gateway.service.CloudService;
 
 @Component
 @Slf4j
-public class CommandsConsumer implements Runnable {
+public class CommandsConsumer implements BackgroundJob {
     private final CloudService cloudService;
     private final String token;
     private final String brokerUrl;

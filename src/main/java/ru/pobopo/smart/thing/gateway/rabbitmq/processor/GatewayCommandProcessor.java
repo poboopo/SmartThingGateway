@@ -3,13 +3,10 @@ package ru.pobopo.smart.thing.gateway.rabbitmq.processor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashSet;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.messaging.core.GenericMessagingTemplate;
+import ru.pobopo.smart.thing.gateway.exception.MissingValueException;
 import ru.pobopo.smart.thing.gateway.jobs.DeviceSearchJob;
-import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 import ru.pobopo.smart.thing.gateway.rabbitmq.message.GatewayCommand;
 import ru.pobopo.smart.thing.gateway.rabbitmq.message.MessageResponse;
 
@@ -27,8 +24,9 @@ public class GatewayCommandProcessor implements MessageProcessor {
     public MessageResponse process(String message) throws Exception {
         GatewayCommand gatewayCommand = objectMapper.readValue(message, GatewayCommand.class);
         if (StringUtils.isBlank(gatewayCommand.getRequestId())) {
-            throw new NullPointerException("Request id is missing!");
+            throw new MissingValueException("Request id is missing!");
         }
+
         MessageResponse response = new MessageResponse();
 
         if (StringUtils.isBlank(gatewayCommand.getCommand())) {

@@ -13,11 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.cache.ConcurrentSetCache;
+import ru.pobopo.smart.thing.gateway.model.BackgroundJob;
 import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 
 @Component
 @Slf4j
-public class DeviceSearchJob implements Runnable {
+public class DeviceSearchJob implements BackgroundJob {
     public static final String DEVICES_SEARCH_TOPIC = "/devices/search";
 
     private final static String GROUP = "224.1.1.1";

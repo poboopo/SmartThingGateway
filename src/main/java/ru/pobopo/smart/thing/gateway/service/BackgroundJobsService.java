@@ -1,25 +1,31 @@
 package ru.pobopo.smart.thing.gateway.service;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smart.thing.gateway.jobs.CommandsConsumer;
-import ru.pobopo.smart.thing.gateway.jobs.DeviceLogsJob;
-import ru.pobopo.smart.thing.gateway.jobs.DeviceSearchJob;
+import ru.pobopo.smart.thing.gateway.model.BackgroundJob;
 
 @Component
 @Slf4j
 public class BackgroundJobsService {
-    private final ThreadPoolExecutor threadPoolExecutor;
+    private ThreadPoolExecutor threadPoolExecutor;
 
     @Autowired
-    public BackgroundJobsService(DeviceSearchJob searchService, DeviceLogsJob logsService, CommandsConsumer commandsConsumer) {
-        this.threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(3);
+    public BackgroundJobsService(List<BackgroundJob> jobList) {
+        if (jobList == null || jobList.isEmpty()) {
+            log.warn("No background jobs were configured!");
+            return;
+        }
 
-        threadPoolExecutor.submit(searchService);
-//        threadPoolExecutor.submit(logsService);
-        threadPoolExecutor.submit(commandsConsumer);
+        log.info("Total background jobs: {}", jobList.size());
+
+        this.threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(jobList.size());
+        for (BackgroundJob job: jobList) {
+            log.info("Starting job {}", job.getClass());
+            threadPoolExecutor.submit(job);
+        }
     }
 }

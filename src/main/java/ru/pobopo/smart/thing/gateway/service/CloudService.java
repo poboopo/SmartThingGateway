@@ -1,5 +1,6 @@
 package ru.pobopo.smart.thing.gateway.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
@@ -24,8 +25,8 @@ import ru.pobopo.smart.thing.gateway.model.GatewayQueueInfo;
 public class CloudService {
     private static final String TOKEN_HEADER = "SmartThing-Token-Gateway";
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String token;
+    private final ObjectMapper objectMapper = new ObjectMapper()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);    private final String token;
     private final String url;
 
     @Autowired
@@ -37,7 +38,6 @@ public class CloudService {
     public GatewayInfo getGatewayInfo() {
         return basicGetRequest("/gateway/info", GatewayInfo.class);
     }
-
     public GatewayQueueInfo getQueueInfo() {
         return basicGetRequest("/gateway/queue", GatewayQueueInfo.class);
     }

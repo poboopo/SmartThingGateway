@@ -32,7 +32,7 @@ public class MessageConsumer extends DefaultConsumer {
         log.info("Got new message! {}", message);
         MessageProcessor processor = messageProcessorFactory.getProcessor(properties.getType());
         if (processor == null) {
-            log.error("can't find message processor for type {}", properties.getType());
+            log.error("Can't find message processor for type {}", properties.getType());
             return;
         }
 

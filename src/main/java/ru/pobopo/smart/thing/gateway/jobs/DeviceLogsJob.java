@@ -11,11 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smart.thing.gateway.model.BackgroundJob;
 import ru.pobopo.smart.thing.gateway.model.DeviceLoggerMessage;
 
 @Component
 @Slf4j
-public class DeviceLogsJob implements Runnable {
+public class DeviceLogsJob implements BackgroundJob {
     public static String DEVICES_LOGS_TOPIC = "/devices/logs";
 
     private final static String GROUP = "224.1.1.1";
