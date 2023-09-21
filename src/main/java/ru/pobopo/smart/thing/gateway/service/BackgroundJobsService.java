@@ -6,7 +6,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smart.thing.gateway.model.BackgroundJob;
+import ru.pobopo.smart.thing.gateway.jobs.BackgroundJob;
 
 @Component
 @Slf4j

@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.cache.ConcurrentSetCache;
-import ru.pobopo.smart.thing.gateway.model.BackgroundJob;
 import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 
 @Component

@@ -18,7 +18,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
-import ru.pobopo.smart.thing.gateway.model.GatewayQueueInfo;
 
 @Component
 @Slf4j
@@ -36,10 +35,7 @@ public class CloudService {
     }
 
     public GatewayInfo getGatewayInfo() {
-        return basicGetRequest("/gateway/info", GatewayInfo.class);
-    }
-    public GatewayQueueInfo getQueueInfo() {
-        return basicGetRequest("/gateway/queue", GatewayQueueInfo.class);
+        return basicGetRequest("/gateway/me/info", GatewayInfo.class);
     }
 
     @Nullable

@@ -28,6 +28,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
         }
 
         MessageResponse response = new MessageResponse();
+        response.setRequestId(gatewayCommand.getRequestId());
 
         if (StringUtils.isBlank(gatewayCommand.getCommand())) {
             response.setSuccess(false);
@@ -47,6 +48,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
         return response;
     }
 
+    //todo LOAD DEVICES INFO!!!!
     private String searchDevices() throws JsonProcessingException {
         return objectMapper.writeValueAsString(searchJob.getRecentFoundDevices());
     }

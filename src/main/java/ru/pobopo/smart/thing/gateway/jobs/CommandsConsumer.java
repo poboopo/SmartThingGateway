@@ -1,33 +1,32 @@
 package ru.pobopo.smart.thing.gateway.jobs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.DefaultConsumer;
-import com.rabbitmq.client.Envelope;
+import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smart.thing.gateway.model.BackgroundJob;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
-import ru.pobopo.smart.thing.gateway.model.GatewayQueueInfo;
 import ru.pobopo.smart.thing.gateway.rabbitmq.MessageConsumer;
 import ru.pobopo.smart.thing.gateway.rabbitmq.MessageProcessorFactory;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
 
 @Component
 @Slf4j
-public class CommandsConsumer implements BackgroundJob {
+public class CommandsConsumer {
     private final CloudService cloudService;
     private final String token;
     private final String brokerUrl;
     private final MessageProcessorFactory messageProcessorFactory;
+    private Connection connection;
+    private Channel channel;
 
 
     @Autowired
@@ -38,8 +37,8 @@ public class CommandsConsumer implements BackgroundJob {
         this.brokerUrl = environment.getProperty("BROKER_URL");
     }
 
-    @Override
-    public void run() {
+    @EventListener
+    public void connect(ContextRefreshedEvent event) throws IOException, TimeoutException {
         if (StringUtils.isBlank(token)) {
             log.error("Token is missing!");
             return;
@@ -56,32 +55,27 @@ public class CommandsConsumer implements BackgroundJob {
         }
         log.info("Loaded gateway info: {}", info);
 
-        GatewayQueueInfo queueInfo = cloudService.getQueueInfo();
-        if (queueInfo == null) {
-            return;
-        }
-        log.info("Loaded gateway queue info: {}", queueInfo);
-
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(brokerUrl);
         factory.setUsername(info.getId());
         factory.setPassword(token);
 
-        try (Connection connection = factory.newConnection()) {
-            Channel channel = connection.createChannel();
-            log.info("Connected to rabbit");
+        connection = factory.newConnection();
+        this.channel = connection.createChannel();
+        log.info("Connected to rabbit");
 
-            channel.basicConsume(
-                queueInfo.getQueueIn(),
-                true,
-                "commands_consumer",
-                new MessageConsumer(channel, messageProcessorFactory, queueInfo.getQueueOut())
-            );
-            log.info("Subscribed to queue {}", queueInfo.getQueueIn());
+        channel.basicConsume(
+            info.getQueueIn(),
+            true,
+            "commands_consumer",
+            new MessageConsumer(channel, messageProcessorFactory, info.getQueueOut())
+        );
+        log.info("Subscribed to queue {}", info.getQueueIn());
+    }
 
-            for(;;){}
-        } catch (IOException | TimeoutException e) {
-            throw new RuntimeException(e);
-        }
+
+    @PreDestroy
+    public void closeConnection() throws IOException {
+        connection.close();
     }
 }
