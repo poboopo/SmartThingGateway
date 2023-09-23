@@ -88,30 +88,4 @@ public class GatewayCommandProcessor implements MessageProcessor {
             log.error("Failed to load {} full info: {}", info, exception.getMessage());
         }
     }
-
-//    private String searchDevices() throws JsonProcessingException, ExecutionException, InterruptedException {
-//        Set<DeviceInfo> infoSet = searchJob.getRecentFoundDevices();
-//        if (infoSet.isEmpty()) {
-//            return "[]";
-//        }
-//        ExecutorService executorService = Executors.newFixedThreadPool(infoSet.size());
-//        List<Future<DeviceInfo>> futures = new ArrayList<>();
-//        infoSet.forEach(info -> {
-//            futures.add(executorService.submit(() -> loadDeviceFullInfo(info)));
-//        });
-//        List<DeviceInfo> infos = new ArrayList<>();
-//        for (Future<DeviceInfo> future: futures) {
-//            infos.add(future.get());
-//        }
-//        return objectMapper.writeValueAsString(infos);
-//    }
-//
-//    private DeviceInfo loadDeviceFullInfo(DeviceInfo info) {
-//        try {
-//            info.setFullInfo(deviceService.getDeviceFullInfo(info));
-//        } catch (Exception exception) {
-//            log.error("Failed to load {} full info: {}", info, exception.getMessage());
-//        }
-//        return info;
-//    }
 }
