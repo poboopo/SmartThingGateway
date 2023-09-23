@@ -11,12 +11,16 @@ import org.springframework.lang.Nullable;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString
 public class DeviceInfo {
     private String ip;
     private String name;
+    private DeviceFullInfo fullInfo;
+
+    public DeviceInfo(String ip, String name) {
+        this.ip = ip;
+        this.name = name;
+    }
 
     @Nullable
     public static DeviceInfo fromMulticastMessage(String message) {

@@ -3,21 +3,36 @@ package ru.pobopo.smart.thing.gateway.rabbitmq.processor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import ru.pobopo.smart.thing.gateway.exception.MissingValueException;
 import ru.pobopo.smart.thing.gateway.jobs.DeviceSearchJob;
+import ru.pobopo.smart.thing.gateway.model.DeviceFullInfo;
+import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 import ru.pobopo.smart.thing.gateway.rabbitmq.message.GatewayCommand;
 import ru.pobopo.smart.thing.gateway.rabbitmq.message.MessageResponse;
+import ru.pobopo.smart.thing.gateway.service.DeviceService;
 
 @Slf4j
 public class GatewayCommandProcessor implements MessageProcessor {
     private final ObjectMapper objectMapper = new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    private final DeviceSearchJob searchJob;
 
-    public GatewayCommandProcessor(DeviceSearchJob searchJob) {
+    private final DeviceSearchJob searchJob;
+    private final DeviceService deviceService;
+
+    public GatewayCommandProcessor(DeviceSearchJob searchJob, DeviceService deviceService) {
         this.searchJob = searchJob;
+        this.deviceService = deviceService;
     }
 
     @Override
@@ -48,8 +63,55 @@ public class GatewayCommandProcessor implements MessageProcessor {
         return response;
     }
 
-    //todo LOAD DEVICES INFO!!!!
-    private String searchDevices() throws JsonProcessingException {
-        return objectMapper.writeValueAsString(searchJob.getRecentFoundDevices());
+    private String searchDevices() throws JsonProcessingException, InterruptedException {
+        Set<DeviceInfo> infoSet = searchJob.getRecentFoundDevices();
+        if (infoSet.isEmpty()) {
+            return "[]";
+        }
+        int size = infoSet.size();
+        CountDownLatch latch = new CountDownLatch(size);
+        ExecutorService executorService = Executors.newFixedThreadPool(size);
+        infoSet.forEach(info -> {
+            executorService.submit(() -> {
+                loadDeviceFullInfo(info);
+                latch.countDown();
+            });
+        });
+        latch.await();
+        return objectMapper.writeValueAsString(infoSet);
     }
+
+    private void loadDeviceFullInfo(DeviceInfo info) {
+        try {
+            info.setFullInfo(deviceService.getDeviceFullInfo(info));
+        } catch (Exception exception) {
+            log.error("Failed to load {} full info: {}", info, exception.getMessage());
+        }
+    }
+
+//    private String searchDevices() throws JsonProcessingException, ExecutionException, InterruptedException {
+//        Set<DeviceInfo> infoSet = searchJob.getRecentFoundDevices();
+//        if (infoSet.isEmpty()) {
+//            return "[]";
+//        }
+//        ExecutorService executorService = Executors.newFixedThreadPool(infoSet.size());
+//        List<Future<DeviceInfo>> futures = new ArrayList<>();
+//        infoSet.forEach(info -> {
+//            futures.add(executorService.submit(() -> loadDeviceFullInfo(info)));
+//        });
+//        List<DeviceInfo> infos = new ArrayList<>();
+//        for (Future<DeviceInfo> future: futures) {
+//            infos.add(future.get());
+//        }
+//        return objectMapper.writeValueAsString(infos);
+//    }
+//
+//    private DeviceInfo loadDeviceFullInfo(DeviceInfo info) {
+//        try {
+//            info.setFullInfo(deviceService.getDeviceFullInfo(info));
+//        } catch (Exception exception) {
+//            log.error("Failed to load {} full info: {}", info, exception.getMessage());
+//        }
+//        return info;
+//    }
 }

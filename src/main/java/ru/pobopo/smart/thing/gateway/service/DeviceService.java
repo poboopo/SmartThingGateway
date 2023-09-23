@@ -1,5 +1,7 @@
 package ru.pobopo.smart.thing.gateway.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -17,12 +19,33 @@ import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
+import ru.pobopo.smart.thing.gateway.model.DeviceFullInfo;
+import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
 import ru.pobopo.smart.thing.gateway.rabbitmq.message.DeviceRequestMessage;
 
 @Component
 @Slf4j
 public class DeviceService {
+    private final ObjectMapper objectMapper = new ObjectMapper()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+    public DeviceFullInfo getDeviceFullInfo(DeviceInfo info) throws Exception {
+        DeviceResponse response = sendRequest(
+            new DeviceRequestMessage(
+                info.getIp(),
+                "/info/system",
+                "GET",
+                null, null
+            )
+        );
+        if (response.getCode() != 200) {
+            log.error("Failed to load device full info. Code {}, response {}", response.getCode(), response.getCode());
+            return null;
+        }
+        return objectMapper.readValue(response.getBody(), DeviceFullInfo.class);
+    }
+
     public DeviceResponse sendRequest(DeviceRequestMessage requestMessage) throws Exception {
         validateRequest(requestMessage);
 

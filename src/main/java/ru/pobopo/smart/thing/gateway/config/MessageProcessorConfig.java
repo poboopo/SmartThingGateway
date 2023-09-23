@@ -16,7 +16,9 @@ public class MessageProcessorConfig {
     public MessageProcessorFactory messageProcessorFactory(DeviceSearchJob searchJob, DeviceService deviceService) {
         MessageProcessorFactory messageProcessorFactory = new MessageProcessorFactory();
         messageProcessorFactory.addProcessor(GatewayMessageType.DEVICE_REQUEST, new DeviceRequestMessageProcessor(deviceService));
-        messageProcessorFactory.addProcessor(GatewayMessageType.GATEWAY_COMMAND, new GatewayCommandProcessor(searchJob));
+        messageProcessorFactory.addProcessor(GatewayMessageType.GATEWAY_COMMAND, new GatewayCommandProcessor(searchJob,
+            deviceService
+        ));
         return messageProcessorFactory;
     }
 }
