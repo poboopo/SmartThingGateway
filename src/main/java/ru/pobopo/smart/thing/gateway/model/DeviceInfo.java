@@ -1,7 +1,5 @@
 package ru.pobopo.smart.thing.gateway.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,13 +10,22 @@ import org.springframework.lang.Nullable;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class DeviceInfo {
     private String ip;
+    private String type;
     private String name;
     private DeviceFullInfo fullInfo;
 
-    public DeviceInfo(String ip, String name) {
+    public DeviceInfo(String ip,  String name) {
         this.ip = ip;
+        this.name = name;
+        this.type = "type_missing";
+    }
+
+    public DeviceInfo(String ip, String type, String name) {
+        this.ip = ip;
+        this.type = type;
         this.name = name;
     }
 
@@ -27,11 +34,15 @@ public class DeviceInfo {
         if (StringUtils.isBlank(message)) {
             return null;
         }
+
         String[] splited = message.split("[$]");
-        if (splited.length != 2) {
-            return null;
+        if (splited.length == 2) { //old version
+            return new DeviceInfo(splited[0], splited[1]);
         }
-        return new DeviceInfo(splited[0], splited[1]);
+        if (splited.length == 3) {
+            return new DeviceInfo(splited[0], splited[1], splited[2]);
+        }
+        return null;
     }
 
     @Override
@@ -45,7 +56,8 @@ public class DeviceInfo {
         }
 
         DeviceInfo comp = (DeviceInfo) obj;
-        return StringUtils.equals(comp.getIp(), getIp()) && StringUtils.equals(comp.getName(), getName());
+        return StringUtils.equals(comp.getIp(), getIp())
+               && StringUtils.equals(comp.getName(), getName());
     }
 
     @Override

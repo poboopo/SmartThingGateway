@@ -44,7 +44,7 @@ public class DeviceSearchJob implements BackgroundJob {
     private void search() throws IOException {
         MulticastSocket s = new MulticastSocket(PORT);
         InetAddress group = InetAddress.getByName(GROUP);
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[4096];
 
         try {
             s.joinGroup(group);
@@ -68,8 +68,13 @@ public class DeviceSearchJob implements BackgroundJob {
                         deviceInfo
                     );
                     cache.put(deviceInfo);
+                } else {
+                    log.error("Can't build device info for {}", message);
                 }
             }
+        } catch (Exception exception) {
+            log.error("Search job failed", exception);
+            throw new RuntimeException(exception);
         } finally {
             s.leaveGroup(group);
             s.close();

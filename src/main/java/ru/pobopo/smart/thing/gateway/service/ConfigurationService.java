@@ -60,6 +60,9 @@ public class ConfigurationService {
     public void updateCloudInfo(@NonNull CloudInfo info) throws ConfigurationException {
         Objects.requireNonNull(info);
         log.info("Cloud info was updated: {}", info);
+        if (StringUtils.equals(info.getToken(), "empty") || StringUtils.equals(info.getToken(), "present")) {
+            info.setToken(cloudInfo.getToken());
+        }
         this.cloudInfo = info;
         savePropertiesToFile();
         sendCloudInfoEvent();
