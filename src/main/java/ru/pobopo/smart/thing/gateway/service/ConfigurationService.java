@@ -12,12 +12,10 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smart.thing.gateway.event.CloudInfoLoadedEvent;
+import ru.pobopo.smart.thing.gateway.event.CloudInfoUpdated;
 import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
 import ru.pobopo.smart.thing.gateway.model.CloudInfo;
 
@@ -25,8 +23,8 @@ import ru.pobopo.smart.thing.gateway.model.CloudInfo;
 @Slf4j
 public class ConfigurationService {
     public static final String TOKEN_PROPERTY = "token";
-    public static final String CLOUD_URL_PROPERTY = "cloud.url";
-    public static final String BROKER_IP_PROPERTY = "broker.ip";
+    public static final String CCLOUD_IP_PROPERTY = "cloud.ip";
+    public static final String CLOUD_PORT_PROPERTY = "cloud.port";
 
     private static final Path CONFIG_FILE_DEFAULT_PATH =
         Paths.get(System.getProperty("user.home"), ".smartthing/gateway.config");
@@ -48,40 +46,37 @@ public class ConfigurationService {
         }
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void loadAfterStartUp() throws ConfigurationException {
-        loadPropertiesFromFile();
-    }
-
     public CloudInfo getCloudInfo() {
         return cloudInfo;
     }
 
     public void updateCloudInfo(@NonNull CloudInfo info) throws ConfigurationException {
         Objects.requireNonNull(info);
-        log.info("Cloud info was updated: {}", info);
-        if (StringUtils.equals(info.getToken(), "empty") || StringUtils.equals(info.getToken(), "present")) {
-            info.setToken(cloudInfo.getToken());
-        }
+
         this.cloudInfo = info;
+        log.info("Cloud info was updated: {}", info);
+
         savePropertiesToFile();
         sendCloudInfoEvent();
     }
 
-    private void loadCloudInfo() {
+    public void loadConfiguration() throws ConfigurationException {
+        loadPropertiesFromFile();
+
         this.cloudInfo = new CloudInfo(
             properties.getProperty(TOKEN_PROPERTY),
-            properties.getProperty(CLOUD_URL_PROPERTY),
-            properties.getProperty(BROKER_IP_PROPERTY)
+            properties.getProperty(CCLOUD_IP_PROPERTY),
+            Integer.parseInt(properties.getProperty(CLOUD_PORT_PROPERTY, "8080"))
         );
+
         log.info("Loaded cloud info: {}", this.cloudInfo);
         sendCloudInfoEvent();
     }
 
     private void writeCloudInfoToProperties() {
         properties.setProperty(TOKEN_PROPERTY, cloudInfo.getToken());
-        properties.setProperty(CLOUD_URL_PROPERTY, cloudInfo.getCloudUrl());
-        properties.setProperty(BROKER_IP_PROPERTY, cloudInfo.getBrokerIp());
+        properties.setProperty(CCLOUD_IP_PROPERTY, cloudInfo.getCloudIp());
+        properties.setProperty(CLOUD_PORT_PROPERTY, String.valueOf(cloudInfo.getCloudPort()));
     }
 
     private void savePropertiesToFile() throws ConfigurationException {
@@ -109,8 +104,6 @@ public class ConfigurationService {
                 log.info("Loading config from {}", configFilePath);
             }
             properties.load(new FileInputStream(configFile));
-
-            loadCloudInfo();
         } catch (IOException exception) {
             log.error("Failed to load configuration from properties file", exception);
             throw new ConfigurationException(exception.getMessage());
@@ -119,7 +112,7 @@ public class ConfigurationService {
 
     private void sendCloudInfoEvent() {
         try {
-            applicationEventPublisher.publishEvent(new CloudInfoLoadedEvent(this, this.cloudInfo));
+            applicationEventPublisher.publishEvent(new CloudInfoUpdated(this));
         } catch (Exception exception) {
             log.error("Event publish failed: {}", exception.getMessage(), exception);
         }

@@ -9,17 +9,13 @@ import java.util.concurrent.TimeoutException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smart.thing.gateway.event.CloudConnectionEvent;
-import ru.pobopo.smart.thing.gateway.event.CloudConnectionEventType;
-import ru.pobopo.smart.thing.gateway.event.CloudInfoLoadedEvent;
-import ru.pobopo.smart.thing.gateway.event.RabbitConnectionCloseEvent;
+import ru.pobopo.smart.thing.gateway.event.*;
+import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
+import ru.pobopo.smart.thing.gateway.model.CloudInfo;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
-import ru.pobopo.smart.thing.gateway.service.CloudService;
+import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
 
 @Component
 @Slf4j
@@ -27,86 +23,53 @@ public class CommandsConsumer {
     private static final String CONSUMER_TAG = "gateway_commands_consumer";
 
     private final MessageProcessorFactory messageProcessorFactory;
-    private final CloudService cloudService;
     private final RabbitExceptionHandler exceptionHandler;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ConfigurationService configurationService;
 
-    private String token;
-    private  String brokerIp;
     private Connection connection;
     private Channel channel;
 
     @Autowired
     public CommandsConsumer(
-        CloudService cloudService,
-        Environment environment,
         MessageProcessorFactory messageProcessorFactory,
         RabbitExceptionHandler exceptionHandler,
-        ApplicationEventPublisher applicationEventPublisher
+        ConfigurationService configurationService
     ) {
-        this.cloudService = cloudService;
         this.messageProcessorFactory = messageProcessorFactory;
-        this.token = environment.getProperty("TOKEN");
-        this.brokerIp = environment.getProperty("BROKER_URL");
         this.exceptionHandler = exceptionHandler;
-        this.applicationEventPublisher = applicationEventPublisher;
+        this.configurationService = configurationService;
     }
 
     @EventListener
-    @Order(1)
-    public void connect(CloudInfoLoadedEvent event) throws IOException, TimeoutException {
-        cleanup();
-
-        token = event.getToken();
-        brokerIp = event.getBrokerIp();
-        log.info("Token and broker ip were updated!");
-
-        if (StringUtils.isBlank(token)) {
-            log.error("Token is missing!");
-            return;
-        }
-
-        if (StringUtils.isBlank(brokerIp)) {
-            log.error("Broker ip is missing!");
-            return;
-        }
-
-        GatewayInfo info = cloudService.getGatewayInfo();
-        if (info == null) {
-            log.error("No gateway info were loaded, leaving...");
-            return;
-        }
-        log.info("Loaded gateway info: {}", info);
-        sendEvent(CloudConnectionEventType.GATEWAY_INFO_LOADED);
-
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(brokerIp);
-        factory.setUsername(info.getId());
-        factory.setPassword(token);
-        factory.setAutomaticRecoveryEnabled(true);
-        factory.setExceptionHandler(exceptionHandler);
-
-        connection = factory.newConnection();
-        this.channel = connection.createChannel();
-        log.info("Connected to rabbit");
-        sendEvent(CloudConnectionEventType.CONNECTED_TO_BROKER);
-
-        channel.basicConsume(
-            info.getQueueIn(),
-            true,
-            CONSUMER_TAG,
-            new MessageConsumer(channel, messageProcessorFactory, info.getQueueOut())
-        );
-        log.info("Subscribed to queue {}", info.getQueueIn());
-        sendEvent(CloudConnectionEventType.SUBSCRIBED_TO_QUEUE);
-    }
-
-    @EventListener
-    public void connectionEvent(RabbitConnectionCloseEvent event) throws IOException, TimeoutException {
+    public void connectionClosedEvent(RabbitConnectionCloseEvent event) throws IOException, TimeoutException {
         log.warn("Closing rabbitMq channel and connection");
         cleanup();
     }
 
+    @EventListener
+    public void connect(AuthorizedEvent event) throws IOException, TimeoutException, InterruptedException {
+        cleanup();
+        try {
+            GatewayInfo gatewayInfo = event.getAuthorizedCloudUser().getGateway();
+            if (gatewayInfo == null) {
+                throw new ConfigurationException("Gateway info is missing");
+            }
+
+            connection = getConnectionFactory(gatewayInfo).newConnection();
+            this.channel = connection.createChannel();
+            log.info("Connected to rabbit");
+
+            channel.basicConsume(
+                    gatewayInfo.getQueueIn(),
+                    true,
+                    CONSUMER_TAG,
+                    new MessageConsumer(channel, messageProcessorFactory, gatewayInfo.getQueueOut())
+            );
+            log.info("Subscribed to queue {}", gatewayInfo.getQueueIn());
+        } catch (ConfigurationException exception) {
+            log.error("Failed to configure rabbitmq connection: {}", exception.getMessage());
+        }
+    }
 
     @PreDestroy
     public void cleanup() throws IOException, TimeoutException {
@@ -122,11 +85,30 @@ public class CommandsConsumer {
             connection.close();
             log.warn("Connection were closed");
         }
-
-        sendEvent(CloudConnectionEventType.CONNECTION_CLOSED);
     }
 
-    private void sendEvent(CloudConnectionEventType eventType) {
-        applicationEventPublisher.publishEvent(new CloudConnectionEvent(this, eventType));
+    private ConnectionFactory getConnectionFactory(GatewayInfo gatewayInfo) throws ConfigurationException {
+        CloudInfo cloudInfo = configurationService.getCloudInfo();
+        if (cloudInfo == null) {
+            throw new ConfigurationException("Cloud info missing");
+        }
+
+        String token = cloudInfo.getToken();
+        String brokerIp = cloudInfo.getCloudIp();
+
+        if (StringUtils.isBlank(token)) {
+            throw new ConfigurationException("Token is missing");
+        }
+        if (StringUtils.isBlank(brokerIp)) {
+            throw new ConfigurationException("Broker ip is missing");
+        }
+
+        ConnectionFactory factory = new ConnectionFactory();
+        factory.setHost(brokerIp);
+        factory.setUsername(gatewayInfo.getId());
+        factory.setPassword(token);
+        factory.setExceptionHandler(exceptionHandler);
+
+        return factory;
     }
 }

@@ -11,6 +11,6 @@ import lombok.ToString;
 @ToString
 public class CloudInfo {
     private String token;
-    private String cloudUrl;
-    private String brokerIp;
+    private String cloudIp;
+    private int cloudPort;
 }
