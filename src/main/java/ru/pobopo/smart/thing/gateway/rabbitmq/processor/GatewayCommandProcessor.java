@@ -14,6 +14,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.exception.MissingValueException;
 import ru.pobopo.smart.thing.gateway.jobs.DeviceSearchJob;
 import ru.pobopo.smart.thing.gateway.model.DeviceFullInfo;
@@ -54,6 +55,10 @@ public class GatewayCommandProcessor implements MessageProcessor {
         switch (gatewayCommand.getCommand()) {
             case "ping" -> response.setResponse("pong");
             case "search" -> response.setResponse(searchDevices());
+            case "logout" -> {
+                log.info("Logout event!");
+                throw new LogoutException();
+            }
             default -> {
                 response.setResponse("Unknown command");
                 response.setSuccess(false);

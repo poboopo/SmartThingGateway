@@ -8,6 +8,7 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.rabbitmq.message.MessageResponse;
 import ru.pobopo.smart.thing.gateway.rabbitmq.processor.MessageProcessor;
 
@@ -45,6 +46,8 @@ public class MessageConsumer extends DefaultConsumer {
             } else {
                 log.warn("Empty message response!");
             }
+        } catch (LogoutException exception) {
+            throw exception;
         } catch (Exception exception) {
             log.error("Failed to process message", exception);
         }
