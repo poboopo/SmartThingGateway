@@ -22,7 +22,7 @@ public class SmartThingGatewayApp {
             configurationService.loadConfiguration();
             try {
                 cloudService.authorize();
-            } catch (AccessDeniedException exception) {
+            } catch (Throwable exception) {
                 log.error("Failed to authorize", exception);
             }
         };

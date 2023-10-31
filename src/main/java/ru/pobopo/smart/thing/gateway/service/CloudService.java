@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.event.AuthorizedEvent;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.model.AuthorizedCloudUser;
-import ru.pobopo.smart.thing.gateway.model.CloudInfo;
+import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
 
 @Component
 @Slf4j
@@ -44,6 +44,7 @@ public class CloudService {
 
     public AuthorizedCloudUser getAuthorizedCloudUser() throws AccessDeniedException {
         if (authorizedCloudUser == null) {
+            log.info("AuthorizedCloudUser is null, trying to auth");
             authorize();
         }
         return authorizedCloudUser;
@@ -64,7 +65,7 @@ public class CloudService {
             path = "";
         }
 
-        CloudInfo cloudInfo = configurationService.getCloudInfo();
+        CloudAuthInfo cloudInfo = configurationService.getCloudAuthInfo();
         if (cloudInfo == null) {
             return null;
         }

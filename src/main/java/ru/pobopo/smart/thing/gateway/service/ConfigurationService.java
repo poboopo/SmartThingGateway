@@ -17,7 +17,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.event.CloudInfoUpdated;
 import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
-import ru.pobopo.smart.thing.gateway.model.CloudInfo;
+import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
 
 @Component
 @Slf4j
@@ -32,7 +32,7 @@ public class ConfigurationService {
     private final Properties properties = new Properties();
     private final String configFilePath;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private CloudInfo cloudInfo = new CloudInfo();
+    private CloudAuthInfo cloudInfo = new CloudAuthInfo();
 
     @Autowired
     public ConfigurationService(Environment environment, ApplicationEventPublisher applicationEventPublisher) {
@@ -46,11 +46,11 @@ public class ConfigurationService {
         }
     }
 
-    public CloudInfo getCloudInfo() {
+    public CloudAuthInfo getCloudAuthInfo() {
         return cloudInfo;
     }
 
-    public void updateCloudInfo(@NonNull CloudInfo info) throws ConfigurationException {
+    public void updateCloudAuthInfo(@NonNull CloudAuthInfo info) throws ConfigurationException {
         Objects.requireNonNull(info);
 
         this.cloudInfo = info;
@@ -63,7 +63,7 @@ public class ConfigurationService {
     public void loadConfiguration() throws ConfigurationException {
         loadPropertiesFromFile();
 
-        this.cloudInfo = new CloudInfo(
+        this.cloudInfo = new CloudAuthInfo(
             properties.getProperty(TOKEN_PROPERTY),
             properties.getProperty(CCLOUD_IP_PROPERTY),
             Integer.parseInt(properties.getProperty(CLOUD_PORT_PROPERTY, "8080"))

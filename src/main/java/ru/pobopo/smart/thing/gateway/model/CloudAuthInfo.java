@@ -9,7 +9,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class CloudInfo {
+public class CloudAuthInfo {
     private String token;
     private String cloudIp;
     private int cloudPort;

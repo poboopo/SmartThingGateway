@@ -1,4 +1,4 @@
-package ru.pobopo.smart.thing.gateway.rabbitmq;
+package ru.pobopo.smart.thing.gateway.service;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -13,13 +13,16 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.event.*;
 import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
-import ru.pobopo.smart.thing.gateway.model.CloudInfo;
+import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
+import ru.pobopo.smart.thing.gateway.rabbitmq.MessageConsumer;
+import ru.pobopo.smart.thing.gateway.rabbitmq.MessageProcessorFactory;
+import ru.pobopo.smart.thing.gateway.rabbitmq.RabbitExceptionHandler;
 import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
 
 @Component
 @Slf4j
-public class CommandsConsumer {
+public class RabbitConnectionService {
     private static final String CONSUMER_TAG = "gateway_commands_consumer";
 
     private final MessageProcessorFactory messageProcessorFactory;
@@ -30,7 +33,7 @@ public class CommandsConsumer {
     private Channel channel;
 
     @Autowired
-    public CommandsConsumer(
+    public RabbitConnectionService(
         MessageProcessorFactory messageProcessorFactory,
         RabbitExceptionHandler exceptionHandler,
         ConfigurationService configurationService
@@ -40,6 +43,10 @@ public class CommandsConsumer {
         this.configurationService = configurationService;
     }
 
+    public boolean isConnected() {
+        return channel != null && channel.isOpen();
+    }
+
     @EventListener
     public void connectionClosedEvent(RabbitConnectionCloseEvent event) throws IOException, TimeoutException {
         log.warn("Closing rabbitMq channel and connection");
@@ -47,10 +54,13 @@ public class CommandsConsumer {
     }
 
     @EventListener
-    public void connect(AuthorizedEvent event) throws IOException, TimeoutException, InterruptedException {
+    public void connect(AuthorizedEvent event) throws IOException, TimeoutException {
+        connect(event.getAuthorizedCloudUser().getGateway());
+    }
+
+    public boolean connect(GatewayInfo gatewayInfo) throws IOException, TimeoutException {
         cleanup();
         try {
-            GatewayInfo gatewayInfo = event.getAuthorizedCloudUser().getGateway();
             if (gatewayInfo == null) {
                 throw new ConfigurationException("Gateway info is missing");
             }
@@ -66,19 +76,19 @@ public class CommandsConsumer {
                     new MessageConsumer(channel, messageProcessorFactory, gatewayInfo.getQueueOut())
             );
             log.info("Subscribed to queue {}", gatewayInfo.getQueueIn());
+            return true;
         } catch (ConfigurationException exception) {
             log.error("Failed to configure rabbitmq connection: {}", exception.getMessage());
         }
+        return false;
     }
 
     @PreDestroy
     public void cleanup() throws IOException, TimeoutException {
-        if (channel != null) {
+        if (channel != null && channel.isOpen()) {
             channel.basicCancel(CONSUMER_TAG);
-            if (channel.isOpen()) {
-                channel.close();
-                log.warn("Channel were closed");
-            }
+            channel.close();
+            log.warn("Channel were closed");
         }
 
         if (connection != null && connection.isOpen()) {
@@ -88,7 +98,7 @@ public class CommandsConsumer {
     }
 
     private ConnectionFactory getConnectionFactory(GatewayInfo gatewayInfo) throws ConfigurationException {
-        CloudInfo cloudInfo = configurationService.getCloudInfo();
+        CloudAuthInfo cloudInfo = configurationService.getCloudAuthInfo();
         if (cloudInfo == null) {
             throw new ConfigurationException("Cloud info missing");
         }
