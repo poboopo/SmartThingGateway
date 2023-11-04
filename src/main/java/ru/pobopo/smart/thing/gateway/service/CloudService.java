@@ -2,24 +2,18 @@ package ru.pobopo.smart.thing.gateway.service;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
 import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
-import org.apache.hc.core5.http.ParseException;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.event.AuthorizedEvent;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.model.AuthorizedCloudUser;
@@ -34,12 +28,15 @@ public class CloudService {
 
     private final ConfigurationService configurationService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final RestTemplate restTemplate;
+
     private AuthorizedCloudUser authorizedCloudUser;
 
     @Autowired
-    public CloudService(ConfigurationService configurationService, ApplicationEventPublisher applicationEventPublisher) {
+    public CloudService(ConfigurationService configurationService, ApplicationEventPublisher applicationEventPublisher, RestTemplate restTemplate) {
         this.configurationService = configurationService;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.restTemplate = restTemplate;
     }
 
     public AuthorizedCloudUser getAuthorizedCloudUser() throws AccessDeniedException {
@@ -74,52 +71,28 @@ public class CloudService {
             return null;
         }
 
-        final HttpGet httpGet = new HttpGet(
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(TOKEN_HEADER, cloudInfo.getToken());
+        HttpEntity<String> entity = new HttpEntity<>(
+                "body",
+                headers
+        );
+
+        ResponseEntity<T> response = restTemplate.exchange(
                 String.format(
                         "http://%s:%s/%s",
                         cloudInfo.getCloudIp(),
                         cloudInfo.getCloudPort(),
                         path.length() > 0 && path.charAt(0) == '/' ? path.substring(1) : path
-                )
+                ),
+                HttpMethod.GET,
+                entity,
+                tClass
         );
-        httpGet.setHeader(TOKEN_HEADER, cloudInfo.getToken());
 
-        HttpClientBuilder builder = HttpClientBuilder.create();
-        builder.setDefaultRequestConfig(getConfigRequest());
-        builder.setConnectionManager(getConnectionManager());
-
-        log.info("Sending GET request to {}", httpGet.getPath());
-        try (CloseableHttpClient httpClient = builder.build(); CloseableHttpResponse response = httpClient.execute(httpGet)) {
-            String responseBody = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-            if (response.getCode() >= 200 && response.getCode() <= 300) {
-                log.info("Got response: {}", responseBody);
-                return objectMapper.readValue(responseBody, tClass);
-            }
-            if (response.getCode() == 403) {
-                throw new AccessDeniedException("Failed to authorize in cloud service");
-            }
-            log.error("Request to {} failed: [{}] {}", path, response.getCode(), responseBody);
-        } catch (IOException | ParseException e) {
-            throw new RuntimeException(e);
+        if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
+            throw new AccessDeniedException("Failed to authorize in cloud service");
         }
-        return null;
-    }
-
-    private RequestConfig getConfigRequest() {
-        return RequestConfig.custom()
-            .setConnectionRequestTimeout(5, TimeUnit.SECONDS)
-            .build();
-    }
-
-    private BasicHttpClientConnectionManager getConnectionManager() {
-        ConnectionConfig config = ConnectionConfig.custom()
-            .setConnectTimeout(5, TimeUnit.SECONDS)
-            .setSocketTimeout(10, TimeUnit.SECONDS)
-            .build();
-
-        BasicHttpClientConnectionManager cm = new BasicHttpClientConnectionManager();
-        cm.setConnectionConfig(config);
-
-        return cm;
+        return response.getBody();
     }
 }
