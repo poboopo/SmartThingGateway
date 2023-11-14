@@ -39,6 +39,10 @@ public class CloudService {
         this.restTemplate = restTemplate;
     }
 
+    public void clearAuthorization() {
+        this.authorizedCloudUser = null;
+    }
+
     public AuthorizedCloudUser getAuthorizedCloudUser() throws AccessDeniedException {
         if (authorizedCloudUser == null) {
             log.info("AuthorizedCloudUser is null, trying to auth");
@@ -63,7 +67,7 @@ public class CloudService {
         }
 
         CloudAuthInfo cloudInfo = configurationService.getCloudAuthInfo();
-        if (cloudInfo == null) {
+        if (cloudInfo == null || StringUtils.isBlank(cloudInfo.getToken())) {
             return null;
         }
         if (StringUtils.isBlank(cloudInfo.getCloudIp())) {

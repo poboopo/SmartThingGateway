@@ -20,7 +20,7 @@ public class DeviceLoggerMessage {
             return deviceLoggerMessage;
         }
 
-        String[] splited = message.split("[$]");
+        String[] splited = message.split("_&_*");
         if (splited.length != 5) {
             return deviceLoggerMessage;
         }

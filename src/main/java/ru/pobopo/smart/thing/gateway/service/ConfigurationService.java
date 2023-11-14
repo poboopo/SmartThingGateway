@@ -74,8 +74,8 @@ public class ConfigurationService {
     }
 
     private void writeCloudInfoToProperties() {
-        properties.setProperty(TOKEN_PROPERTY, cloudInfo.getToken());
-        properties.setProperty(CCLOUD_IP_PROPERTY, cloudInfo.getCloudIp());
+        properties.setProperty(TOKEN_PROPERTY, cloudInfo.getToken() == null ? "" : cloudInfo.getToken());
+        properties.setProperty(CCLOUD_IP_PROPERTY, cloudInfo.getCloudIp() == null ? "" : cloudInfo.getCloudIp());
         properties.setProperty(CLOUD_PORT_PROPERTY, String.valueOf(cloudInfo.getCloudPort()));
     }
 

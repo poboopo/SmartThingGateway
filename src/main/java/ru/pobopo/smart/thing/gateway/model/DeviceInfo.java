@@ -15,7 +15,6 @@ public class DeviceInfo {
     private String ip;
     private String type;
     private String name;
-    private DeviceFullInfo fullInfo;
 
     public DeviceInfo(String ip,  String name) {
         this.ip = ip;
