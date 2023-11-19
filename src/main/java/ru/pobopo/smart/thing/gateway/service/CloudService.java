@@ -18,13 +18,12 @@ import ru.pobopo.smart.thing.gateway.event.AuthorizedEvent;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.model.AuthorizedCloudUser;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
+import ru.pobopo.smart.thing.gateway.model.GatewayConfig;
 
 @Component
 @Slf4j
 public class CloudService {
     private static final String TOKEN_HEADER = "SmartThing-Token-Gateway";
-    private final ObjectMapper objectMapper = new ObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     private final ConfigurationService configurationService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -58,6 +57,10 @@ public class CloudService {
             applicationEventPublisher.publishEvent(new AuthorizedEvent(this, authorizedCloudUser));
         }
         return authorizedCloudUser;
+    }
+
+    public GatewayConfig getGatewayConfig() throws AccessDeniedException {
+        return basicGetRequest("/gateway/management/config", GatewayConfig.class);
     }
 
     @Nullable

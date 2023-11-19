@@ -12,13 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.event.*;
+import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
+import ru.pobopo.smart.thing.gateway.model.GatewayConfig;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
 import ru.pobopo.smart.thing.gateway.rabbitmq.MessageConsumer;
 import ru.pobopo.smart.thing.gateway.rabbitmq.MessageProcessorFactory;
 import ru.pobopo.smart.thing.gateway.rabbitmq.RabbitExceptionHandler;
-import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
 
 @Component
 @Slf4j
@@ -28,6 +29,7 @@ public class RabbitConnectionService {
     private final MessageProcessorFactory messageProcessorFactory;
     private final RabbitExceptionHandler exceptionHandler;
     private final ConfigurationService configurationService;
+    private final CloudService cloudService;
 
     private Connection connection;
     private Channel channel;
@@ -36,11 +38,13 @@ public class RabbitConnectionService {
     public RabbitConnectionService(
         MessageProcessorFactory messageProcessorFactory,
         RabbitExceptionHandler exceptionHandler,
-        ConfigurationService configurationService
+        ConfigurationService configurationService,
+        CloudService cloudService
     ) {
         this.messageProcessorFactory = messageProcessorFactory;
         this.exceptionHandler = exceptionHandler;
         this.configurationService = configurationService;
+        this.cloudService = cloudService;
     }
 
     public boolean isConnected() {
@@ -65,20 +69,28 @@ public class RabbitConnectionService {
                 throw new ConfigurationException("Gateway info is missing");
             }
 
-            connection = getConnectionFactory(gatewayInfo).newConnection();
+            GatewayConfig config = cloudService.getGatewayConfig();
+            if (config == null) {
+                throw new ConfigurationException("Gateway config is missing");
+            }
+
+            log.info("Using gateway config: {}", config);
+
+            connection = getConnectionFactory(gatewayInfo, config).newConnection();
             this.channel = connection.createChannel();
-            log.info("Connected to rabbit");
+            log.info("Connected to rabbit message broker");
 
             channel.basicConsume(
-                    gatewayInfo.getQueueIn(),
+                    config.getQueueIn(),
                     true,
                     CONSUMER_TAG,
-                    new MessageConsumer(channel, messageProcessorFactory, gatewayInfo.getQueueOut())
+                    new MessageConsumer(channel, messageProcessorFactory, config.getQueueOut())
             );
-            log.info("Subscribed to queue {}", gatewayInfo.getQueueIn());
             return true;
         } catch (ConfigurationException exception) {
             log.error("Failed to configure rabbitmq connection: {}", exception.getMessage());
+        } catch (AccessDeniedException e) {
+            log.error("Failed to authenticate!");
         }
         return false;
     }
@@ -97,14 +109,15 @@ public class RabbitConnectionService {
         }
     }
 
-    private ConnectionFactory getConnectionFactory(GatewayInfo gatewayInfo) throws ConfigurationException {
+    private ConnectionFactory getConnectionFactory(GatewayInfo gatewayInfo, GatewayConfig gatewayConfig) throws ConfigurationException {
         CloudAuthInfo cloudInfo = configurationService.getCloudAuthInfo();
         if (cloudInfo == null) {
             throw new ConfigurationException("Cloud info missing");
         }
 
         String token = cloudInfo.getToken();
-        String brokerIp = cloudInfo.getCloudIp();
+        String brokerIp = gatewayConfig.getBrokerIp();
+        int port = gatewayConfig.getBrokerPort();
 
         if (StringUtils.isBlank(token)) {
             throw new ConfigurationException("Token is missing");
@@ -115,9 +128,17 @@ public class RabbitConnectionService {
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(brokerIp);
+        factory.setPort(port);
         factory.setUsername(gatewayInfo.getId());
         factory.setPassword(token);
         factory.setExceptionHandler(exceptionHandler);
+
+        log.info(
+                "Message broker connection factory: host={} port={} username={}",
+                factory.getHost(),
+                factory.getPort(),
+                factory.getUsername()
+        );
 
         return factory;
     }
