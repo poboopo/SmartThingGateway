@@ -1,13 +1,7 @@
 package ru.pobopo.smart.thing.gateway.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.config.ConnectionConfig;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.*;
@@ -18,7 +12,7 @@ import ru.pobopo.smart.thing.gateway.event.AuthorizedEvent;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.model.AuthorizedCloudUser;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
-import ru.pobopo.smart.thing.gateway.model.GatewayConfig;
+import ru.pobopo.smart.thing.gateway.model.GatewayCloudConfig;
 
 @Component
 @Slf4j
@@ -59,8 +53,8 @@ public class CloudService {
         return authorizedCloudUser;
     }
 
-    public GatewayConfig getGatewayConfig() throws AccessDeniedException {
-        return basicGetRequest("/gateway/management/config", GatewayConfig.class);
+    public GatewayCloudConfig getGatewayConfig() throws AccessDeniedException {
+        return basicGetRequest("/gateway/management/config", GatewayCloudConfig.class);
     }
 
     @Nullable

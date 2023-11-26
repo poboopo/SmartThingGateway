@@ -1,33 +1,17 @@
 package ru.pobopo.smart.thing.gateway.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
-import org.apache.hc.client5.http.config.ConnectionConfig;
-import org.apache.hc.client5.http.config.RequestConfig;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
-import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
-import ru.pobopo.smart.thing.gateway.model.DeviceFullInfo;
 import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
 import ru.pobopo.smart.thing.gateway.rabbitmq.message.DeviceRequestMessage;
@@ -35,27 +19,26 @@ import ru.pobopo.smart.thing.gateway.rabbitmq.message.DeviceRequestMessage;
 @Component
 @Slf4j
 public class DeviceService {
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
     @Autowired
     private RestTemplate restTemplate;
 
-
-    public DeviceFullInfo getDeviceFullInfo(DeviceInfo info) throws Exception {
-        DeviceResponse response = sendRequest(
-                new DeviceRequestMessage(
-                        info.getIp(),
-                        "/info/system",
-                        "GET",
-                        null, null
-                )
+    public Map<String, Object> getConfigValues(DeviceInfo info) {
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                String.format("http://%s/config", info.getIp()),
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
         );
-        if (response.getCode() != 200) {
-            log.error("Failed to load device full info. Code {}, response {}", response.getCode(), response.getCode());
-            return null;
-        }
-        return objectMapper.readValue(response.getBody(), DeviceFullInfo.class);
+        return response.getBody();
+    }
+
+    public boolean addConfigValues(DeviceInfo info, Map<String, Object> values) {
+        ResponseEntity<Void> response = restTemplate.postForEntity(
+                String.format("http://%s/config/save", info.getIp()),
+                values,
+                Void.class
+        );
+        return response.getStatusCode() == HttpStatus.OK;
     }
 
     public DeviceResponse sendRequest(DeviceRequestMessage requestMessage) throws Exception {

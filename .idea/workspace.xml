@@ -4,22 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/SmartThingGatewayApp.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/config/WebSocketConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/jobs/DeviceLogsJob.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/jobs/DeviceSearchJob.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceInfo.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceLoggerMessage.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/BackgroundJobsService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/logback_remove_from_here.xml" afterDir="false" />
+    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="added notification send">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/NotificationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/NotificationController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/jobs/DeviceSearchJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/jobs/DeviceSearchJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/Notification.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/NotificationService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,28 +20,49 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="Interface" />
+        <option value="Enum" />
         <option value="Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
   <component name="ProjectId" id="2UXKhDKgEoextQoE84fmpcl2iZs" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.SmartThingGatewayApp.executor": "Debug",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/home/pobopo/projects/smart_thing/smart_thing_gateway",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
-}</component>
+}]]></component>
   <component name="RunManager">
     <configuration name="SmartThingGatewayApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <envs>
+        <env name="BROKER_IP" value="localhost" />
+        <env name="CLOUD_URL" value="http://localhost:8080" />
+      </envs>
       <option name="MAIN_CLASS_NAME" value="ru.pobopo.smart.thing.gateway.SmartThingGatewayApp" />
       <module name="smart_thing_gateway" />
       <extension name="coverage">
@@ -66,6 +78,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="Application.SmartThingGatewayApp" />
+        <item itemvalue="Application.SmartThingGatewayApp" />
       </list>
     </recent_temporary>
   </component>
@@ -78,6 +91,140 @@
       <option name="presentableId" value="Default" />
       <updated>1693080601588</updated>
     </task>
+    <task id="LOCAL-00001" summary="simple local gateway for SmartThing(tm)">
+      <option name="closed" value="true" />
+      <created>1693512109816</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1693512109816</updated>
+    </task>
+    <task id="LOCAL-00002" summary="added incoming commands processor; added devices search cache">
+      <option name="closed" value="true" />
+      <created>1695146457549</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1695146457549</updated>
+    </task>
+    <task id="LOCAL-00003" summary="implemented DeviceRequestMessageProcessor; added BackgroundJobsConfig">
+      <option name="closed" value="true" />
+      <created>1695235742931</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1695235742931</updated>
+    </task>
+    <task id="LOCAL-00004" summary="fixed response generation">
+      <option name="closed" value="true" />
+      <created>1695325777343</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1695325777343</updated>
+    </task>
+    <task id="LOCAL-00005" summary="loading full device info on search command">
+      <option name="closed" value="true" />
+      <created>1695482048708</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1695482048708</updated>
+    </task>
+    <task id="LOCAL-00006" summary="clean up">
+      <option name="closed" value="true" />
+      <created>1695482064215</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1695482064215</updated>
+    </task>
+    <task id="LOCAL-00007" summary="added status controller">
+      <option name="closed" value="true" />
+      <created>1697900206406</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1697900206406</updated>
+    </task>
+    <task id="LOCAL-00008" summary="added logout command processing">
+      <option name="closed" value="true" />
+      <created>1698616279596</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1698616279596</updated>
+    </task>
+    <task id="LOCAL-00009" summary="fixed rabbitmq connection establishment">
+      <option name="closed" value="true" />
+      <created>1698783197352</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1698783197352</updated>
+    </task>
+    <task id="LOCAL-00010" summary="added rest template">
+      <option name="closed" value="true" />
+      <created>1699124968736</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1699124968736</updated>
+    </task>
+    <task id="LOCAL-00011" summary="authorization fixes">
+      <option name="closed" value="true" />
+      <created>1699992127502</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1699992127502</updated>
+    </task>
+    <task id="LOCAL-00012" summary="added gateway config">
+      <option name="closed" value="true" />
+      <created>1700425245268</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1700425245268</updated>
+    </task>
+    <task id="LOCAL-00013" summary="added notification send">
+      <option name="closed" value="true" />
+      <created>1701021017715</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1701021017715</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-core" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-websocket" />
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-messaging" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.boot:spring-boot" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-webmvc" />
+    <option featureType="dependencySupport" implementationName="java:org.projectlombok:lombok" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="simple local gateway for SmartThing(tm)" />
+    <MESSAGE value="added incoming commands processor; added devices search cache" />
+    <MESSAGE value="implemented DeviceRequestMessageProcessor; added BackgroundJobsConfig" />
+    <MESSAGE value="fixed response generation" />
+    <MESSAGE value="loading full device info on search command" />
+    <MESSAGE value="clean up" />
+    <MESSAGE value="added status controller" />
+    <MESSAGE value="added logout command processing" />
+    <MESSAGE value="fixed rabbitmq connection establishment" />
+    <MESSAGE value="added rest template" />
+    <MESSAGE value="authorization fixes" />
+    <MESSAGE value="added gateway config" />
+    <MESSAGE value="added notification send" />
+    <option name="LAST_COMMIT_MESSAGE" value="added notification send" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

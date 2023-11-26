@@ -28,6 +28,10 @@ public class DeviceInfo {
         this.name = name;
     }
 
+    public boolean isEmpty() {
+        return StringUtils.isEmpty(ip) || StringUtils.isEmpty(name);
+    }
+
     @Nullable
     public static DeviceInfo fromMulticastMessage(String message) {
         if (StringUtils.isBlank(message)) {

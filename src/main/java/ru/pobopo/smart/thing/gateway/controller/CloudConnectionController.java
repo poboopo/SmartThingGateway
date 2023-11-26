@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
-import ru.pobopo.smart.thing.gateway.service.RabbitConnectionService;
+import ru.pobopo.smart.thing.gateway.service.MessageBrokerService;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -14,22 +14,22 @@ import java.util.concurrent.TimeoutException;
 @RestController
 @RequestMapping("/connection")
 public class CloudConnectionController {
-    private final RabbitConnectionService connectionService;
+    private final MessageBrokerService messageService;
     private final CloudService cloudService;
 
     @Autowired
-    public CloudConnectionController(RabbitConnectionService connectionService, CloudService cloudService) {
-        this.connectionService = connectionService;
+    public CloudConnectionController(MessageBrokerService messageService, CloudService cloudService) {
+        this.messageService = messageService;
         this.cloudService = cloudService;
     }
 
     @GetMapping("/connected")
     public boolean isConnected() {
-        return connectionService.isConnected();
+        return messageService.isConnected();
     }
 
     @PutMapping("/connect")
     public boolean connect() throws AccessDeniedException, IOException, TimeoutException {
-        return connectionService.connect(Objects.requireNonNull(cloudService.getAuthorizedCloudUser()).getGateway());
+        return messageService.connect(Objects.requireNonNull(cloudService.getAuthorizedCloudUser()).getGateway());
     }
 }
