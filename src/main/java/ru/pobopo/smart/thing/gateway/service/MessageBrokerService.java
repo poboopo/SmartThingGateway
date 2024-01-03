@@ -1,21 +1,25 @@
 package ru.pobopo.smart.thing.gateway.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import jakarta.annotation.PreDestroy;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
+
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
 import ru.pobopo.smart.thing.gateway.event.*;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
-import ru.pobopo.smart.thing.gateway.model.GatewayConfig;
+import ru.pobopo.smart.thing.gateway.model.GatewayCloudConfig;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
 import ru.pobopo.smart.thing.gateway.rabbitmq.MessageConsumer;
 import ru.pobopo.smart.thing.gateway.rabbitmq.MessageProcessorFactory;
@@ -23,19 +27,23 @@ import ru.pobopo.smart.thing.gateway.rabbitmq.RabbitExceptionHandler;
 
 @Component
 @Slf4j
-public class RabbitConnectionService {
+public class MessageBrokerService {
     private static final String CONSUMER_TAG = "gateway_commands_consumer";
+
+    private ObjectMapper mapper = new ObjectMapper();
 
     private final MessageProcessorFactory messageProcessorFactory;
     private final RabbitExceptionHandler exceptionHandler;
     private final ConfigurationService configurationService;
     private final CloudService cloudService;
 
+    @Getter
     private Connection connection;
     private Channel channel;
+    private GatewayCloudConfig cloudConfig;
 
     @Autowired
-    public RabbitConnectionService(
+    public MessageBrokerService(
         MessageProcessorFactory messageProcessorFactory,
         RabbitExceptionHandler exceptionHandler,
         ConfigurationService configurationService,
@@ -49,6 +57,40 @@ public class RabbitConnectionService {
 
     public boolean isConnected() {
         return channel != null && channel.isOpen();
+    }
+
+    public boolean sendNotification(SendNotificationRequest notificationRequest) {
+        if (notificationRequest == null) {
+            return false;
+        }
+
+        if (isConnected()) {
+            log.warn("Not connected to the cloud!");
+            return false;
+        }
+
+        if (cloudConfig == null || StringUtils.isEmpty(cloudConfig.getQueueNotification())) {
+            log.warn("Cloud config is empty or notification queue is not set!");
+            return false;
+        }
+
+        try {
+            String payload = mapper.writeValueAsString(notificationRequest);
+
+            Channel notifyChannel = connection.createChannel();
+            notifyChannel.basicPublish(
+                    "",
+                    cloudConfig.getQueueNotification(),
+                    null,
+                    payload.getBytes()
+            );
+            notifyChannel.close();
+            log.debug("Notification sent in queue {}", cloudConfig.getQueueNotification());
+            return true;
+        } catch (Exception exception) {
+            log.error("Failed to send message to notification queue", exception);
+            return false;
+        }
     }
 
     @EventListener
@@ -69,22 +111,22 @@ public class RabbitConnectionService {
                 throw new ConfigurationException("Gateway info is missing");
             }
 
-            GatewayConfig config = cloudService.getGatewayConfig();
-            if (config == null) {
+            cloudConfig = cloudService.getGatewayConfig();
+            if (cloudConfig == null) {
                 throw new ConfigurationException("Gateway config is missing");
             }
 
-            log.info("Using gateway config: {}", config);
+            log.info("Using gateway config: {}", cloudConfig);
 
-            connection = getConnectionFactory(gatewayInfo, config).newConnection();
-            this.channel = connection.createChannel();
+            connection = getConnectionFactory(gatewayInfo, cloudConfig).newConnection();
             log.info("Connected to rabbit message broker");
 
+            channel = connection.createChannel();
             channel.basicConsume(
-                    config.getQueueIn(),
+                    cloudConfig.getQueueIn(),
                     true,
                     CONSUMER_TAG,
-                    new MessageConsumer(channel, messageProcessorFactory, config.getQueueOut())
+                    new MessageConsumer(channel, messageProcessorFactory, cloudConfig.getQueueOut())
             );
             return true;
         } catch (ConfigurationException exception) {
@@ -109,15 +151,15 @@ public class RabbitConnectionService {
         }
     }
 
-    private ConnectionFactory getConnectionFactory(GatewayInfo gatewayInfo, GatewayConfig gatewayConfig) throws ConfigurationException {
+    private ConnectionFactory getConnectionFactory(GatewayInfo gatewayInfo, GatewayCloudConfig gatewayCloudConfig) throws ConfigurationException {
         CloudAuthInfo cloudInfo = configurationService.getCloudAuthInfo();
         if (cloudInfo == null) {
             throw new ConfigurationException("Cloud info missing");
         }
 
         String token = cloudInfo.getToken();
-        String brokerIp = gatewayConfig.getBrokerIp();
-        int port = gatewayConfig.getBrokerPort();
+        String brokerIp = gatewayCloudConfig.getBrokerIp();
+        int port = gatewayCloudConfig.getBrokerPort();
 
         if (StringUtils.isBlank(token)) {
             throw new ConfigurationException("Token is missing");
