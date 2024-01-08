@@ -23,7 +23,7 @@ public class CloudConnectionController {
         this.cloudService = cloudService;
     }
 
-    @GetMapping("/connected")
+    @GetMapping("/status")
     public boolean isConnected() {
         return messageService.isConnected();
     }

@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
-import ru.pobopo.smart.thing.gateway.rabbitmq.message.DeviceRequestMessage;
+import ru.pobopo.smart.thing.gateway.stomp.message.DeviceRequestMessage;
 
 @Component
 @Slf4j

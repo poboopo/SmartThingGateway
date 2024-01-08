@@ -1,4 +1,4 @@
-package ru.pobopo.smart.thing.gateway.rabbitmq.message;
+package ru.pobopo.smart.thing.gateway.stomp.message;
 
 import java.util.Map;
 import lombok.Data;
