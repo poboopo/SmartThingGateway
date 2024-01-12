@@ -12,12 +12,12 @@ import ru.pobopo.smart.thing.gateway.event.AuthorizedEvent;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.model.AuthorizedCloudUser;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
-import ru.pobopo.smart.thing.gateway.model.GatewayCloudConfig;
+import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 
 @Component
 @Slf4j
 public class CloudService {
-    private static final String TOKEN_HEADER = "SmartThing-Token-Gateway";
+    public static final String AUTH_TOKEN_HEADER = "SmartThing-Token-Gateway";
 
     private final ConfigurationService configurationService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -45,7 +45,7 @@ public class CloudService {
     }
 
     public AuthorizedCloudUser authorize() throws AccessDeniedException {
-        authorizedCloudUser = basicGetRequest("/auth", AuthorizedCloudUser.class);
+        authorizedCloudUser = basicRequest(HttpMethod.GET, "/auth", null, AuthorizedCloudUser.class);
         if (authorizedCloudUser != null) {
             log.info("Successfully authorized! {}", authorizedCloudUser);
             applicationEventPublisher.publishEvent(new AuthorizedEvent(this, authorizedCloudUser));
@@ -53,40 +53,37 @@ public class CloudService {
         return authorizedCloudUser;
     }
 
-    public GatewayCloudConfig getGatewayConfig() throws AccessDeniedException {
-        return basicGetRequest("/gateway/management/config", GatewayCloudConfig.class);
+    public void sendResponse(MessageResponse response) throws AccessDeniedException {
+        basicRequest(
+                HttpMethod.POST,
+                "/gateway/request/response",
+                response,
+                Void.class
+        );
     }
 
     @Nullable
-    private <T> T basicGetRequest(String path, Class<T> tClass) throws AccessDeniedException {
+    private <T, P> T basicRequest(HttpMethod method, String path, P payload, Class<T> tClass) throws AccessDeniedException {
         if (path == null) {
             path = "";
         }
 
         CloudAuthInfo cloudInfo = configurationService.getCloudAuthInfo();
         if (cloudInfo == null || StringUtils.isBlank(cloudInfo.getToken())) {
-            return null;
-        }
-        if (StringUtils.isBlank(cloudInfo.getCloudIp())) {
-            log.error("Cloud ip is blank!");
+            log.error("No cloud token");
             return null;
         }
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(TOKEN_HEADER, cloudInfo.getToken());
-        HttpEntity<String> entity = new HttpEntity<>(
-                "body",
+        headers.add(AUTH_TOKEN_HEADER, cloudInfo.getToken());
+        HttpEntity<P> entity = new HttpEntity<>(
+                payload,
                 headers
         );
 
         ResponseEntity<T> response = restTemplate.exchange(
-                String.format(
-                        "http://%s:%s/%s",
-                        cloudInfo.getCloudIp(),
-                        cloudInfo.getCloudPort(),
-                        path.length() > 0 && path.charAt(0) == '/' ? path.substring(1) : path
-                ),
-                HttpMethod.GET,
+                buildUrl(cloudInfo, path),
+                method,
                 entity,
                 tClass
         );
@@ -95,5 +92,14 @@ public class CloudService {
             throw new AccessDeniedException("Failed to authorize in cloud service");
         }
         return response.getBody();
+    }
+
+    private String buildUrl(CloudAuthInfo cloudInfo, String path) {
+        return String.format(
+                "http://%s:%s/%s",
+                cloudInfo.getCloudIp(),
+                cloudInfo.getCloudPort(),
+                !path.isEmpty() && path.charAt(0) == '/' ? path.substring(1) : path
+        );
     }
 }

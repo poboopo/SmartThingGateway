@@ -1,8 +1,10 @@
-package ru.pobopo.smart.thing.gateway.rabbitmq.message;
+package ru.pobopo.smart.thing.gateway.stomp.message;
 
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
+@Getter
 public enum GatewayMessageType {
     DEVICE_REQUEST("device_request"),
     GATEWAY_COMMAND("gateway_command");
@@ -10,10 +12,6 @@ public enum GatewayMessageType {
     private String type;
     GatewayMessageType(String type) {
         this.type = type;
-    }
-
-    public String getType() {
-        return type;
     }
 
     @Nullable

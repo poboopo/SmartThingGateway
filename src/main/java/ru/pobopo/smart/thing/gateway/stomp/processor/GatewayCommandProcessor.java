@@ -1,4 +1,4 @@
-package ru.pobopo.smart.thing.gateway.rabbitmq.processor;
+package ru.pobopo.smart.thing.gateway.stomp.processor;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -8,8 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.jobs.DeviceSearchJob;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
-import ru.pobopo.smart.thing.gateway.rabbitmq.message.GatewayCommand;
-import ru.pobopo.smart.thing.gateway.rabbitmq.message.MessageResponse;
+import ru.pobopo.smart.thing.gateway.stomp.message.GatewayCommand;
+import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
 import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
 
@@ -29,8 +29,8 @@ public class GatewayCommandProcessor implements MessageProcessor {
     }
 
     @Override
-    public MessageResponse process(String message) throws Exception {
-        GatewayCommand gatewayCommand = objectMapper.readValue(message, GatewayCommand.class);
+    public MessageResponse process(Object payload) throws Exception {
+        GatewayCommand gatewayCommand = (GatewayCommand) payload;
 
         MessageResponse response = new MessageResponse();
         response.setRequestId(gatewayCommand.getRequestId());

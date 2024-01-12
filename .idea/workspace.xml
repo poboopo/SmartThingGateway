@@ -4,13 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="added notification send">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/NotificationController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/NotificationController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/jobs/DeviceSearchJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/jobs/DeviceSearchJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/Notification.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/NotificationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/NotificationService.java" afterDir="false" />
+    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="cloud connection rework">
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/CustomStompSessionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/CustomStompSessionHandler.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,6 +41,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.SmartThingGatewayApp.executor": "Debug",
+    "Maven.smart_thing_gateway [clean,package].executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
@@ -59,6 +55,8 @@
 }]]></component>
   <component name="RunManager">
     <configuration name="SmartThingGatewayApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="openjdk-21" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
       <envs>
         <env name="BROKER_IP" value="localhost" />
         <env name="CLOUD_URL" value="http://localhost:8080" />
@@ -195,7 +193,31 @@
       <option name="project" value="LOCAL" />
       <updated>1701021017715</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="cloud connection rework">
+      <option name="closed" value="true" />
+      <created>1704736761407</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1704736761407</updated>
+    </task>
+    <task id="LOCAL-00015" summary="cloud connection rework">
+      <option name="closed" value="true" />
+      <created>1704736875561</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1704736875561</updated>
+    </task>
+    <task id="LOCAL-00016" summary="cloud connection rework">
+      <option name="closed" value="true" />
+      <created>1704737617404</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1704737617404</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -221,7 +243,8 @@
     <MESSAGE value="authorization fixes" />
     <MESSAGE value="added gateway config" />
     <MESSAGE value="added notification send" />
-    <option name="LAST_COMMIT_MESSAGE" value="added notification send" />
+    <MESSAGE value="cloud connection rework" />
+    <option name="LAST_COMMIT_MESSAGE" value="cloud connection rework" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

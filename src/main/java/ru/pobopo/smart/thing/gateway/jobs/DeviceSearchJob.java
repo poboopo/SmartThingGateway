@@ -14,6 +14,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.cache.ConcurrentSetCache;
@@ -24,12 +25,15 @@ import ru.pobopo.smart.thing.gateway.service.DeviceService;
 @Slf4j
 public class DeviceSearchJob implements BackgroundJob {
     // TODO MOVE ALL TO ENV
-    // todo implement push notifications in device lib
     public static final String DEVICES_SEARCH_TOPIC = "/devices/search";
-    private final static String gatewayIp = "192.168.2.81";
     private final static String GATEWAY_CONFIG_FIELD = "gtw";
     private final static String GROUP = "224.1.1.1";
     private final static int PORT = 7778;
+
+    @Value("${server.ip}")
+    private String gatewayIp;
+    @Value("${server.port}")
+    private String gatewayPort;
 
     private final ConcurrentSetCache<DeviceInfo> cache = new ConcurrentSetCache<>(5, ChronoUnit.SECONDS);
     private final Set<String> foundIps = ConcurrentHashMap.newKeySet();
@@ -66,18 +70,18 @@ public class DeviceSearchJob implements BackgroundJob {
                 s.receive(packet);
 
                 String message = new String(
-                    packet.getData(),
-                    packet.getOffset(),
-                    packet.getLength(),
-                    StandardCharsets.UTF_8
+                        packet.getData(),
+                        packet.getOffset(),
+                        packet.getLength(),
+                        StandardCharsets.UTF_8
                 );
 
                 DeviceInfo deviceInfo = DeviceInfo.fromMulticastMessage(message);
 
                 if (deviceInfo != null) {
                     messagingTemplate.convertAndSend(
-                        DEVICES_SEARCH_TOPIC,
-                        deviceInfo
+                            DEVICES_SEARCH_TOPIC,
+                            deviceInfo
                     );
                     setupDevice(deviceInfo);
                     cache.put(deviceInfo);
@@ -113,9 +117,9 @@ public class DeviceSearchJob implements BackgroundJob {
         new Thread(() -> {
             try {
                 Map<String, Object> config = deviceService.getConfigValues(info);
-                if (config == null || !StringUtils.equals((String) config.get(GATEWAY_CONFIG_FIELD), gatewayIp)) {
+                if (config == null || !StringUtils.isNotBlank((String) config.get(GATEWAY_CONFIG_FIELD))) {
                     log.debug("Setting up device");
-                    boolean res = deviceService.addConfigValues(info, Map.of(GATEWAY_CONFIG_FIELD, gatewayIp));
+                    boolean res = deviceService.addConfigValues(info, Map.of(GATEWAY_CONFIG_FIELD, gatewayIp + ":" + gatewayPort));
                     if (!res) {
                         throw new Exception("Failed to save device config");
                     }
