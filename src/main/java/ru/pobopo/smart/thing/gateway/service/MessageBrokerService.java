@@ -16,6 +16,7 @@ import ru.pobopo.smart.thing.gateway.event.*;
 import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
+import ru.pobopo.smart.thing.gateway.model.Notification;
 import ru.pobopo.smart.thing.gateway.stomp.CustomStompSessionHandler;
 
 @Component
@@ -25,6 +26,7 @@ public class MessageBrokerService {
     private final WebSocketStompClient stompClient;
     private final ConfigurationService configurationService;
     private final CustomStompSessionHandler sessionHandler;
+    private final CloudService cloudService;
 
     private StompSession stompSession;
 
@@ -42,7 +44,12 @@ public class MessageBrokerService {
             return false;
         }
 
-        //todo send notification
+        try {
+            cloudService.notification(notificationRequest);
+            return true;
+        } catch (Exception exception) {
+            log.error("Failed to send notification in cloud: {}", exception.getMessage(), exception);
+        }
 
         return false;
     }
@@ -75,11 +82,10 @@ public class MessageBrokerService {
             WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
             headers.add(CloudService.AUTH_TOKEN_HEADER, authInfo.getToken());
             stompSession = stompClient.connectAsync(url, headers, sessionHandler).get();
-
             return true;
         } catch (ConfigurationException exception) {
             log.error("Failed to configure rabbitmq connection: {}", exception.getMessage());
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (Exception e) {
             log.error("Failed to connect", e);
         }
         return false;

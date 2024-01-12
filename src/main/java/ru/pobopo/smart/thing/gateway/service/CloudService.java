@@ -8,10 +8,12 @@ import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
 import ru.pobopo.smart.thing.gateway.event.AuthorizedEvent;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.model.AuthorizedCloudUser;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
+import ru.pobopo.smart.thing.gateway.model.Notification;
 import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 
 @Component
@@ -56,8 +58,17 @@ public class CloudService {
     public void sendResponse(MessageResponse response) throws AccessDeniedException {
         basicRequest(
                 HttpMethod.POST,
-                "/gateway/request/response",
+                "/gateway/requests/response",
                 response,
+                Void.class
+        );
+    }
+
+    public void notification(SendNotificationRequest notification) throws AccessDeniedException {
+        basicRequest(
+                HttpMethod.POST,
+                "/gateway/requests/notification",
+                notification,
                 Void.class
         );
     }

@@ -8,4 +8,8 @@ import ru.pobopo.smart.thing.gateway.model.Notification;
 public class SendNotificationRequest {
     private DeviceInfo device;
     private Notification notification;
+
+    public SendNotificationRequest(Notification notification) {
+        this.notification = notification;
+    }
 }

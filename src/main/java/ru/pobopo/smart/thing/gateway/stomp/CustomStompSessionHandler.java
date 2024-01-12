@@ -6,8 +6,11 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
+import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
+import ru.pobopo.smart.thing.gateway.model.Notification;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
 import ru.pobopo.smart.thing.gateway.stomp.message.BaseMessage;
 import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
@@ -19,6 +22,8 @@ import java.lang.reflect.Type;
 @Slf4j
 @RequiredArgsConstructor
 public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
+    private final static String TOPIC = "/secured/queue/gateway/";
+
     @Getter
     @Setter
     private GatewayInfo gatewayInfo;
@@ -32,9 +37,8 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
 
     @Override
     public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-        String topic = "/secured/queue/gateway/";
-        log.info("Connected to cloud STOMP ws! Subscribing to topic: {}", topic);
-        session.subscribe(topic, new StompFrameHandler() {
+        log.info("Connected to cloud STOMP ws! Subscribing to topic: {}", TOPIC);
+        session.subscribe(TOPIC, new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
                 return BaseMessage.class;
@@ -66,6 +70,18 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
                 }
             }
         });
+
+
+        try {
+            cloudService.notification(
+                    new SendNotificationRequest(new Notification(
+                            "I am online!!!",
+                            "info"
+                    ))
+            );
+        } catch (AccessDeniedException e) {
+            log.error("Failed to send notification", e);
+        }
     }
 
     @Override
