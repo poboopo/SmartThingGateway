@@ -37,7 +37,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
 
         if (StringUtils.isBlank(gatewayCommand.getCommand())) {
             response.setSuccess(false);
-            response.setResponse("Command is missing!");
+            response.setError("Command is missing!");
             return response;
         }
 
@@ -53,7 +53,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
                 throw new LogoutException();
             }
             default -> {
-                response.setResponse("Unknown command");
+                response.setError("Unknown command");
                 response.setSuccess(false);
             }
         }

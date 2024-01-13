@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class DeviceFullInfo {
+    private String ip;
     private String name;
     private String version;
     private String type;

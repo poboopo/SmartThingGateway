@@ -1,0 +1,71 @@
+package ru.pobopo.smart.thing.gateway.service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import ru.pobopo.smart.thing.gateway.device.api.DeviceApi;
+import ru.pobopo.smart.thing.gateway.exception.DeviceApiException;
+import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
+import ru.pobopo.smart.thing.gateway.model.DeviceRequest;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.*;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class DeviceApiService {
+    private final List<DeviceApi> apis;
+    private final ObjectMapper objectMapper;
+
+    public Object execute(DeviceRequest request) {
+        for (DeviceApi api : apis) {
+            if (api.accept(request)) {
+                return callApi(api, request);
+            }
+        }
+        throw new DeviceApiException("Api not found for this target");
+    }
+
+    private Object callApi(DeviceApi api, DeviceRequest request) {
+        Method[] methods = api.getClass().getDeclaredMethods();
+        Method targetMethod = Arrays.stream(methods)
+                .filter((method) -> method.getName().equals(request.getMethod()))
+                .findFirst()
+                .orElseThrow(() -> new DeviceApiException(String.format(
+                        "There is no such method %s in class %s",
+                        request.getMethod(),
+                        api.getClass().getName()
+                )));
+        try {
+            log.info(
+                    "Calling api: method {} in {} (params={})",
+                    targetMethod.getName(),
+                    api.getClass().getName(),
+                    request.getParams()
+            );
+            Map<String, Object> params = request.getParams();
+            List<Object> args = new ArrayList<>();
+            for (Parameter parameter: targetMethod.getParameters()) {
+                if (parameter.getType().equals(DeviceInfo.class)) {
+                    args.add(request.getTarget());
+                } else if (parameter.getType().equals(DeviceRequest.class)) {
+                    args.add(request);
+                } else {
+                    Object value = params.getOrDefault(parameter.getName(), null);
+                    if (value == null) {
+                        args.add(null);
+                        continue;
+                    }
+                    args.add(objectMapper.convertValue(value, parameter.getType()));
+                }
+            }
+            return targetMethod.invoke(api, args.toArray());
+        } catch (Exception e) {
+            log.error("Failed to call device api", e);
+            throw new DeviceApiException(e.getMessage());
+        }
+    }
+}

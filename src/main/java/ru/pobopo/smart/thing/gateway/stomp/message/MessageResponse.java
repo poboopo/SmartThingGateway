@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class MessageResponse {
     private String requestId;
-    private String response;
+    private Object response;
+    private String error;
     private boolean success = true;
 }

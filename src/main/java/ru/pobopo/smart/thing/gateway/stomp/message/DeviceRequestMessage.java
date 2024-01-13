@@ -1,17 +1,13 @@
 package ru.pobopo.smart.thing.gateway.stomp.message;
 
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.pobopo.smart.thing.gateway.model.DeviceRequest;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class DeviceRequestMessage extends BaseMessage {
-    private String target;
-    private String path;
-    private String method;
-    private String payload;
-    private Map<String, String> headers;
+    private DeviceRequest request;
 }

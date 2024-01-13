@@ -4,13 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="cloud connection rework">
+    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="added cloud notifications">
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/DeviceApiController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/device/api/DefaultDeviceApi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/device/api/DeviceApi.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/device/api/model/Observable.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/exception/DeviceApiException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceApiService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/SmartThingGatewayApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/SmartThingGatewayApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/config/MessageProcessorConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/config/MessageProcessorConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/ErrorHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/ErrorHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/model/SendNotificationRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/model/SendNotificationRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/Notification.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/Notification.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/MessageBrokerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/MessageBrokerService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/CustomStompSessionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/CustomStompSessionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceFullInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceFullInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceInfo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/message/DeviceRequestMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/message/DeviceRequestMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/message/MessageResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/message/MessageResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/processor/DeviceRequestMessageProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/processor/DeviceRequestMessageProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/processor/GatewayCommandProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/processor/GatewayCommandProcessor.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,8 +33,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="Enum" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -232,7 +245,15 @@
       <option name="project" value="LOCAL" />
       <updated>1704737711292</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="added cloud notifications">
+      <option name="closed" value="true" />
+      <created>1705093179254</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1705093179254</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -259,7 +280,8 @@
     <MESSAGE value="added gateway config" />
     <MESSAGE value="added notification send" />
     <MESSAGE value="cloud connection rework" />
-    <option name="LAST_COMMIT_MESSAGE" value="cloud connection rework" />
+    <MESSAGE value="added cloud notifications" />
+    <option name="LAST_COMMIT_MESSAGE" value="added cloud notifications" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -1,5 +1,7 @@
 package ru.pobopo.smart.thing.gateway;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +16,11 @@ import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
 public class SmartThingGatewayApp {
     public static void main(String[] args) {
         SpringApplication.run(SmartThingGatewayApp.class, args);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Bean

@@ -60,13 +60,15 @@ public class DeviceInfo {
 
         DeviceInfo comp = (DeviceInfo) obj;
         return StringUtils.equals(comp.getIp(), getIp())
-               && StringUtils.equals(comp.getName(), getName());
+               && StringUtils.equals(comp.getName(), getName())
+                && StringUtils.equals(comp.getType(), getType());
     }
 
     @Override
     public int hashCode() {
         int hashCode = ip.hashCode();
         hashCode = 31 * hashCode + name.hashCode();
+        hashCode = 31 * hashCode + type.hashCode();
         return hashCode;
     }
 }
