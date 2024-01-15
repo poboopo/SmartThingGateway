@@ -1,11 +1,10 @@
 package ru.pobopo.smart.thing.gateway.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smart.thing.gateway.model.DeviceRequest;
+import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
 import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
 
 @RestController
@@ -15,7 +14,11 @@ public class DeviceApiController {
     private final DeviceApiService deviceApiService;
 
     @PostMapping
-    public Object callApi(@RequestBody DeviceRequest request) {
-        return deviceApiService.execute(request);
+    public ResponseEntity<String> callApi(@RequestBody DeviceRequest request) {
+        DeviceResponse result = (DeviceResponse) deviceApiService.execute(request);
+        return new ResponseEntity<>(
+                result.getBody(),
+                result.getCode()
+        );
     }
 }

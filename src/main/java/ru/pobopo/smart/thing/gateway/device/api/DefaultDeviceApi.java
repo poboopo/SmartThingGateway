@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -43,7 +44,8 @@ public class DefaultDeviceApi implements DeviceApi {
 
     @Override
     public boolean accept(DeviceRequest request) {
-        return searchJob.getRecentFoundDevices().contains(request.getTarget());
+        return searchJob.getRecentFoundDevices()
+                .stream().anyMatch((d) -> d.getIp().equals(request.getDevice().getIp()));
     }
 
     public DeviceResponse getInfo(DeviceInfo info) {
@@ -226,22 +228,23 @@ public class DefaultDeviceApi implements DeviceApi {
                     new HttpEntity<>(payload == null ? "" : payload),
                     String.class
             );
-
-            return new DeviceResponse(
-                    response.getStatusCode().value(),
+            DeviceResponse deviceResponse = new DeviceResponse(
+                    response.getStatusCode(),
                     response.getBody(),
                     response.getHeaders()
             );
+            log.info("Request finished: {}", deviceResponse);
+            return deviceResponse;
         } catch (HttpClientErrorException | HttpServerErrorException exception) {
             log.error("Request failed: {}", exception.getMessage());
             return new DeviceResponse(
-                    exception.getStatusCode().value(),
+                    exception.getStatusCode(),
                     exception.getResponseBodyAsString(),
                     exception.getResponseHeaders()
             );
         } catch (Exception exception) {
             log.error("Failed to send request {}", exception.getMessage(), exception);
-            return new DeviceResponse(-1, null, null);
+            return new DeviceResponse(HttpStatusCode.valueOf(503), null, null);
         }
     }
 

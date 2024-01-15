@@ -9,7 +9,7 @@ import java.util.Map;
 @Data
 @ToString
 public class DeviceRequest {
-    private DeviceInfo target;
+    private DeviceInfo device;
     private String method;
     private Map<String, Object> params = new HashMap<>();
 }

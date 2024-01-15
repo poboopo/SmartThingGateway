@@ -29,6 +29,17 @@ public class DeviceApiService {
         throw new DeviceApiException("Api not found for this target");
     }
 
+    private String toCaps(String camel) {
+        StringBuilder res = new StringBuilder();
+        for (char value: camel.toCharArray()) {
+            if (Character.isUpperCase(value)) {
+                res.append("_");
+            }
+            res.append(Character.toUpperCase(value));
+        }
+        return res.toString();
+    }
+
     private Object callApi(DeviceApi api, DeviceRequest request) {
         Method[] methods = api.getClass().getDeclaredMethods();
         Method targetMethod = Arrays.stream(methods)
@@ -50,7 +61,7 @@ public class DeviceApiService {
             List<Object> args = new ArrayList<>();
             for (Parameter parameter: targetMethod.getParameters()) {
                 if (parameter.getType().equals(DeviceInfo.class)) {
-                    args.add(request.getTarget());
+                    args.add(request.getDevice());
                 } else if (parameter.getType().equals(DeviceRequest.class)) {
                     args.add(request);
                 } else {

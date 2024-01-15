@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
 import ru.pobopo.smart.thing.gateway.event.AuthorizedEvent;
@@ -92,17 +93,21 @@ public class CloudService {
                 headers
         );
 
-        ResponseEntity<T> response = restTemplate.exchange(
-                buildUrl(cloudInfo, path),
-                method,
-                entity,
-                tClass
-        );
-
-        if (response.getStatusCode() == HttpStatus.FORBIDDEN) {
-            throw new AccessDeniedException("Failed to authorize in cloud service");
+        try {
+            ResponseEntity<T> response = restTemplate.exchange(
+                    buildUrl(cloudInfo, path),
+                    method,
+                    entity,
+                    tClass
+            );
+            return response.getBody();
+        } catch (ResourceAccessException exception) {
+            log.error("Request failed: {}", exception.getMessage());
+            throw exception;
+        } catch (Exception exception) {
+            log.error("Request failed: {}", exception.getMessage());
+            throw new  RuntimeException();
         }
-        return response.getBody();
     }
 
     private String buildUrl(CloudAuthInfo cloudInfo, String path) {
