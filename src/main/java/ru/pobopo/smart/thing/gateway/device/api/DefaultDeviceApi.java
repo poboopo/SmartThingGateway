@@ -16,12 +16,15 @@ import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 import ru.pobopo.smart.thing.gateway.model.DeviceRequest;
 import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DefaultDeviceApi implements DeviceApi {
+public class DefaultDeviceApi extends DeviceApi {
+    public final static Collection<String> SUPPORTED_VERSIONS = List.of("0.5");
     public final static String SYSTEM_INFO = "/info/system";
     public final static String GET_ACTIONS = "/info/actions";
     public final static String GET_CONFIG = "/info/config";
@@ -45,9 +48,13 @@ public class DefaultDeviceApi implements DeviceApi {
     @Override
     public boolean accept(DeviceRequest request) {
         return searchJob.getRecentFoundDevices()
-                .stream().anyMatch((d) -> d.getIp().equals(request.getDevice().getIp()));
+                .stream().anyMatch((d) ->
+                        d.getIp().equals(request.getDevice().getIp()) &&
+                                SUPPORTED_VERSIONS.contains(d.getVersion())
+                );
     }
 
+    @Override
     public DeviceResponse getInfo(DeviceInfo info) {
         return sendRequest(info, SYSTEM_INFO);
     }
@@ -61,16 +68,34 @@ public class DefaultDeviceApi implements DeviceApi {
         );
     }
 
+    @Override
     public DeviceResponse getActions(DeviceInfo info) {
         return sendRequest(info, GET_ACTIONS);
     }
 
+    @Override
     public DeviceResponse callAction(DeviceInfo info, String action) {
         return sendRequest(
                 info,
                 CALL_ACTION + "?action=" + action,
                 HttpMethod.PUT,
                 null
+        );
+    }
+
+    @Override
+    public DeviceResponse getSensors(DeviceInfo info) {
+        return sendRequest(
+                info,
+                SENSORS
+        );
+    }
+
+    @Override
+    public DeviceResponse getStates(DeviceInfo info) {
+        return sendRequest(
+                info,
+                STATES
         );
     }
 
@@ -106,20 +131,6 @@ public class DefaultDeviceApi implements DeviceApi {
                 DELETE_ALL_CONFIG_VALUES,
                 HttpMethod.DELETE,
                 null
-        );
-    }
-
-    public DeviceResponse getSensors(DeviceInfo info) {
-        return sendRequest(
-                info,
-                SENSORS
-        );
-    }
-
-    public DeviceResponse getStates(DeviceInfo info) {
-        return sendRequest(
-                info,
-                STATES
         );
     }
 

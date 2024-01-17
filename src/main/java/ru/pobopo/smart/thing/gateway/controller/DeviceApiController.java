@@ -15,7 +15,7 @@ public class DeviceApiController {
 
     @PostMapping
     public ResponseEntity<String> callApi(@RequestBody DeviceRequest request) {
-        DeviceResponse result = (DeviceResponse) deviceApiService.execute(request);
+        DeviceResponse result = deviceApiService.execute(request);
         return new ResponseEntity<>(
                 result.getBody(),
                 result.getCode()

@@ -1,30 +1,23 @@
 package ru.pobopo.smart.thing.gateway.model;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 
 @Getter
 @Setter
 @ToString
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class DeviceInfo {
     private String ip;
     private String type;
     private String name;
+    private String version;
 
     public DeviceInfo(String ip,  String name) {
         this.ip = ip;
-        this.name = name;
-        this.type = "type_missing";
-    }
-
-    public DeviceInfo(String ip, String type, String name) {
-        this.ip = ip;
-        this.type = type;
         this.name = name;
     }
 
@@ -39,13 +32,16 @@ public class DeviceInfo {
         }
 
         String[] splited = message.split("[$]");
-        if (splited.length == 2) { //old version
-            return new DeviceInfo(splited[0], splited[1]);
+        if (splited.length != 4) {
+            return null;
         }
-        if (splited.length == 3) {
-            return new DeviceInfo(splited[0], splited[1], splited[2]);
-        }
-        return null;
+
+        DeviceInfo.DeviceInfoBuilder builder = builder();
+        builder.ip(splited[0])
+                .type(splited[1])
+                .name(splited[2])
+                .version(splited[3]);
+        return builder.build();
     }
 
     @Override

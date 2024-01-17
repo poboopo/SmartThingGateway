@@ -5,16 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="device api rework">
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/filter/CorsFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/CloudConnectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/CloudConnectionController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/DeviceApiController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/DeviceApiController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/ErrorHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/ErrorHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/device/api/DefaultDeviceApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/device/api/DefaultDeviceApi.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/device/api/model/Observable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/device/api/model/Observable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/device/api/DeviceApi.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/device/api/DeviceApi.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/jobs/DeviceSearchJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/jobs/DeviceSearchJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceInfo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceApiService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceApiService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -258,7 +255,15 @@
       <option name="project" value="LOCAL" />
       <updated>1705171986886</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="device api rework">
+      <option name="closed" value="true" />
+      <created>1705340434843</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1705340434843</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="UnknownFeatures">

@@ -8,6 +8,7 @@ import ru.pobopo.smart.thing.gateway.device.api.DeviceApi;
 import ru.pobopo.smart.thing.gateway.exception.DeviceApiException;
 import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 import ru.pobopo.smart.thing.gateway.model.DeviceRequest;
+import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -20,7 +21,7 @@ public class DeviceApiService {
     private final List<DeviceApi> apis;
     private final ObjectMapper objectMapper;
 
-    public Object execute(DeviceRequest request) {
+    public DeviceResponse execute(DeviceRequest request) {
         for (DeviceApi api : apis) {
             if (api.accept(request)) {
                 return callApi(api, request);
@@ -40,10 +41,13 @@ public class DeviceApiService {
         return res.toString();
     }
 
-    private Object callApi(DeviceApi api, DeviceRequest request) {
+    private DeviceResponse callApi(DeviceApi api, DeviceRequest request) {
         Method[] methods = api.getClass().getDeclaredMethods();
         Method targetMethod = Arrays.stream(methods)
-                .filter((method) -> method.getName().equals(request.getMethod()))
+                .filter((method) ->
+                        method.getName().equals(request.getMethod()) &&
+                        method.getReturnType().equals(DeviceResponse.class)
+                )
                 .findFirst()
                 .orElseThrow(() -> new DeviceApiException(String.format(
                         "There is no such method %s in class %s",
@@ -73,7 +77,7 @@ public class DeviceApiService {
                     args.add(objectMapper.convertValue(value, parameter.getType()));
                 }
             }
-            return targetMethod.invoke(api, args.toArray());
+            return (DeviceResponse) targetMethod.invoke(api, args.toArray());
         } catch (Exception e) {
             log.error("Failed to call device api", e);
             throw new DeviceApiException(e.getMessage());

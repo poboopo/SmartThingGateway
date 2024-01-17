@@ -86,7 +86,7 @@ public class DeviceSearchJob implements BackgroundJob {
                     setupDevice(deviceInfo);
                     cache.put(deviceInfo);
                 } else {
-                    log.error("Can't build device info for {}", message);
+                    log.error("Can't build device info from {}", message);
                 }
             }
         } catch (Exception exception) {
