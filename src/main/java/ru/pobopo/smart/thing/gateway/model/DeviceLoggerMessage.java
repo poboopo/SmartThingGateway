@@ -1,6 +1,8 @@
 package ru.pobopo.smart.thing.gateway.model;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
@@ -8,13 +10,14 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 @ToString
 public class DeviceLoggerMessage {
-    private LocalDateTime receiveDate;
-    private DeviceInfo deviceInfo;
-    private String logLevel;
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime dateTime;
+    private DeviceInfo device;
+    private String level;
     private String tag;
     private String message;
 
-    public static DeviceLoggerMessage fromMulticastMessage(String message) {
+    public static DeviceLoggerMessage parse(String message) {
         DeviceLoggerMessage deviceLoggerMessage = new DeviceLoggerMessage();
         if (StringUtils.isBlank(message)) {
             return deviceLoggerMessage;
@@ -25,11 +28,11 @@ public class DeviceLoggerMessage {
             return deviceLoggerMessage;
         }
 
-        deviceLoggerMessage.setReceiveDate(LocalDateTime.now());
-        deviceLoggerMessage.setDeviceInfo(
+        deviceLoggerMessage.setDateTime(LocalDateTime.now());
+        deviceLoggerMessage.setDevice(
             new DeviceInfo(splited[0], splited[1])
         );
-        deviceLoggerMessage.setLogLevel(splited[2]);
+        deviceLoggerMessage.setLevel(splited[2]);
         deviceLoggerMessage.setTag(splited[3]);
         deviceLoggerMessage.setMessage(splited[4].trim());
         return deviceLoggerMessage;

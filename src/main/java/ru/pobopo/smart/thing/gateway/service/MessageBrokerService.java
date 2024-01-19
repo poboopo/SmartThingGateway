@@ -2,8 +2,6 @@ package ru.pobopo.smart.thing.gateway.service;
 
 import jakarta.annotation.PreDestroy;
 
-import java.util.concurrent.ExecutionException;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;

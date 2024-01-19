@@ -7,7 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
+import ru.pobopo.smart.thing.gateway.service.LogJobsService;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
 import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
 
@@ -24,8 +24,13 @@ public class SmartThingGatewayApp {
     }
 
     @Bean
-    CommandLineRunner run(ConfigurationService configurationService, CloudService cloudService)  {
+    CommandLineRunner run(
+            ConfigurationService configurationService,
+            CloudService cloudService,
+            LogJobsService logsJobs
+    )  {
         return args -> {
+            logsJobs.start();
             configurationService.loadConfiguration();
             try {
                 cloudService.authorize();

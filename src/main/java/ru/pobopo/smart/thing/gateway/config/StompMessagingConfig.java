@@ -27,12 +27,14 @@ import ru.pobopo.smart.thing.gateway.stomp.message.BaseMessage;
 import ru.pobopo.smart.thing.gateway.stomp.message.DeviceRequestMessage;
 import ru.pobopo.smart.thing.gateway.stomp.message.GatewayCommand;
 
+import static ru.pobopo.smart.thing.gateway.service.NotificationService.NOTIFICATION_TOPIC;
+
 @Configuration
 @EnableWebSocketMessageBroker
 public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker( "/devices", "/notification");
+        config.enableSimpleBroker( "/devices", NOTIFICATION_TOPIC);
     }
 
     @Override

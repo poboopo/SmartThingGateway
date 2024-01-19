@@ -8,7 +8,7 @@ import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
 @Component
 @Slf4j
 public class NotificationService {
-    private static final String NOTIFICATION_TOPIC = "/notification";
+    public static final String NOTIFICATION_TOPIC = "/notification";
 
     private final MessageBrokerService messageBrokerService;
     private final SimpMessagingTemplate messagingTemplate;
