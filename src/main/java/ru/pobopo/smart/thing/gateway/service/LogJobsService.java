@@ -1,6 +1,8 @@
 package ru.pobopo.smart.thing.gateway.service;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -8,11 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.logs.LogsListener;
+import ru.pobopo.smart.thing.gateway.model.DeviceLoggerMessage;
 
 @Component
 @Slf4j
 public class LogJobsService {
-    public static String DEVICES_LOGS_TOPIC = "/devices/logs";
+    public static final String DEVICES_LOGS_TOPIC = "/devices/logs";
 
     private final List<LogsListener> logsListenerList;
     private final ThreadPoolExecutor threadPoolExecutor;

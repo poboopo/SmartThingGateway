@@ -4,23 +4,18 @@ import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smart.thing.gateway.model.DeviceLogSource;
 import ru.pobopo.smart.thing.gateway.model.DeviceLoggerMessage;
+import ru.pobopo.smart.thing.gateway.service.DeviceLogsProcessor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import static ru.pobopo.smart.thing.gateway.service.LogJobsService.DEVICES_LOGS_TOPIC;
 
 @Slf4j
 @Component
@@ -29,7 +24,7 @@ public class TcpLogsListener implements LogsListener {
     @Value("${device.logs.tcp.port}")
     private String port;
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final DeviceLogsProcessor logsProcessor;
 
     private ServerSocket serverSocket;
     private final HashMap<String, LogClient> clients = new HashMap<>();
@@ -52,7 +47,7 @@ public class TcpLogsListener implements LogsListener {
                     clients.remove(ip).stopClient();
                 }
 
-                LogClient client = new LogClient(messagingTemplate, socketClient);
+                LogClient client = new LogClient(logsProcessor, socketClient);
                 client.setDaemon(true);
                 client.start();
                 clients.put(ip, client);
@@ -90,11 +85,11 @@ public class TcpLogsListener implements LogsListener {
 
     private static class LogClient extends Thread {
         private final Socket clientSocket;
-        private final SimpMessagingTemplate messagingTemplate;
+        private final DeviceLogsProcessor logsProcessor;
 
-        public LogClient(SimpMessagingTemplate messagingTemplate, Socket clientSocket) {
+        public LogClient(DeviceLogsProcessor logsProcessor, Socket clientSocket) {
             this.clientSocket = clientSocket;
-            this.messagingTemplate = messagingTemplate;
+            this.logsProcessor = logsProcessor;
         }
 
         @Override
@@ -105,11 +100,8 @@ public class TcpLogsListener implements LogsListener {
                 String message;
                 while ((message = in.readLine()) != null) {
                     DeviceLoggerMessage deviceLoggerMessage = DeviceLoggerMessage.parse(message);
-                    log.info(deviceLoggerMessage.toString());
-                    messagingTemplate.convertAndSend(
-                            DEVICES_LOGS_TOPIC,
-                            deviceLoggerMessage
-                    );
+                    deviceLoggerMessage.setSource(DeviceLogSource.TCP);
+                    logsProcessor.addLog(deviceLoggerMessage);
                 }
 
                 in.close();

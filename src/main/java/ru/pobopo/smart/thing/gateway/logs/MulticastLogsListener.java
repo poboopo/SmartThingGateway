@@ -3,19 +3,16 @@ package ru.pobopo.smart.thing.gateway.logs;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smart.thing.gateway.model.DeviceLogSource;
 import ru.pobopo.smart.thing.gateway.model.DeviceLoggerMessage;
+import ru.pobopo.smart.thing.gateway.service.DeviceLogsProcessor;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.nio.charset.StandardCharsets;
-
-import static ru.pobopo.smart.thing.gateway.service.LogJobsService.DEVICES_LOGS_TOPIC;
 
 @Slf4j
 @Component
@@ -27,8 +24,7 @@ public class MulticastLogsListener implements LogsListener {
     @Value("${device.logs.multicast.port}")
     private String port;
 
-    private final Logger multicastLogs = LoggerFactory.getLogger("multicast-logs");
-    private final SimpMessagingTemplate messagingTemplate;
+    private final DeviceLogsProcessor logsProcessor;
 
     @Override
     public void run() {
@@ -63,12 +59,8 @@ public class MulticastLogsListener implements LogsListener {
                         StandardCharsets.UTF_8
                 );
                 DeviceLoggerMessage deviceLoggerMessage = DeviceLoggerMessage.parse(message);
-
-                multicastLogs.info(deviceLoggerMessage.toString());
-                messagingTemplate.convertAndSend(
-                        DEVICES_LOGS_TOPIC,
-                        deviceLoggerMessage
-                );
+                deviceLoggerMessage.setSource(DeviceLogSource.MULTICAST);
+                logsProcessor.addLog(deviceLoggerMessage);
             }
         } finally {
             s.leaveGroup(groupAddr);
