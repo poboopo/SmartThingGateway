@@ -1,9 +1,10 @@
 package ru.pobopo.smart.thing.gateway.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import ru.pobopo.smart.thing.gateway.model.DeviceLoggerMessage;
@@ -14,14 +15,29 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static ru.pobopo.smart.thing.gateway.service.LogJobsService.DEVICES_LOGS_TOPIC;
 
 @Service
-@RequiredArgsConstructor
 public class DeviceLogsProcessor {
-    private final int MAX_LOGS_SIZE = 100;
+    /**
+     * todo:
+     * - add logs level filter in add
+     * - move max size and level filter to env
+     * - load last 100 logs from log file?
+     */
+    private final int cacheSize;
+    private final Level logLevel;
 
-    private final Logger deviceLogs = LoggerFactory.getLogger("device-logs");
+    private final Logger log = LoggerFactory.getLogger("device-logs");
     private final ConcurrentLinkedQueue<DeviceLoggerMessage> logsQueue = new ConcurrentLinkedQueue<>();
 
     private final SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    public DeviceLogsProcessor(SimpMessagingTemplate messagingTemplate, Environment env) {
+        this.messagingTemplate = messagingTemplate;
+        cacheSize = env.getProperty("device.logs.cache.max", Integer.class, 100);
+        logLevel = env.getProperty("device.logs.level", Level.class, Level.INFO);
+
+        log.info("Using logs cache size: {}, logs level: {}", cacheSize, logLevel);
+    }
 
     public List<DeviceLoggerMessage> getLogs() {
         return logsQueue.stream().toList();
@@ -29,12 +45,16 @@ public class DeviceLogsProcessor {
 
     public void addLog(DeviceLoggerMessage message) {
         if (message == null) {
-            deviceLogs.error("Message is null!");
+            log.error("Message is null!");
             return;
         }
 
-        deviceLogs.atLevel(message.getLevel()).log(message.toString());
-        if (logsQueue.size() > MAX_LOGS_SIZE) {
+        if (logLevel.compareTo(message.getLevel()) < 0) {
+            return;
+        }
+
+        log.atLevel(message.getLevel()).log(message.toString());
+        if (logsQueue.size() > cacheSize) {
             logsQueue.remove();
         }
         logsQueue.add(message);
