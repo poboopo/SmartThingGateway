@@ -16,19 +16,12 @@ import static ru.pobopo.smart.thing.gateway.service.LogJobsService.DEVICES_LOGS_
 
 @Service
 public class DeviceLogsProcessor {
-    /**
-     * todo:
-     * - add logs level filter in add
-     * - move max size and level filter to env
-     * - load last 100 logs from log file?
-     */
-    private final int cacheSize;
-    private final Level logLevel;
-
     private final Logger log = LoggerFactory.getLogger("device-logs");
     private final ConcurrentLinkedQueue<DeviceLoggerMessage> logsQueue = new ConcurrentLinkedQueue<>();
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final int cacheSize;
+    private final Level logLevel;
 
     @Autowired
     public DeviceLogsProcessor(SimpMessagingTemplate messagingTemplate, Environment env) {

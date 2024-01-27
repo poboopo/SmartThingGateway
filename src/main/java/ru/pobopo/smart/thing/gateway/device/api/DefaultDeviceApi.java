@@ -42,6 +42,8 @@ public class DefaultDeviceApi extends DeviceApi {
 
     public final static String METRICS = "/metrics";
 
+    public final static String SETTINGS = "/settings";
+
     private final DeviceSearchJob searchJob;
     private final RestTemplate restTemplate;
 
@@ -216,6 +218,24 @@ public class DefaultDeviceApi extends DeviceApi {
         return sendRequest(
                 info,
                 METRICS
+        );
+    }
+
+    public DeviceResponse exportSettings(DeviceInfo info) {
+        return sendRequest(
+                info,
+                SETTINGS,
+                HttpMethod.GET,
+                null
+        );
+    }
+
+    public DeviceResponse importSettings(DeviceInfo info, Map<String, Object> settings) {
+        return sendRequest(
+                info,
+                SETTINGS,
+                HttpMethod.POST,
+                settings
         );
     }
 
