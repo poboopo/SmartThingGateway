@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
 import ru.pobopo.smart.thing.gateway.controller.model.ErrorResponse;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
+import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.exception.DeviceApiException;
+import ru.pobopo.smart.thing.gateway.exception.DeviceSettingsException;
 
 @Slf4j
 @RestControllerAdvice
@@ -22,6 +24,13 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse badRequest(BadRequestException exception) {
+        log.error("Bad request: {}", exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse apiError(DeviceApiException exception) {
         log.error("Device api exception", exception);
         return new ErrorResponse(exception.getMessage());
@@ -30,6 +39,13 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public ErrorResponse unavailable(ResourceAccessException exception) {
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse deviceSettings(DeviceSettingsException exception) {
+        log.error("Device settings exception: {}", exception.getMessage(), exception.getCause());
         return new ErrorResponse(exception.getMessage());
     }
 }

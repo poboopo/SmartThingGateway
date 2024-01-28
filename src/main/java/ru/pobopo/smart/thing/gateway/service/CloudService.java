@@ -14,7 +14,6 @@ import ru.pobopo.smart.thing.gateway.event.AuthorizedEvent;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.model.AuthorizedCloudUser;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
-import ru.pobopo.smart.thing.gateway.model.Notification;
 import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 
 @Component

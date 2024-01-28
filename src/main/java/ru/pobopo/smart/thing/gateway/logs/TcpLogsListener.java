@@ -38,7 +38,7 @@ public class TcpLogsListener implements LogsListener {
         serverSocket = new ServerSocket(Integer.parseInt(port));
         log.info("TCP logs started, waiting for connections...");
 
-        while(true) {
+        while(!serverSocket.isClosed()) {
             try {
                 Socket socketClient = serverSocket.accept();
                 String ip = socketClient.getInetAddress().getHostAddress();
@@ -60,6 +60,7 @@ public class TcpLogsListener implements LogsListener {
                 log.error("Tcp logger error: {}", exception.getMessage());
             }
         }
+        log.info("Tcp device logs listener stopped (socket closed)");
     }
 
     @Override
@@ -75,7 +76,9 @@ public class TcpLogsListener implements LogsListener {
     public void stop() throws IOException {
         clients.values().forEach(client -> {
             try {
-                client.stopClient();
+                if (client.isAlive()) {
+                    client.stopClient();
+                }
             } catch (IOException e) {
                 log.error("Failed to stop log client: {}", e.getMessage());
             }

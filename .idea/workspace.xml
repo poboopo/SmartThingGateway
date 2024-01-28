@@ -4,9 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="added device logs level filtration">
+    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="added device api for export and import settings">
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/DeviceSettingsController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/exception/DeviceSettingsException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceSettings.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceSettingsService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceLogsProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceLogsProcessor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/ErrorHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/ErrorHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/logs/TcpLogsListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/logs/TcpLogsListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/ConfigurationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/ConfigurationService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,8 +25,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -290,7 +298,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706374301293</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="added device api for export and import settings">
+      <option name="closed" value="true" />
+      <created>1706376445006</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1706376445006</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -323,7 +339,8 @@
     <MESSAGE value="tcp logger impl" />
     <MESSAGE value="added get logs rest" />
     <MESSAGE value="added device logs level filtration" />
-    <option name="LAST_COMMIT_MESSAGE" value="added device logs level filtration" />
+    <MESSAGE value="added device api for export and import settings" />
+    <option name="LAST_COMMIT_MESSAGE" value="added device api for export and import settings" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

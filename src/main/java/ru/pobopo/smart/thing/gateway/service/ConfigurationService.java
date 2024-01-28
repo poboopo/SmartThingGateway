@@ -38,7 +38,7 @@ public class ConfigurationService {
     public ConfigurationService(Environment environment, ApplicationEventPublisher applicationEventPublisher) {
         this.applicationEventPublisher = applicationEventPublisher;
 
-        String configFile = environment.getProperty("CONFIG_FILE");
+        String configFile = environment.getProperty("config.file.path");
         if (StringUtils.isNotBlank(configFile)) {
             configFilePath = configFile;
         } else {
