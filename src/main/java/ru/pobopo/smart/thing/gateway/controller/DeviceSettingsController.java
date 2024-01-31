@@ -2,6 +2,7 @@ package ru.pobopo.smart.thing.gateway.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import ru.pobopo.smart.thing.gateway.controller.model.UpdateDeviceSettings;
 import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.exception.DeviceSettingsException;
 import ru.pobopo.smart.thing.gateway.model.DeviceSettings;
@@ -21,8 +22,13 @@ public class DeviceSettingsController {
     }
 
     @PostMapping
-    public void saveSettings(@RequestBody DeviceSettings settings) throws BadRequestException, DeviceSettingsException {
-        settingsService.saveSettings(settings);
+    public void createSettings(@RequestBody DeviceSettings settings) throws BadRequestException, DeviceSettingsException {
+        settingsService.createSettings(settings);
+    }
+
+    @PutMapping
+    public void updateSettings(@RequestBody UpdateDeviceSettings settings) throws BadRequestException, DeviceSettingsException {
+        settingsService.updateSettings(settings);
     }
 
     @DeleteMapping("/{name}")

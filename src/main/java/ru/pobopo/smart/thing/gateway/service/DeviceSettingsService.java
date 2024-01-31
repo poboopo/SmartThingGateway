@@ -1,16 +1,14 @@
 package ru.pobopo.smart.thing.gateway.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
+import ru.pobopo.smart.thing.gateway.controller.model.UpdateDeviceSettings;
 import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.exception.DeviceSettingsException;
 import ru.pobopo.smart.thing.gateway.model.DeviceSettings;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -43,7 +41,38 @@ public class DeviceSettingsService {
         return files.stream().map(this::fromFilePath).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    public void saveSettings(DeviceSettings deviceSettings) throws BadRequestException, DeviceSettingsException {
+    public void updateSettings(UpdateDeviceSettings deviceSettings) throws DeviceSettingsException, BadRequestException {
+        if (StringUtils.isBlank(deviceSettings.getName())) {
+            throw new BadRequestException("Settings name can't be blank!");
+        }
+        Path settingsPath = buildSettingsFilePath(deviceSettings.getName());
+        if (StringUtils.isNotBlank(deviceSettings.getOldName()) && !StringUtils.equals(deviceSettings.getOldName(), deviceSettings.getName())) {
+            if (isSettingsExists(settingsPath)) {
+                throw new DeviceSettingsException("Settings with name " + deviceSettings.getName() + " already exists");
+            }
+            Path oldPath = buildSettingsFilePath(deviceSettings.getOldName());
+            if (!isSettingsExists(oldPath)) {
+                throw new DeviceSettingsException("There is no settings with name " + deviceSettings.getOldName());
+            }
+            try {
+                Files.copy(oldPath, settingsPath);
+                Files.delete(oldPath);
+                log.info("Renamed settings file from {} to {}", oldPath, settingsPath);
+            } catch (IOException e) {
+                throw new DeviceSettingsException("Failed to rename");
+            }
+        } else if (!isSettingsExists(settingsPath)) {
+            throw new DeviceSettingsException("There is no settings with name " + deviceSettings.getName());
+        }
+        try {
+            Files.writeString(settingsPath, deviceSettings.getSettings());
+            log.info("Update device settings ({}): {}", settingsPath, deviceSettings.getSettings());
+        } catch (IOException exception) {
+            throw new DeviceSettingsException("Failed to save device settings " + deviceSettings.getName(), exception);
+        }
+    }
+
+    public void createSettings(DeviceSettings deviceSettings) throws BadRequestException, DeviceSettingsException {
         Objects.requireNonNull(deviceSettings);
         if (StringUtils.isBlank(deviceSettings.getName())) {
             throw new BadRequestException("Settings name can't be blank!");
@@ -51,10 +80,13 @@ public class DeviceSettingsService {
         if (StringUtils.isBlank(deviceSettings.getSettings())) {
             throw new BadRequestException("Settings fields can't be blank!");
         }
-        Path path = Paths.get(directoryPath.toString(), deviceSettings.getName() + ".json");
+        Path path = buildSettingsFilePath(deviceSettings.getName());
+        if (isSettingsExists(path)) {
+            throw new DeviceSettingsException("Settings with name " + deviceSettings.getName() + " already exists!");
+        }
         try {
             Files.writeString(path, deviceSettings.getSettings());
-            log.info("Saved device settings ({}): {}", path, deviceSettings.getSettings());
+            log.info("Created device settings ({}): {}", path, deviceSettings.getSettings());
         } catch (IOException exception) {
             throw new DeviceSettingsException("Failed to save device settings " + deviceSettings.getName(), exception);
         }
@@ -64,7 +96,7 @@ public class DeviceSettingsService {
         if (StringUtils.isBlank(name)) {
             throw new BadRequestException("Settings name can't be blank!");
         }
-        Path path = Paths.get(directoryPath.toString(), name + ".json");
+        Path path = buildSettingsFilePath(name);
         File file = new File(path.toString());
         if (!file.exists() || file.isDirectory()) {
             throw new BadRequestException("Unknown settings name: " + name);
@@ -73,6 +105,15 @@ public class DeviceSettingsService {
             throw new DeviceSettingsException("Failed to delete settings " + name);
         }
         log.info("Settings {} deleted", path);
+    }
+
+    private boolean isSettingsExists(Path path) {
+        File f = new File(path.toString());
+        return f.exists() && !f.isDirectory();
+    }
+
+    private Path buildSettingsFilePath(String name) {
+        return Paths.get(directoryPath.toString(), name + ".json");
     }
 
     private DeviceSettings fromFilePath(Path path) {

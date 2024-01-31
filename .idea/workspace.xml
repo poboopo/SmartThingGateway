@@ -4,17 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="added device api for export and import settings">
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/DeviceSettingsController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/exception/DeviceSettingsException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/DeviceSettings.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceSettingsService.java" afterDir="false" />
+    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="added device settings api">
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/model/UpdateDeviceSettings.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/ErrorHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/ErrorHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/logs/TcpLogsListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/logs/TcpLogsListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/ConfigurationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/ConfigurationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/DeviceSettingsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/DeviceSettingsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceSettingsService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/DeviceSettingsService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -306,7 +300,15 @@
       <option name="project" value="LOCAL" />
       <updated>1706376445006</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="added device settings api">
+      <option name="closed" value="true" />
+      <created>1706460550307</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1706460550307</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -340,7 +342,8 @@
     <MESSAGE value="added get logs rest" />
     <MESSAGE value="added device logs level filtration" />
     <MESSAGE value="added device api for export and import settings" />
-    <option name="LAST_COMMIT_MESSAGE" value="added device api for export and import settings" />
+    <MESSAGE value="added device settings api" />
+    <option name="LAST_COMMIT_MESSAGE" value="added device settings api" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
