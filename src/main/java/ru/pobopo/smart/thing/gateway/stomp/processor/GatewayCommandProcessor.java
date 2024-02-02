@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import ru.pobopo.smart.thing.gateway.exception.LogoutException;
-import ru.pobopo.smart.thing.gateway.jobs.DeviceSearchJob;
+import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
 import ru.pobopo.smart.thing.gateway.stomp.message.GatewayCommand;
 import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
@@ -18,11 +18,11 @@ public class GatewayCommandProcessor implements MessageProcessor {
     private final ObjectMapper objectMapper = new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-    private final DeviceSearchJob searchJob;
+    private final DevicesSearchJob searchJob;
     private final ConfigurationService configurationService;
     private final CloudService cloudService;
 
-    public GatewayCommandProcessor(DeviceSearchJob searchJob, ConfigurationService configurationService, CloudService cloudService) {
+    public GatewayCommandProcessor(DevicesSearchJob searchJob, ConfigurationService configurationService, CloudService cloudService) {
         this.searchJob = searchJob;
         this.configurationService = configurationService;
         this.cloudService = cloudService;

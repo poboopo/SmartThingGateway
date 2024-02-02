@@ -11,7 +11,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.device.api.model.Observable;
-import ru.pobopo.smart.thing.gateway.jobs.DeviceSearchJob;
+import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
 import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 import ru.pobopo.smart.thing.gateway.model.DeviceRequest;
 import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
@@ -44,7 +44,7 @@ public class DefaultDeviceApi extends DeviceApi {
 
     public final static String SETTINGS = "/settings";
 
-    private final DeviceSearchJob searchJob;
+    private final DevicesSearchJob searchJob;
     private final RestTemplate restTemplate;
 
     @Override

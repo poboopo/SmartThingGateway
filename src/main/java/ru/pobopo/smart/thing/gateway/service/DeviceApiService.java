@@ -1,5 +1,6 @@
 package ru.pobopo.smart.thing.gateway.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +62,6 @@ public class DeviceApiService {
                     api.getClass().getName(),
                     request.getParams()
             );
-            Map<String, Object> params = request.getParams();
             List<Object> args = new ArrayList<>();
             for (Parameter parameter: targetMethod.getParameters()) {
                 if (parameter.getType().equals(DeviceInfo.class)) {
@@ -69,7 +69,7 @@ public class DeviceApiService {
                 } else if (parameter.getType().equals(DeviceRequest.class)) {
                     args.add(request);
                 } else {
-                    Object value = params.getOrDefault(parameter.getName(), null);
+                    Object value = request.getParams().getOrDefault(parameter.getName(), null);
                     if (value == null) {
                         args.add(null);
                         continue;

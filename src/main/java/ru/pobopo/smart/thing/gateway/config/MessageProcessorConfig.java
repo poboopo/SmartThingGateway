@@ -2,7 +2,7 @@ package ru.pobopo.smart.thing.gateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.pobopo.smart.thing.gateway.jobs.DeviceSearchJob;
+import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
 import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
 import ru.pobopo.smart.thing.gateway.stomp.MessageProcessorFactory;
 import ru.pobopo.smart.thing.gateway.stomp.message.GatewayMessageType;
@@ -10,14 +10,13 @@ import ru.pobopo.smart.thing.gateway.stomp.processor.DeviceRequestMessageProcess
 import ru.pobopo.smart.thing.gateway.stomp.processor.GatewayCommandProcessor;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
 import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
-import ru.pobopo.smart.thing.gateway.service.DeviceService;
 
 @Configuration
 public class MessageProcessorConfig {
 
     @Bean
     public MessageProcessorFactory messageProcessorFactory(
-            DeviceSearchJob searchJob,
+            DevicesSearchJob searchJob,
             ConfigurationService configurationService,
             CloudService cloudService,
             DeviceApiService deviceApiService

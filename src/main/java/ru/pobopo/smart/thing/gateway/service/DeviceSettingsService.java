@@ -65,8 +65,8 @@ public class DeviceSettingsService {
             throw new DeviceSettingsException("There is no settings with name " + deviceSettings.getName());
         }
         try {
-            Files.writeString(settingsPath, deviceSettings.getSettings());
-            log.info("Update device settings ({}): {}", settingsPath, deviceSettings.getSettings());
+            Files.writeString(settingsPath, deviceSettings.getValue());
+            log.info("Update device settings ({}): {}", settingsPath, deviceSettings.getValue());
         } catch (IOException exception) {
             throw new DeviceSettingsException("Failed to save device settings " + deviceSettings.getName(), exception);
         }
@@ -77,7 +77,7 @@ public class DeviceSettingsService {
         if (StringUtils.isBlank(deviceSettings.getName())) {
             throw new BadRequestException("Settings name can't be blank!");
         }
-        if (StringUtils.isBlank(deviceSettings.getSettings())) {
+        if (StringUtils.isBlank(deviceSettings.getValue())) {
             throw new BadRequestException("Settings fields can't be blank!");
         }
         Path path = buildSettingsFilePath(deviceSettings.getName());
@@ -85,8 +85,8 @@ public class DeviceSettingsService {
             throw new DeviceSettingsException("Settings with name " + deviceSettings.getName() + " already exists!");
         }
         try {
-            Files.writeString(path, deviceSettings.getSettings());
-            log.info("Created device settings ({}): {}", path, deviceSettings.getSettings());
+            Files.writeString(path, deviceSettings.getValue());
+            log.info("Created device settings ({}): {}", path, deviceSettings.getValue());
         } catch (IOException exception) {
             throw new DeviceSettingsException("Failed to save device settings " + deviceSettings.getName(), exception);
         }
@@ -126,7 +126,7 @@ public class DeviceSettingsService {
             String fileName = path.getFileName().toString();
             DeviceSettings settings = new DeviceSettings();
             settings.setName(fileName.replace(".json", ""));
-            settings.setSettings(String.join("\n", lines));
+            settings.setValue(String.join("\n", lines));
             return settings;
         } catch (Exception exception) {
             log.error("Failed to load settings from {}, reason: {}", path, exception.getMessage());

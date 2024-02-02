@@ -23,7 +23,7 @@ import ru.pobopo.smart.thing.gateway.service.DeviceService;
 
 @Component
 @Slf4j
-public class DeviceSearchJob implements BackgroundJob {
+public class DevicesSearchJob implements BackgroundJob {
     // TODO MOVE ALL TO ENV
     public static final String DEVICES_SEARCH_TOPIC = "/devices/search";
     private final static String GATEWAY_CONFIG_FIELD = "gtw";
@@ -42,7 +42,7 @@ public class DeviceSearchJob implements BackgroundJob {
     private final DeviceService deviceService;
 
     @Autowired
-    public DeviceSearchJob(SimpMessagingTemplate messagingTemplate, DeviceService deviceService) {
+    public DevicesSearchJob(SimpMessagingTemplate messagingTemplate, DeviceService deviceService) {
         this.messagingTemplate = messagingTemplate;
         this.deviceService = deviceService;
     }
