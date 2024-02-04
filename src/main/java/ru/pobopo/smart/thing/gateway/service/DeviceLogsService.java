@@ -1,5 +1,6 @@
 package ru.pobopo.smart.thing.gateway.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -15,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static ru.pobopo.smart.thing.gateway.service.LogJobsService.DEVICES_LOGS_TOPIC;
 
 @Service
-public class DeviceLogsProcessor {
+public class DeviceLogsService {
     private final Logger log = LoggerFactory.getLogger("device-logs");
     private final ConcurrentLinkedQueue<DeviceLoggerMessage> logsQueue = new ConcurrentLinkedQueue<>();
 
@@ -24,7 +25,7 @@ public class DeviceLogsProcessor {
     private final Level logLevel;
 
     @Autowired
-    public DeviceLogsProcessor(SimpMessagingTemplate messagingTemplate, Environment env) {
+    public DeviceLogsService(SimpMessagingTemplate messagingTemplate, Environment env) {
         this.messagingTemplate = messagingTemplate;
         cacheSize = env.getProperty("device.logs.cache.max", Integer.class, 100);
         logLevel = env.getProperty("device.logs.level", Level.class, Level.INFO);

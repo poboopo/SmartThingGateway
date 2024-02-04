@@ -10,7 +10,7 @@ import ru.pobopo.smart.thing.gateway.exception.DeviceSettingsException;
 import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
 import ru.pobopo.smart.thing.gateway.model.*;
 import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
-import ru.pobopo.smart.thing.gateway.service.DeviceLogsProcessor;
+import ru.pobopo.smart.thing.gateway.service.DeviceLogsService;
 import ru.pobopo.smart.thing.gateway.service.DeviceSettingsService;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class DeviceController {
     private final DeviceSettingsService settingsService;
-    private final DeviceLogsProcessor deviceLogsProcessor;
+    private final DeviceLogsService deviceLogsService;
     private final DeviceApiService deviceApiService;
     private final DevicesSearchJob searchJob;
 
@@ -62,6 +62,6 @@ public class DeviceController {
 
     @GetMapping("/logs")
     public List<DeviceLoggerMessage> getLogs() {
-        return deviceLogsProcessor.getLogs();
+        return deviceLogsService.getLogs();
     }
 }

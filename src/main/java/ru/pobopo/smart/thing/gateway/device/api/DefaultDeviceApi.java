@@ -41,8 +41,8 @@ public class DefaultDeviceApi extends DeviceApi {
     public final static String CALLBACKS_TEMPLATES = CALLBACKS + "/templates";
 
     public final static String METRICS = "/metrics";
-
     public final static String SETTINGS = "/settings";
+    public final static String RESTART = "/restart";
 
     private final DevicesSearchJob searchJob;
     private final RestTemplate restTemplate;
@@ -236,6 +236,15 @@ public class DefaultDeviceApi extends DeviceApi {
                 SETTINGS,
                 HttpMethod.POST,
                 settings
+        );
+    }
+
+    public DeviceResponse restart(DeviceInfo info) {
+        return sendRequest(
+                info,
+                RESTART,
+                HttpMethod.PUT,
+                null
         );
     }
 

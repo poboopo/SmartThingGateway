@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.model.DeviceLogSource;
 import ru.pobopo.smart.thing.gateway.model.DeviceLoggerMessage;
-import ru.pobopo.smart.thing.gateway.service.DeviceLogsProcessor;
+import ru.pobopo.smart.thing.gateway.service.DeviceLogsService;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -24,7 +24,7 @@ public class MulticastLogsListener implements LogsListener {
     @Value("${device.logs.multicast.port}")
     private String port;
 
-    private final DeviceLogsProcessor logsProcessor;
+    private final DeviceLogsService logsProcessor;
 
     @Override
     public void run() {

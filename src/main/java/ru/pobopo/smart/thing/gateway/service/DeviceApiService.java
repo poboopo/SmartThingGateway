@@ -1,6 +1,5 @@
 package ru.pobopo.smart.thing.gateway.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,13 +45,13 @@ public class DeviceApiService {
         Method[] methods = api.getClass().getDeclaredMethods();
         Method targetMethod = Arrays.stream(methods)
                 .filter((method) ->
-                        method.getName().equals(request.getMethod()) &&
+                        method.getName().equals(request.getCommand()) &&
                         method.getReturnType().equals(DeviceResponse.class)
                 )
                 .findFirst()
                 .orElseThrow(() -> new DeviceApiException(String.format(
                         "There is no such method %s in class %s",
-                        request.getMethod(),
+                        request.getCommand(),
                         api.getClass().getName()
                 )));
         try {

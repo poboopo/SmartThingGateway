@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.model.DeviceLogSource;
 import ru.pobopo.smart.thing.gateway.model.DeviceLoggerMessage;
-import ru.pobopo.smart.thing.gateway.service.DeviceLogsProcessor;
+import ru.pobopo.smart.thing.gateway.service.DeviceLogsService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class TcpLogsListener implements LogsListener {
     @Value("${device.logs.tcp.port}")
     private String port;
 
-    private final DeviceLogsProcessor logsProcessor;
+    private final DeviceLogsService logsProcessor;
 
     private ServerSocket serverSocket;
     private final HashMap<String, LogClient> clients = new HashMap<>();
@@ -88,9 +88,9 @@ public class TcpLogsListener implements LogsListener {
 
     private static class LogClient extends Thread {
         private final Socket clientSocket;
-        private final DeviceLogsProcessor logsProcessor;
+        private final DeviceLogsService logsProcessor;
 
-        public LogClient(DeviceLogsProcessor logsProcessor, Socket clientSocket) {
+        public LogClient(DeviceLogsService logsProcessor, Socket clientSocket) {
             this.clientSocket = clientSocket;
             this.logsProcessor = logsProcessor;
         }
