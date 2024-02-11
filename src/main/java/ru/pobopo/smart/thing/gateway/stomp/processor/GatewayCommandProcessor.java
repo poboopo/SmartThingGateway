@@ -40,7 +40,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
 
         switch (gatewayCommand.getCommand()) {
             case "ping" -> response.setResponse("pong");
-            case "search" -> response.setResponse(searchDevices());
+            case "search" -> response.setResponse(searchJob.getRecentFoundDevices());
             case "logout" -> {
                 log.info("Logout event! Removing token from config.");
                 CloudAuthInfo authInfo = configurationService.getCloudAuthInfo();
@@ -56,9 +56,5 @@ public class GatewayCommandProcessor implements MessageProcessor {
         }
 
         return response;
-    }
-
-    private String searchDevices() throws JsonProcessingException {
-        return objectMapper.writeValueAsString(searchJob.getRecentFoundDevices());
     }
 }

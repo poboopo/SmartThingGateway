@@ -35,10 +35,10 @@ public class DefaultDeviceApi extends DeviceApi {
     public final static String SENSORS = "/sensors";
     public final static String STATES = "/states";
 
-    public final static String CALLBACKS = "/callbacks";
-    public final static String CALLBACKS_BY_OBSERVABLE = CALLBACKS + "/by/observable";
-    public final static String CALLBACKS_BY_ID = CALLBACKS + "/by/id";
-    public final static String CALLBACKS_TEMPLATES = CALLBACKS + "/templates";
+    public final static String HOOKS = "/hooks";
+    public final static String HOOKS_BY_OBSERVABLE = HOOKS + "/by/observable";
+    public final static String HOOKS_BY_ID = HOOKS + "/by/id";
+    public final static String HOOKS_TEMPLATES = HOOKS + "/templates";
 
     public final static String METRICS = "/metrics";
     public final static String SETTINGS = "/settings";
@@ -136,31 +136,31 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse getAllCallbacks(DeviceInfo info) {
+    public DeviceResponse getAllHooks(DeviceInfo info) {
         return sendRequest(
                 info,
-                CALLBACKS
+                HOOKS
         );
     }
 
-    public DeviceResponse getCallbacks(DeviceInfo info, Observable observable) {
+    public DeviceResponse getHooks(DeviceInfo info, Observable observable) {
         return sendRequest(
                 info,
                 String.format(
                         "%s?type=%s&name=%s",
-                        CALLBACKS_BY_OBSERVABLE,
+                        HOOKS_BY_OBSERVABLE,
                         observable.getType(),
                         observable.getName()
                 )
         );
     }
 
-    public DeviceResponse getCallbackById(DeviceInfo info, Observable observable, String id) {
+    public DeviceResponse getHookById(DeviceInfo info, Observable observable, String id) {
         return sendRequest(
                 info,
                 String.format(
                         "%s?type=%s&name=%s&id=%s",
-                        CALLBACKS_BY_ID,
+                        HOOKS_BY_ID,
                         observable.getType(),
                         observable.getName(),
                         id
@@ -168,43 +168,43 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse getCallbacksTemplates(DeviceInfo info) {
+    public DeviceResponse getHooksTemplates(DeviceInfo info) {
         return sendRequest(
                 info,
-                CALLBACKS_TEMPLATES
+                HOOKS_TEMPLATES
         );
     }
 
-    public DeviceResponse createCallback(DeviceInfo info, Observable observable, Map<String, Object> callback) {
+    public DeviceResponse createHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
         return sendRequest(
                 info,
-                CALLBACKS,
+                HOOKS,
                 HttpMethod.POST,
                 Map.of(
                         "observable", observable,
-                        "callback", callback
+                        "hook", hook
                 )
         );
     }
 
-    public DeviceResponse updateCallback(DeviceInfo info, Observable observable, Map<String, Object> callback) {
+    public DeviceResponse updateHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
         return sendRequest(
                 info,
-                CALLBACKS,
+                HOOKS,
                 HttpMethod.PUT,
                 Map.of(
                         "observable", observable,
-                        "callback", callback
+                        "hook", hook
                 )
         );
     }
 
-    public DeviceResponse deleteCallback(DeviceInfo info, Observable observable, String id) {
+    public DeviceResponse deleteHook(DeviceInfo info, Observable observable, String id) {
         return sendRequest(
                 info,
                 String.format(
                         "%s?type=%s&name=%s&id=%s",
-                        CALLBACKS_BY_ID,
+                        HOOKS_BY_ID,
                         observable.getType(),
                         observable.getName(),
                         id
