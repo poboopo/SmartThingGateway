@@ -34,7 +34,8 @@ public class CloudController {
     }
     @PutMapping("/connection/disconnect")
     public boolean disconnect() throws AccessDeniedException {
-        return messageService.disconnect();
+        messageService.disconnect();
+        return true;
     }
 
     @GetMapping("/auth")

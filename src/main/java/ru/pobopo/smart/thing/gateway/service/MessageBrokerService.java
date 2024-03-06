@@ -88,7 +88,7 @@ public class MessageBrokerService {
             }
 
             String url = String.format(
-                    "ws://%s:%d/stomp",
+                    "ws://%s:%d/ws",
                     authInfo.getCloudIp(),
                     authInfo.getCloudPort()
             );
@@ -109,14 +109,12 @@ public class MessageBrokerService {
     }
 
     @PreDestroy
-    public boolean disconnect() {
+    public void disconnect() {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
             log.info("Stomp disconnected");
-            setStatus(CloudConnectionStatus.DISCONNECTED);
-            return true;
         }
-        return false;
+        setStatus(CloudConnectionStatus.DISCONNECTED);
     }
 
     private boolean isConnected() {
