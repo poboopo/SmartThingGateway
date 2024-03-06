@@ -43,9 +43,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
             case "search" -> response.setResponse(searchJob.getRecentFoundDevices());
             case "logout" -> {
                 log.info("Logout event! Removing token from config.");
-                CloudAuthInfo authInfo = configurationService.getCloudAuthInfo();
-                authInfo.setToken(null);
-                configurationService.updateCloudAuthInfo(authInfo);
+                configurationService.updateCloudAuthInfo(null);
                 cloudService.clearAuthorization();
                 throw new LogoutException();
             }

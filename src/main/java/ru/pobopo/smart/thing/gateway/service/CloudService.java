@@ -10,9 +10,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
-import ru.pobopo.smart.thing.gateway.event.AuthorizedEvent;
+import ru.pobopo.smart.thing.gateway.event.CloudLoginEvent;
+import ru.pobopo.smart.thing.gateway.event.CloudLogoutEvent;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
-import ru.pobopo.smart.thing.gateway.model.AuthorizedCloudUser;
+import ru.pobopo.smart.thing.gateway.model.AuthenticatedCloudUser;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
 import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 
@@ -25,7 +26,7 @@ public class CloudService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final RestTemplate restTemplate;
 
-    private AuthorizedCloudUser authorizedCloudUser;
+    private AuthenticatedCloudUser authenticatedCloudUser;
 
     @Autowired
     public CloudService(ConfigurationService configurationService, ApplicationEventPublisher applicationEventPublisher, RestTemplate restTemplate) {
@@ -35,24 +36,29 @@ public class CloudService {
     }
 
     public void clearAuthorization() {
-        this.authorizedCloudUser = null;
+        this.authenticatedCloudUser = null;
     }
 
-    public AuthorizedCloudUser getAuthorizedCloudUser() throws AccessDeniedException {
-        if (authorizedCloudUser == null) {
-            log.info("AuthorizedCloudUser is null, trying to auth");
-            authorize();
+    public AuthenticatedCloudUser getAuthenticatedUser() throws AccessDeniedException {
+        if (authenticatedCloudUser == null) {
+            log.info("AuthenticatedCloudUser is null, trying to auth");
+            auth();
         }
-        return authorizedCloudUser;
+        return authenticatedCloudUser;
     }
 
-    public AuthorizedCloudUser authorize() throws AccessDeniedException {
-        authorizedCloudUser = basicRequest(HttpMethod.GET, "/auth", null, AuthorizedCloudUser.class);
-        if (authorizedCloudUser != null) {
-            log.info("Successfully authorized! {}", authorizedCloudUser);
-            applicationEventPublisher.publishEvent(new AuthorizedEvent(this, authorizedCloudUser));
+    public AuthenticatedCloudUser auth() throws AccessDeniedException {
+        authenticatedCloudUser = basicRequest(HttpMethod.GET, "/auth", null, AuthenticatedCloudUser.class);
+        if (authenticatedCloudUser != null) {
+            log.info("Successfully authorized! {}", authenticatedCloudUser);
+            applicationEventPublisher.publishEvent(new CloudLoginEvent(this, authenticatedCloudUser));
         }
-        return authorizedCloudUser;
+        return authenticatedCloudUser;
+    }
+
+    public void logout() {
+        authenticatedCloudUser = null;
+        applicationEventPublisher.publishEvent(new CloudLogoutEvent(this));
     }
 
     public void sendResponse(MessageResponse response) throws AccessDeniedException {

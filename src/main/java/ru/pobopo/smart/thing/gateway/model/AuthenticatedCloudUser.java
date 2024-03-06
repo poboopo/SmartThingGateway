@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class AuthorizedCloudUser {
+public class AuthenticatedCloudUser {
     private GatewayInfo gateway;
     private UserInfo user;
 }

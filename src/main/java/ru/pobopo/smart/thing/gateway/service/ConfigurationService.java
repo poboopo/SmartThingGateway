@@ -32,7 +32,7 @@ public class ConfigurationService {
     private final Properties properties = new Properties();
     private final String configFilePath;
     private final ApplicationEventPublisher applicationEventPublisher;
-    private CloudAuthInfo cloudInfo = new CloudAuthInfo();
+    private CloudAuthInfo cloudInfo;
 
     @Autowired
     public ConfigurationService(Environment environment, ApplicationEventPublisher applicationEventPublisher) {
@@ -50,9 +50,7 @@ public class ConfigurationService {
         return cloudInfo;
     }
 
-    public void updateCloudAuthInfo(@NonNull CloudAuthInfo info) throws ConfigurationException {
-        Objects.requireNonNull(info);
-
+    public void updateCloudAuthInfo(CloudAuthInfo info) throws ConfigurationException {
         this.cloudInfo = info;
         log.info("Cloud info was updated: {}", info);
 
@@ -63,8 +61,14 @@ public class ConfigurationService {
     public void loadConfiguration() throws ConfigurationException {
         loadPropertiesFromFile();
 
+        String token = properties.getProperty(TOKEN_PROPERTY);
+        if (StringUtils.isBlank(token)) {
+            log.info("Token property empty! No cloud info loaded");
+            return;
+        }
+
         this.cloudInfo = new CloudAuthInfo(
-            properties.getProperty(TOKEN_PROPERTY),
+            token,
             properties.getProperty(CCLOUD_IP_PROPERTY),
             Integer.parseInt(properties.getProperty(CLOUD_PORT_PROPERTY, "8080"))
         );
@@ -74,9 +78,15 @@ public class ConfigurationService {
     }
 
     private void writeCloudInfoToProperties() {
-        properties.setProperty(TOKEN_PROPERTY, cloudInfo.getToken() == null ? "" : cloudInfo.getToken());
-        properties.setProperty(CCLOUD_IP_PROPERTY, cloudInfo.getCloudIp() == null ? "" : cloudInfo.getCloudIp());
-        properties.setProperty(CLOUD_PORT_PROPERTY, String.valueOf(cloudInfo.getCloudPort()));
+        if (cloudInfo == null) {
+            properties.setProperty(TOKEN_PROPERTY, "");
+            properties.setProperty(CCLOUD_IP_PROPERTY, "");
+            properties.setProperty(CLOUD_PORT_PROPERTY, "");
+        } else {
+            properties.setProperty(TOKEN_PROPERTY, cloudInfo.getToken() == null ? "" : cloudInfo.getToken());
+            properties.setProperty(CCLOUD_IP_PROPERTY, cloudInfo.getCloudIp() == null ? "" : cloudInfo.getCloudIp());
+            properties.setProperty(CLOUD_PORT_PROPERTY, String.valueOf(cloudInfo.getCloudPort()));
+        }
     }
 
     private void savePropertiesToFile() throws ConfigurationException {

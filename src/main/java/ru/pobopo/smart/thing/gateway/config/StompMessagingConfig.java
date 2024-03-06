@@ -27,6 +27,7 @@ import ru.pobopo.smart.thing.gateway.stomp.message.BaseMessage;
 import ru.pobopo.smart.thing.gateway.stomp.message.DeviceRequestMessage;
 import ru.pobopo.smart.thing.gateway.stomp.message.GatewayCommand;
 
+import static ru.pobopo.smart.thing.gateway.service.MessageBrokerService.CONNECTION_STATUS_TOPIC;
 import static ru.pobopo.smart.thing.gateway.service.NotificationService.NOTIFICATION_TOPIC;
 
 @Configuration
@@ -34,12 +35,16 @@ import static ru.pobopo.smart.thing.gateway.service.NotificationService.NOTIFICA
 public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker( "/devices", NOTIFICATION_TOPIC);
+        config.enableSimpleBroker(
+                "/devices",
+                NOTIFICATION_TOPIC,
+                CONNECTION_STATUS_TOPIC
+        );
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/stomp").setAllowedOrigins("*");
+        registry.addEndpoint("/ws").setAllowedOrigins("*");
     }
 
     @Override

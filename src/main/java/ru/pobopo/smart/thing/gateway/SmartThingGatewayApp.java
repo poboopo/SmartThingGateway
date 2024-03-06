@@ -36,7 +36,7 @@ public class SmartThingGatewayApp {
             logsJobs.start();
             configurationService.loadConfiguration();
             try {
-                cloudService.authorize();
+                cloudService.auth();
             } catch (Throwable exception) {
                 log.error("Failed to authorize", exception);
             }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
 import ru.pobopo.smart.thing.gateway.exception.LogoutException;
+import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
 import ru.pobopo.smart.thing.gateway.model.Notification;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
@@ -17,6 +18,7 @@ import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 import ru.pobopo.smart.thing.gateway.stomp.processor.MessageProcessor;
 
 import java.lang.reflect.Type;
+import java.util.function.Consumer;
 
 @Component
 @Slf4j
@@ -27,6 +29,9 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
     @Getter
     @Setter
     private GatewayInfo gatewayInfo;
+    @Setter
+    private Consumer<CloudConnectionStatus> statusConsumer;
+
     private final MessageProcessorFactory processorFactory;
     private final CloudService cloudService;
 
@@ -82,11 +87,13 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
         } catch (AccessDeniedException e) {
             log.error("Failed to send notification", e);
         }
+        statusConsumer.accept(CloudConnectionStatus.CONNECTED);
     }
 
     @Override
     public void handleTransportError(StompSession session, Throwable exception) {
         super.handleTransportError(session, exception);
         log.error("Stomp transport error", exception);
+        statusConsumer.accept(CloudConnectionStatus.CONNECTION_LOST);
     }
 }
