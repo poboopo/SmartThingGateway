@@ -15,6 +15,7 @@ import ru.pobopo.smart.thing.gateway.event.*;
 import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
+import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatusMessage;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
 import ru.pobopo.smart.thing.gateway.stomp.CustomStompSessionHandler;
 
@@ -39,7 +40,7 @@ public class MessageBrokerService {
 
     synchronized public void setStatus(CloudConnectionStatus status) {
         this.cloudConnectionStatus = status;
-        this.messagingTemplate.convertAndSend(CONNECTION_STATUS_TOPIC, status);
+        this.messagingTemplate.convertAndSend(CONNECTION_STATUS_TOPIC, new CloudConnectionStatusMessage(status));
         //todo send logout event to cloud
     }
 

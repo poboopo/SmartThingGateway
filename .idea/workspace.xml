@@ -4,22 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="callback rename to hook">
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/event/CloudLoginEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/event/CloudLogoutEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/CloudConnectionStatus.java" afterDir="false" />
+    <list default="true" id="e3b1125b-84d6-4f28-9e02-629aeba17241" name="Changes" comment="cloud connection rework">
+      <change afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/CloudConnectionStatusMessage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/SmartThingGatewayApp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/SmartThingGatewayApp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/config/StompMessagingConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/config/StompMessagingConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/AuthController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/CloudConnectionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/controller/CloudController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/event/AuthorizedEvent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/AuthorizedCloudUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/model/AuthenticatedCloudUser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/CloudService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/ConfigurationService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/ConfigurationService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/MessageBrokerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/service/MessageBrokerService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/CustomStompSessionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/CustomStompSessionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/processor/GatewayCommandProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/pobopo/smart/thing/gateway/stomp/processor/GatewayCommandProcessor.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -360,7 +348,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707672795955</updated>
     </task>
-    <option name="localTasksCounter" value="31" />
+    <task id="LOCAL-00031" summary="cloud connection rework">
+      <option name="closed" value="true" />
+      <created>1709756834041</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1709756834041</updated>
+    </task>
+    <option name="localTasksCounter" value="32" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -385,7 +381,6 @@
     <MESSAGE value="authorization fixes" />
     <MESSAGE value="added gateway config" />
     <MESSAGE value="added notification send" />
-    <MESSAGE value="cloud connection rework" />
     <MESSAGE value="added cloud notifications" />
     <MESSAGE value="device api rework" />
     <MESSAGE value="changed device api to abstract class" />
@@ -398,7 +393,8 @@
     <MESSAGE value="device api fixes" />
     <MESSAGE value="renamed method to command in device request" />
     <MESSAGE value="callback rename to hook" />
-    <option name="LAST_COMMIT_MESSAGE" value="callback rename to hook" />
+    <MESSAGE value="cloud connection rework" />
+    <option name="LAST_COMMIT_MESSAGE" value="cloud connection rework" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
