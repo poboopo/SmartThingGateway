@@ -41,7 +41,6 @@ public class MessageBrokerService {
     synchronized public void setStatus(CloudConnectionStatus status) {
         this.cloudConnectionStatus = status;
         this.messagingTemplate.convertAndSend(CONNECTION_STATUS_TOPIC, new CloudConnectionStatusMessage(status));
-        //todo send logout event to cloud
     }
 
     public boolean sendNotification(SendNotificationRequest notificationRequest) {
@@ -73,6 +72,7 @@ public class MessageBrokerService {
     public void logout(CloudLogoutEvent event) {
         log.info("Logout event! Disconnecting from the cloud.");
         disconnect();
+        setStatus(CloudConnectionStatus.NOT_CONNECTED);
     }
 
     public boolean connect(GatewayInfo gatewayInfo) {

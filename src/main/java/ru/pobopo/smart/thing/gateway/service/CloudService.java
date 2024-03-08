@@ -1,5 +1,6 @@
 package ru.pobopo.smart.thing.gateway.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,11 @@ import ru.pobopo.smart.thing.gateway.model.AuthenticatedCloudUser;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
 import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 
+//TODO rework to feign client?
+
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class CloudService {
     public static final String AUTH_TOKEN_HEADER = "SmartThing-Token-Gateway";
 
@@ -27,13 +31,6 @@ public class CloudService {
     private final RestTemplate restTemplate;
 
     private AuthenticatedCloudUser authenticatedCloudUser;
-
-    @Autowired
-    public CloudService(ConfigurationService configurationService, ApplicationEventPublisher applicationEventPublisher, RestTemplate restTemplate) {
-        this.configurationService = configurationService;
-        this.applicationEventPublisher = applicationEventPublisher;
-        this.restTemplate = restTemplate;
-    }
 
     public void clearAuthorization() {
         this.authenticatedCloudUser = null;
@@ -57,6 +54,11 @@ public class CloudService {
     }
 
     public void logout() {
+        try {
+            basicRequest(HttpMethod.POST,"/auth/gateway/logout", null, Void.class);
+        } catch (Exception e) {
+            log.error("Failed to logout in cloud: {}", e.getMessage());
+        }
         authenticatedCloudUser = null;
         applicationEventPublisher.publishEvent(new CloudLogoutEvent(this));
     }
@@ -99,8 +101,15 @@ public class CloudService {
         );
 
         try {
+            String url = buildUrl(cloudInfo, path);
+            log.info(
+                "Sending request: url={}, method={}, entity={}",
+                url,
+                method.name(),
+                entity
+            );
             ResponseEntity<T> response = restTemplate.exchange(
-                    buildUrl(cloudInfo, path),
+                    url,
                     method,
                     entity,
                     tClass
