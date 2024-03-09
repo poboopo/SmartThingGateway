@@ -58,8 +58,15 @@ public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
         WebSocketClient webSocketClient = new StandardWebSocketClient();
         WebSocketStompClient stompClient = new WebSocketStompClient(webSocketClient);
         stompClient.setMessageConverter(new BaseMessageConverter(objectMapper()));
-        stompClient.setTaskScheduler(new ThreadPoolTaskScheduler());
+        stompClient.setTaskScheduler(taskScheduler());
         return stompClient;
+    }
+
+    private ThreadPoolTaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(10);
+        taskScheduler.initialize();
+        return taskScheduler;
     }
 
     private ObjectMapper objectMapper() {

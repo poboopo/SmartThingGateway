@@ -18,6 +18,7 @@ import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 import ru.pobopo.smart.thing.gateway.stomp.processor.MessageProcessor;
 
 import java.lang.reflect.Type;
+import java.net.ConnectException;
 import java.util.function.Consumer;
 
 @Component
@@ -26,9 +27,6 @@ import java.util.function.Consumer;
 public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
     private final static String TOPIC = "/secured/queue/gateway/";
 
-    @Getter
-    @Setter
-    private GatewayInfo gatewayInfo;
     @Setter
     private Consumer<CloudConnectionStatus> statusConsumer;
 
@@ -92,8 +90,9 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
 
     @Override
     public void handleTransportError(StompSession session, Throwable exception) {
-        super.handleTransportError(session, exception);
-        log.error("Stomp transport error", exception);
-        statusConsumer.accept(CloudConnectionStatus.CONNECTION_LOST);
+        log.error("Stomp transport error: {} ({})", exception.getMessage(), exception.getClass());
+        if (exception instanceof ConnectionLostException) {
+            statusConsumer.accept(CloudConnectionStatus.CONNECTION_LOST);
+        }
     }
 }

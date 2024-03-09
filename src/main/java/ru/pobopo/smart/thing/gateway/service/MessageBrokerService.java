@@ -2,70 +2,73 @@ package ru.pobopo.smart.thing.gateway.service;
 
 import jakarta.annotation.PreDestroy;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
 import ru.pobopo.smart.thing.gateway.event.*;
 import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
 import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatusMessage;
-import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
 import ru.pobopo.smart.thing.gateway.stomp.CustomStompSessionHandler;
+
+import java.util.concurrent.ExecutionException;
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class MessageBrokerService {
     public static final String CONNECTION_STATUS_TOPIC = "/connection/status";
 
     private final WebSocketStompClient stompClient;
     private final ConfigurationService configurationService;
     private final CustomStompSessionHandler sessionHandler;
-    private final CloudService cloudService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    private CloudConnectionStatus cloudConnectionStatus = CloudConnectionStatus.NOT_CONNECTED;
+    @Value("${server.reconnect.attempts}")
+    private int reconnectAttempts;
+    @Value("${server.reconnect.pause}")
+    private int reconnectPause;
+
+    private CloudConnectionStatus connectionStatus = CloudConnectionStatus.NOT_CONNECTED;
     private StompSession stompSession;
+    private Thread reconnectThread;
+    private boolean reconnectFailed = false;
+
+    public MessageBrokerService(WebSocketStompClient stompClient, ConfigurationService configurationService, CustomStompSessionHandler sessionHandler, SimpMessagingTemplate messagingTemplate) {
+        this.stompClient = stompClient;
+        this.configurationService = configurationService;
+        this.sessionHandler = sessionHandler;
+        this.messagingTemplate = messagingTemplate;
+
+        this.sessionHandler.setStatusConsumer(this::setStatus);
+    }
 
     public CloudConnectionStatus getStatus() {
-        return cloudConnectionStatus;
+        return connectionStatus;
     }
 
     synchronized public void setStatus(CloudConnectionStatus status) {
-        this.cloudConnectionStatus = status;
+        log.info("New connection status: {}", status);
+        this.connectionStatus = status;
         this.messagingTemplate.convertAndSend(CONNECTION_STATUS_TOPIC, new CloudConnectionStatusMessage(status));
-    }
 
-    public boolean sendNotification(SendNotificationRequest notificationRequest) {
-        if (notificationRequest == null) {
-            return false;
+        if (status == CloudConnectionStatus.CONNECTION_LOST) {
+             startReconnectThread();
         }
-
-        if (!isConnected()) {
-            log.warn("Not connected to the cloud!");
-            return false;
+        if (status == CloudConnectionStatus.CONNECTED) {
+            stopReconnectThread();
+            reconnectFailed = false;
         }
-
-        try {
-            cloudService.notification(notificationRequest);
-            return true;
-        } catch (Exception exception) {
-            log.error("Failed to send notification in cloud: {}", exception.getMessage(), exception);
-        }
-
-        return false;
     }
 
     @EventListener
     public void connect(CloudLoginEvent event) {
-        connect(event.getAuthorizedCloudUser().getGateway());
+        connect();
     }
 
     @EventListener
@@ -75,37 +78,41 @@ public class MessageBrokerService {
         setStatus(CloudConnectionStatus.NOT_CONNECTED);
     }
 
-    public boolean connect(GatewayInfo gatewayInfo) {
+    public void connect() {
+        stopReconnectThread();
         disconnect();
         try {
-            if (gatewayInfo == null) {
-                throw new ConfigurationException("Gateway info is missing");
+            if (connectionStatus == CloudConnectionStatus.CONNECTING) {
+                return;
             }
-
-            CloudAuthInfo authInfo = configurationService.getCloudAuthInfo();
-            if (authInfo == null) {
-                throw new ConfigurationException("Cloud info is missing");
-            }
-
-            String url = String.format(
-                    "ws://%s:%d/ws",
-                    authInfo.getCloudIp(),
-                    authInfo.getCloudPort()
-            );
-
-            sessionHandler.setGatewayInfo(gatewayInfo);
-            sessionHandler.setStatusConsumer(this::setStatus);
-
-            WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-            headers.add(CloudService.AUTH_TOKEN_HEADER, authInfo.getToken());
             setStatus(CloudConnectionStatus.CONNECTING);
-            stompSession = stompClient.connectAsync(url, headers, sessionHandler).get();
-            return true;
+            connectWs();
         } catch (Exception e) {
             log.error("Failed to connect", e);
             setStatus(CloudConnectionStatus.FAILED_TO_CONNECT);
         }
-        return false;
+    }
+
+    private void connectWs() throws ConfigurationException, ExecutionException, InterruptedException {
+        CloudAuthInfo authInfo = configurationService.getCloudAuthInfo();
+        if (authInfo == null) {
+            throw new ConfigurationException("Cloud info is missing! No token in config?");
+        }
+
+        String url = String.format(
+                "ws://%s:%d/ws",
+                authInfo.getCloudIp(),
+                authInfo.getCloudPort()
+        );
+        log.info("Connecting to {} websocket", url);
+
+        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+        headers.add(CloudService.AUTH_TOKEN_HEADER, authInfo.getToken());
+
+        if (stompSession != null && stompSession.isConnected()) {
+            stompSession.disconnect();
+        }
+        stompSession = stompClient.connectAsync(url, headers, sessionHandler).get();
     }
 
     @PreDestroy
@@ -117,7 +124,52 @@ public class MessageBrokerService {
         setStatus(CloudConnectionStatus.DISCONNECTED);
     }
 
-    private boolean isConnected() {
-        return stompSession != null && stompSession.isConnected();
+    private void stopReconnectThread() {
+        if (reconnectThread != null && reconnectThread.isAlive()) {
+            log.info("Stopping reconnect thread");
+            reconnectThread.interrupt();
+            reconnectThread = null;
+        }
     }
+
+    private void startReconnectThread() {
+        if (reconnectFailed) {
+            return;
+        }
+        if (reconnectAttempts == 0) {
+            log.info("Reconnect disabled");
+            return;
+        }
+        setStatus(CloudConnectionStatus.RECONNECTING);
+        if (reconnectThread != null && reconnectThread.isAlive()) {
+            log.info("Reconnect thread already running");
+            return;
+        }
+        reconnectThread = new Thread(() -> {
+            int attempt = 0;
+            while ((stompSession == null || !stompSession.isConnected()) && attempt < reconnectAttempts) {
+                try {
+                    Thread.sleep(reconnectPause);
+                    log.info("Reconnect attempt №{}", attempt);
+                    connectWs();
+                } catch (InterruptedException exception) {
+                    break;
+                } catch (Exception exception) {
+                    log.warn("Failed to reconnect: {}", exception.getMessage());
+                } finally {
+                    attempt++;
+                }
+            }
+            log.info("Reconnect thread stopped");
+            if (stompSession == null || !stompSession.isConnected()) {
+                setStatus(CloudConnectionStatus.CONNECTION_LOST);
+                reconnectFailed = true;
+            }
+        });
+        reconnectThread.setDaemon(true);
+
+        log.info("Starting reconnect thread");
+        reconnectThread.start();
+    }
+
 }

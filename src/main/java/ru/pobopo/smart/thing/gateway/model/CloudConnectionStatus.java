@@ -6,5 +6,6 @@ public enum CloudConnectionStatus {
     CONNECTED,
     CONNECTION_LOST,
     DISCONNECTED,
-    FAILED_TO_CONNECT
+    FAILED_TO_CONNECT,
+    RECONNECTING,
 }

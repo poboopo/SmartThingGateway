@@ -27,15 +27,12 @@ public class CloudController {
     }
 
     @PutMapping("/connection/connect")
-    public boolean connect() throws AccessDeniedException {
-        return messageService.connect(
-                Objects.requireNonNull(cloudService.getAuthenticatedUser()).getGateway()
-        );
+    public void connect() {
+        messageService.connect();
     }
     @PutMapping("/connection/disconnect")
-    public boolean disconnect() throws AccessDeniedException {
+    public void disconnect() {
         messageService.disconnect();
-        return true;
     }
 
     @GetMapping("/auth")
