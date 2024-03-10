@@ -75,16 +75,12 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
         });
 
 
-        try {
-            cloudService.notification(
-                    new SendNotificationRequest(new Notification(
-                            "I am online!!!",
-                            "info"
-                    ))
-            );
-        } catch (AccessDeniedException e) {
-            log.error("Failed to send notification", e);
-        }
+        cloudService.notification(
+                new SendNotificationRequest(new Notification(
+                        "I am online!!!",
+                        "info"
+                ))
+        );
         statusConsumer.accept(CloudConnectionStatus.CONNECTED);
     }
 

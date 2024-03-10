@@ -8,17 +8,15 @@ import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
 import ru.pobopo.smart.thing.gateway.stomp.message.GatewayCommand;
 import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
-import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
 
 @Slf4j
 @RequiredArgsConstructor
 public class GatewayCommandProcessor implements MessageProcessor {
     private final DevicesSearchJob searchJob;
-    private final ConfigurationService configurationService;
     private final CloudService cloudService;
 
     @Override
-    public MessageResponse process(Object payload) throws Exception {
+    public MessageResponse process(Object payload) {
         GatewayCommand gatewayCommand = (GatewayCommand) payload;
 
         MessageResponse response = new MessageResponse();
@@ -35,8 +33,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
             case "search" -> response.setResponse(searchJob.getRecentFoundDevices());
             case "logout" -> {
                 log.info("Logout event! Removing token from config.");
-                configurationService.updateCloudAuthInfo(null);
-                cloudService.clearAuthorization();
+                cloudService.logout();
                 throw new LogoutException();
             }
             default -> {

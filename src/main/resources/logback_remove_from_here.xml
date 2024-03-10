@@ -23,8 +23,8 @@
         </rollingPolicy>
     </appender>
 
-    <appender name="MULTICAST_LOGS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS}/multicast-logs.log</file>
+    <appender name="DEVICE_LOGS_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS}/device-logs.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${FILE_LOG_PATTERN}</pattern>
         </encoder>
@@ -32,7 +32,7 @@
         <rollingPolicy
             class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily and when the file reaches 10 MegaBytes -->
-            <fileNamePattern>${LOGS}/multicast-logs-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${LOGS}/device-logs-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                 class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
@@ -40,8 +40,8 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="multicast-logs" level="DEBUG" additivity="false">
-        <appender-ref ref="MULTICAST_LOGS_FILE"/>
+    <logger name="device-logs" level="DEBUG" additivity="false">
+        <appender-ref ref="DEVICE_LOGS_FILE"/>
     </logger>
 
     <root level="INFO">

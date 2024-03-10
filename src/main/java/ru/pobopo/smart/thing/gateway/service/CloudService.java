@@ -1,56 +1,72 @@
 package ru.pobopo.smart.thing.gateway.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
-import ru.pobopo.smart.thing.gateway.event.CloudLoginEvent;
-import ru.pobopo.smart.thing.gateway.event.CloudLogoutEvent;
-import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
-import ru.pobopo.smart.thing.gateway.model.AuthenticatedCloudUser;
-import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
+import ru.pobopo.smart.thing.gateway.exception.StorageException;
+import ru.pobopo.smart.thing.gateway.model.CloudIdentity;
+import ru.pobopo.smart.thing.gateway.model.CloudConfig;
 import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
-
-//TODO rework to feign client?
 
 @Component
 @Slf4j
-@RequiredArgsConstructor
 public class CloudService {
     public static final String AUTH_TOKEN_HEADER = "SmartThing-Token-Gateway";
 
-    private final ConfigurationService configurationService;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final StorageService storageService;
     private final RestTemplate restTemplate;
 
-    private AuthenticatedCloudUser authenticatedCloudUser;
+    private CloudIdentity cloudIdentity;
+    @Getter
+    private CloudConfig cloudConfig;
 
-    public void clearAuthorization() {
-        this.authenticatedCloudUser = null;
+    @Autowired
+    public CloudService(StorageService storageService, RestTemplate restTemplate) {
+        this.storageService = storageService;
+        this.restTemplate = restTemplate;
+
+        try {
+            cloudConfig = storageService.loadCloudConfig();
+            cloudIdentity = storageService.loadCloudIdentity();
+        } catch (StorageException exception) {
+            log.warn("Failed to load cloud config or identity: {}", exception.getMessage());
+        }
     }
 
-    public AuthenticatedCloudUser getAuthenticatedUser() throws AccessDeniedException {
-        if (authenticatedCloudUser == null) {
-            log.info("AuthenticatedCloudUser is null, trying to auth");
-            auth();
+    public CloudIdentity getCloudIdentity() {
+        if (cloudIdentity == null) {
+            log.info("Cloud identity is null, trying to auth");
+            login();
         }
-        return authenticatedCloudUser;
+        return cloudIdentity;
     }
 
-    public AuthenticatedCloudUser auth() throws AccessDeniedException {
-        authenticatedCloudUser = basicRequest(HttpMethod.GET, "/auth", null, AuthenticatedCloudUser.class);
-        if (authenticatedCloudUser != null) {
-            log.info("Successfully authorized! {}", authenticatedCloudUser);
-            applicationEventPublisher.publishEvent(new CloudLoginEvent(this, authenticatedCloudUser));
+    public CloudIdentity login(CloudConfig cloudConfig) throws StorageException {
+        this.cloudConfig = cloudConfig;
+        try {
+            login();
+            storageService.saveCloudConfig(cloudConfig);
+            return cloudIdentity;
+        } catch (Exception exception) {
+            this.cloudConfig = null;
+            throw exception;
         }
-        return authenticatedCloudUser;
+    }
+
+    public void login() {
+        cloudIdentity = basicRequest(HttpMethod.GET, "/auth", null, CloudIdentity.class);
+        try {
+            storageService.saveCloudIdentity(cloudIdentity);
+        } catch (StorageException exception) {
+            log.error("Failed to save cloud identity: {}", exception.getMessage());
+        }
     }
 
     public void logout() {
@@ -59,11 +75,21 @@ public class CloudService {
         } catch (Exception e) {
             log.error("Failed to logout in cloud: {}", e.getMessage());
         }
-        authenticatedCloudUser = null;
-        applicationEventPublisher.publishEvent(new CloudLogoutEvent(this));
+        removeCloudConfigs();
     }
 
-    public void sendResponse(MessageResponse response) throws AccessDeniedException {
+    public void removeCloudConfigs() {
+        cloudIdentity = null;
+        cloudConfig = null;
+        try {
+            storageService.saveCloudIdentity(null);
+            storageService.saveCloudConfig(null);
+        } catch (StorageException exception) {
+            log.error("Failed to clear cloud configs: {}", exception.getMessage());
+        }
+    }
+
+    public void sendResponse(MessageResponse response) {
         basicRequest(
                 HttpMethod.POST,
                 "/gateway/requests/response",
@@ -72,7 +98,7 @@ public class CloudService {
         );
     }
 
-    public void notification(SendNotificationRequest notification) throws AccessDeniedException {
+    public void notification(SendNotificationRequest notification) {
         basicRequest(
                 HttpMethod.POST,
                 "/gateway/requests/notification",
@@ -82,49 +108,35 @@ public class CloudService {
     }
 
     @Nullable
-    private <T, P> T basicRequest(HttpMethod method, String path, P payload, Class<T> tClass) throws AccessDeniedException {
+    private <T, P> T basicRequest(HttpMethod method, String path, P payload, Class<T> tClass) {
         if (path == null) {
             path = "";
         }
 
-        CloudAuthInfo cloudInfo = configurationService.getCloudAuthInfo();
-        if (cloudInfo == null || StringUtils.isBlank(cloudInfo.getToken())) {
-            log.error("No cloud token");
-            return null;
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(AUTH_TOKEN_HEADER, cloudInfo.getToken());
-        HttpEntity<P> entity = new HttpEntity<>(
-                payload,
-                headers
-        );
-
         try {
-            String url = buildUrl(cloudInfo, path);
-            log.info(
-                "Sending request: url={}, method={}, entity={}",
-                url,
-                method.name(),
-                entity
-            );
-            ResponseEntity<T> response = restTemplate.exchange(
-                    url,
-                    method,
-                    entity,
-                    tClass
-            );
+            if (cloudConfig == null || StringUtils.isBlank(cloudConfig.getToken())) {
+                log.error("No cloud token in cloud config found");
+                return null;
+            }
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(AUTH_TOKEN_HEADER, cloudConfig.getToken());
+            HttpEntity<P> entity = new HttpEntity<>(payload, headers);
+
+            String url = buildUrl(cloudConfig, path);
+            log.info("Sending request: url={}, method={}, entity={}", url, method.name(), entity);
+            ResponseEntity<T> response = restTemplate.exchange(url, method, entity, tClass);
             return response.getBody();
         } catch (ResourceAccessException exception) {
             log.error("Request failed: {}", exception.getMessage());
             throw exception;
         } catch (Exception exception) {
             log.error("Request failed: {}", exception.getMessage());
-            throw new  RuntimeException();
+            throw new RuntimeException();
         }
     }
 
-    private String buildUrl(CloudAuthInfo cloudInfo, String path) {
+    private String buildUrl(CloudConfig cloudInfo, String path) {
         return String.format(
                 "http://%s:%s/%s",
                 cloudInfo.getCloudIp(),

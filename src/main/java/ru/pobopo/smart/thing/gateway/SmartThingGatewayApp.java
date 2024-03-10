@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import ru.pobopo.smart.thing.gateway.service.LogJobsService;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
-import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
+import ru.pobopo.smart.thing.gateway.service.MessageBrokerService;
 
 @Slf4j
 @SpringBootApplication
@@ -28,17 +28,21 @@ public class SmartThingGatewayApp {
 
     @Bean
     CommandLineRunner run(
-            ConfigurationService configurationService,
             CloudService cloudService,
+            MessageBrokerService brokerService,
             LogJobsService logsJobs
     )  {
         return args -> {
             logsJobs.start();
-            configurationService.loadConfiguration();
             try {
-                cloudService.auth();
+                cloudService.login();
             } catch (Throwable exception) {
-                log.error("Failed to authorize", exception);
+                log.error("Failed to login in cloud: {}", exception.getMessage());
+            }
+            try {
+                brokerService.connect();
+            } catch (Throwable exception) {
+                log.error("Failed to connect to cloud: {}", exception.getMessage());
             }
         };
     }

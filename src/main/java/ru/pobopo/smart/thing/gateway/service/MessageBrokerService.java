@@ -4,6 +4,7 @@ import jakarta.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.IncompatibleConfigurationException;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompSession;
@@ -11,8 +12,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import ru.pobopo.smart.thing.gateway.event.*;
-import ru.pobopo.smart.thing.gateway.exception.ConfigurationException;
-import ru.pobopo.smart.thing.gateway.model.CloudAuthInfo;
+import ru.pobopo.smart.thing.gateway.exception.StorageException;
+import ru.pobopo.smart.thing.gateway.model.CloudConfig;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatusMessage;
 import ru.pobopo.smart.thing.gateway.stomp.CustomStompSessionHandler;
@@ -25,9 +26,9 @@ public class MessageBrokerService {
     public static final String CONNECTION_STATUS_TOPIC = "/connection/status";
 
     private final WebSocketStompClient stompClient;
-    private final ConfigurationService configurationService;
     private final CustomStompSessionHandler sessionHandler;
     private final SimpMessagingTemplate messagingTemplate;
+    private final CloudService cloudService;
 
     @Value("${server.reconnect.attempts}")
     private int reconnectAttempts;
@@ -39,11 +40,11 @@ public class MessageBrokerService {
     private Thread reconnectThread;
     private boolean reconnectFailed = false;
 
-    public MessageBrokerService(WebSocketStompClient stompClient, ConfigurationService configurationService, CustomStompSessionHandler sessionHandler, SimpMessagingTemplate messagingTemplate) {
+    public MessageBrokerService(WebSocketStompClient stompClient, CloudService cloudService, CustomStompSessionHandler sessionHandler, SimpMessagingTemplate messagingTemplate) {
         this.stompClient = stompClient;
-        this.configurationService = configurationService;
         this.sessionHandler = sessionHandler;
         this.messagingTemplate = messagingTemplate;
+        this.cloudService = cloudService;
 
         this.sessionHandler.setStatusConsumer(this::setStatus);
     }
@@ -66,14 +67,7 @@ public class MessageBrokerService {
         }
     }
 
-    @EventListener
-    public void connect(CloudLoginEvent event) {
-        connect();
-    }
-
-    @EventListener
-    public void logout(CloudLogoutEvent event) {
-        log.info("Logout event! Disconnecting from the cloud.");
+    public void logout() {
         disconnect();
         setStatus(CloudConnectionStatus.NOT_CONNECTED);
     }
@@ -82,7 +76,7 @@ public class MessageBrokerService {
         stopReconnectThread();
         disconnect();
         try {
-            if (connectionStatus == CloudConnectionStatus.CONNECTING) {
+            if (connectionStatus == CloudConnectionStatus.CONNECTING || connectionStatus == CloudConnectionStatus.CONNECTED) {
                 return;
             }
             setStatus(CloudConnectionStatus.CONNECTING);
@@ -93,21 +87,21 @@ public class MessageBrokerService {
         }
     }
 
-    private void connectWs() throws ConfigurationException, ExecutionException, InterruptedException {
-        CloudAuthInfo authInfo = configurationService.getCloudAuthInfo();
-        if (authInfo == null) {
-            throw new ConfigurationException("Cloud info is missing! No token in config?");
+    private void connectWs() throws ExecutionException, InterruptedException {
+        CloudConfig cloudConfig = cloudService.getCloudConfig();
+        if (cloudConfig == null) {
+            throw new IncompatibleConfigurationException("Can't find token in cloud config");
         }
 
         String url = String.format(
                 "ws://%s:%d/ws",
-                authInfo.getCloudIp(),
-                authInfo.getCloudPort()
+                cloudConfig.getCloudIp(),
+                cloudConfig.getCloudPort()
         );
-        log.info("Connecting to {} websocket", url);
+        log.info("Connecting to {}", url);
 
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-        headers.add(CloudService.AUTH_TOKEN_HEADER, authInfo.getToken());
+        headers.add(CloudService.AUTH_TOKEN_HEADER, cloudConfig.getToken());
 
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
@@ -119,7 +113,7 @@ public class MessageBrokerService {
     public void disconnect() {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
-            log.info("Stomp disconnected");
+            log.info("Stop session disconnected");
         }
         setStatus(CloudConnectionStatus.DISCONNECTED);
     }

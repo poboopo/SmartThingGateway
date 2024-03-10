@@ -9,7 +9,6 @@ import ru.pobopo.smart.thing.gateway.stomp.message.GatewayMessageType;
 import ru.pobopo.smart.thing.gateway.stomp.processor.DeviceRequestMessageProcessor;
 import ru.pobopo.smart.thing.gateway.stomp.processor.GatewayCommandProcessor;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
-import ru.pobopo.smart.thing.gateway.service.ConfigurationService;
 
 @Configuration
 public class MessageProcessorConfig {
@@ -17,7 +16,6 @@ public class MessageProcessorConfig {
     @Bean
     public MessageProcessorFactory messageProcessorFactory(
             DevicesSearchJob searchJob,
-            ConfigurationService configurationService,
             CloudService cloudService,
             DeviceApiService deviceApiService
     ) {
@@ -27,7 +25,6 @@ public class MessageProcessorConfig {
         ));
         messageProcessorFactory.addProcessor(GatewayMessageType.GATEWAY_COMMAND, new GatewayCommandProcessor(
                 searchJob,
-                configurationService,
                 cloudService
         ));
         return messageProcessorFactory;
