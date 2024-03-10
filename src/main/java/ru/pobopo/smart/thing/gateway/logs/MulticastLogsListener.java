@@ -58,7 +58,7 @@ public class MulticastLogsListener implements LogsListener {
                         packet.getLength(),
                         StandardCharsets.UTF_8
                 );
-                DeviceLoggerMessage deviceLoggerMessage = DeviceLoggerMessage.parse(message);
+                DeviceLoggerMessage deviceLoggerMessage = DeviceLoggerMessage.parse("empty", message);
                 deviceLoggerMessage.setSource(DeviceLogSource.MULTICAST);
                 logsProcessor.addLog(deviceLoggerMessage);
             }

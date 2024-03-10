@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,8 +16,6 @@ import ru.pobopo.smart.thing.gateway.model.DeviceLoggerMessage;
 @Component
 @Slf4j
 public class LogJobsService {
-    public static final String DEVICES_LOGS_TOPIC = "/devices/logs";
-
     private final List<LogsListener> logsListenerList;
     private final ThreadPoolExecutor threadPoolExecutor;
 
@@ -26,7 +25,9 @@ public class LogJobsService {
         threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(logsListenerList.size());
     }
 
+    @PostConstruct
     public void start() {
+        log.info("Starting devices logs listeners");
         logsListenerList.forEach(threadPoolExecutor::execute);
     }
 }

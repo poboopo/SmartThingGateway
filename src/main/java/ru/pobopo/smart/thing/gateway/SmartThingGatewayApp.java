@@ -7,7 +7,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import ru.pobopo.smart.thing.gateway.service.LogJobsService;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
 import ru.pobopo.smart.thing.gateway.service.MessageBrokerService;
 
@@ -29,11 +28,9 @@ public class SmartThingGatewayApp {
     @Bean
     CommandLineRunner run(
             CloudService cloudService,
-            MessageBrokerService brokerService,
-            LogJobsService logsJobs
+            MessageBrokerService brokerService
     )  {
         return args -> {
-            logsJobs.start();
             try {
                 cloudService.login();
             } catch (Throwable exception) {
