@@ -46,8 +46,8 @@ public class CloudController {
         messageService.logout();
     }
 
-    @GetMapping("/info")
-    public CloudConfig getCloudInfo() {
+    @GetMapping("/config")
+    public CloudConfig getCloudConfig() {
         return cloudService.getCloudConfig();
     }
 }
