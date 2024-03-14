@@ -11,9 +11,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
@@ -23,6 +23,7 @@ import ru.pobopo.smart.thing.gateway.service.DeviceService;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class DevicesSearchJob implements BackgroundJob {
     // TODO MOVE ALL TO ENV
     public static final String DEVICES_SEARCH_TOPIC = "/devices/search";
@@ -40,12 +41,6 @@ public class DevicesSearchJob implements BackgroundJob {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final DeviceService deviceService;
-
-    @Autowired
-    public DevicesSearchJob(SimpMessagingTemplate messagingTemplate, DeviceService deviceService) {
-        this.messagingTemplate = messagingTemplate;
-        this.deviceService = deviceService;
-    }
 
     @Override
     public void run() {

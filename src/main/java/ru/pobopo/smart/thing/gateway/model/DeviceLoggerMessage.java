@@ -1,6 +1,5 @@
 package ru.pobopo.smart.thing.gateway.model;
 
-import java.net.InetAddress;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -15,7 +14,7 @@ public class DeviceLoggerMessage {
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime dateTime;
     private DeviceInfo device;
-    private Level level;
+    private Level level = Level.INFO;
     private String tag;
     private String message;
     private DeviceLogSource source;
@@ -35,11 +34,8 @@ public class DeviceLoggerMessage {
         deviceLoggerMessage.setDevice(
             new DeviceInfo(address, splited[0])
         );
-        String level = splited[1];
-        if (StringUtils.isBlank(level)) {
-            level = "INFO";
-        }
-        deviceLoggerMessage.setLevel(Level.valueOf(level));
+        int level = Integer.parseInt(splited[1]);
+        deviceLoggerMessage.setLevel(Level.intToLevel(level));
         deviceLoggerMessage.setTag(splited[2]);
         deviceLoggerMessage.setMessage(splited[3].trim());
         return deviceLoggerMessage;

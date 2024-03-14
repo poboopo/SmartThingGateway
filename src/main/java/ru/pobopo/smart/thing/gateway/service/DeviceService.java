@@ -1,20 +1,14 @@
 package ru.pobopo.smart.thing.gateway.service;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
-import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
-import ru.pobopo.smart.thing.gateway.stomp.message.DeviceRequestMessage;
 
 @Component
 @Slf4j
