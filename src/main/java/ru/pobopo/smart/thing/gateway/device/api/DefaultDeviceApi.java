@@ -49,6 +49,7 @@ public class DefaultDeviceApi extends DeviceApi {
 
     @Override
     public boolean accept(DeviceRequest request) {
+        // todo select by version and then find in recent?
         return searchJob.getRecentFoundDevices()
                 .stream().anyMatch((d) ->
                         d.getIp().equals(request.getDevice().getIp()) &&

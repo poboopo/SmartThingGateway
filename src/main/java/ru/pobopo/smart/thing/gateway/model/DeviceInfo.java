@@ -1,5 +1,6 @@
 package ru.pobopo.smart.thing.gateway.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
@@ -10,19 +11,20 @@ import org.springframework.lang.Nullable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "Device information")
 public class DeviceInfo {
+    @Schema(description = "Ip in local network")
     private String ip;
+    @Schema(description = "Device type", example = "lamp")
     private String type;
+    @Schema(description = "Device name")
     private String name;
+    @Schema(description = "Firmware version")
     private String version;
 
     public DeviceInfo(String ip,  String name) {
         this.ip = ip;
         this.name = name;
-    }
-
-    public boolean isEmpty() {
-        return StringUtils.isEmpty(ip) || StringUtils.isEmpty(name);
     }
 
     @Nullable

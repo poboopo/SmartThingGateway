@@ -2,6 +2,7 @@ package ru.pobopo.smart.thing.gateway.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import ru.pobopo.smart.thing.gateway.controller.model.UpdateDeviceSettings;
@@ -28,8 +29,7 @@ public class DeviceSettingsService {
 
     private final Path directoryPath;
 
-    public DeviceSettingsService(Environment env) throws IOException {
-        String path = env.getProperty("device.settings.dir", String.class);
+    public DeviceSettingsService(@Value("${device.settings.dir}") String path) throws IOException {
         this.directoryPath = StringUtils.isEmpty(path) ? SETTINGS_DIR_DEFAULT_PATH : Paths.get(path);
 
         log.info("Using device settings directory={}", directoryPath);

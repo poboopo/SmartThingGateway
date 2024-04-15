@@ -12,6 +12,7 @@ import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
 import ru.pobopo.smart.thing.gateway.model.Notification;
+import ru.pobopo.smart.thing.gateway.model.NotificationType;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
 import ru.pobopo.smart.thing.gateway.stomp.message.BaseMessage;
 import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
@@ -78,7 +79,7 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
         cloudService.notification(
                 new SendNotificationRequest(new Notification(
                         "I am online!!!",
-                        "info"
+                        NotificationType.INFO
                 ))
         );
         statusConsumer.accept(CloudConnectionStatus.CONNECTED);
