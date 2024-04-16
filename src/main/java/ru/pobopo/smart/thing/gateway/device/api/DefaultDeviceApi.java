@@ -169,10 +169,10 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse getHooksTemplates(DeviceInfo info) {
+    public DeviceResponse getHooksTemplates(DeviceInfo info, String type) {
         return sendRequest(
                 info,
-                HOOKS_TEMPLATES
+                HOOKS_TEMPLATES + "?type=" + type
         );
     }
 
