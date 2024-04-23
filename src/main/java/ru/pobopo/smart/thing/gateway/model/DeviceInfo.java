@@ -1,5 +1,6 @@
 package ru.pobopo.smart.thing.gateway.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
@@ -11,6 +12,7 @@ import org.springframework.lang.Nullable;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Device information")
 public class DeviceInfo {
     @Schema(description = "Ip in local network")
@@ -58,15 +60,16 @@ public class DeviceInfo {
 
         DeviceInfo comp = (DeviceInfo) obj;
         return StringUtils.equals(comp.getIp(), getIp())
-               && StringUtils.equals(comp.getName(), getName())
-                && StringUtils.equals(comp.getType(), getType());
+               && StringUtils.equals(comp.getName(), getName());
+        // do i need this check?
+//                && StringUtils.equals(comp.getType(), getType());
     }
 
     @Override
     public int hashCode() {
         int hashCode = ip.hashCode();
         hashCode = 31 * hashCode + name.hashCode();
-        hashCode = 31 * hashCode + type.hashCode();
+//        hashCode = 31 * hashCode + type.hashCode();
         return hashCode;
     }
 }

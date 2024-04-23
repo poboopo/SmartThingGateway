@@ -29,7 +29,7 @@ public class DeviceSettingsService {
 
     private final Path directoryPath;
 
-    public DeviceSettingsService(@Value("${device.settings.dir}") String path) throws IOException {
+    public DeviceSettingsService(@Value("${device.settings.dir:}") String path) throws IOException {
         this.directoryPath = StringUtils.isEmpty(path) ? SETTINGS_DIR_DEFAULT_PATH : Paths.get(path);
 
         log.info("Using device settings directory={}", directoryPath);
