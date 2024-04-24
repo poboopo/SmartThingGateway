@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smart.thing.gateway.exception.DashboardFileException;
 import ru.pobopo.smart.thing.gateway.model.DashboardGroup;
-import ru.pobopo.smart.thing.gateway.model.DashboardObservable;
 import ru.pobopo.smart.thing.gateway.service.DashboardService;
 
 import java.io.IOException;
@@ -30,9 +29,9 @@ public class DashboardController {
         return dashboardService.createGroup(group);
     }
 
-    @PutMapping("/{id}")
-    public void updateGroupObservables(@PathVariable UUID id, @RequestBody List<DashboardObservable> observables) throws ValidationException, IOException, DashboardFileException {
-        dashboardService.updateGroupObservables(id, observables);
+    @PutMapping
+    public void updateGroup(@RequestBody DashboardGroup group) throws ValidationException, IOException, DashboardFileException {
+        dashboardService.updateGroup(group);
     }
 
     @DeleteMapping("/{id}")

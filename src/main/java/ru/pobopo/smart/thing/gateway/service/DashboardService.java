@@ -12,7 +12,6 @@ import org.springframework.util.CollectionUtils;
 import ru.pobopo.smart.thing.gateway.exception.DashboardFileException;
 import ru.pobopo.smart.thing.gateway.model.DashboardGroup;
 import ru.pobopo.smart.thing.gateway.model.DashboardObservable;
-import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 
 import java.io.File;
 import java.io.IOException;
@@ -92,25 +91,23 @@ public class DashboardService {
 
     // todo update device info?
 
-    public void updateGroupObservables(UUID id, List<DashboardObservable> observables) throws IOException, ValidationException, DashboardFileException {
+    public void updateGroup(DashboardGroup group) throws IOException, ValidationException, DashboardFileException {
         List<DashboardGroup> groups = getGroups();
-        int index = findGroupIndexById(groups, id);
+        int index = findGroupIndexById(groups, group.getId());
         if (index == -1) {
-            throw new ValidationException("Can't find group by id " + id);
+            throw new ValidationException("Can't find group by id " + group.getId());
         }
 
-        if (CollectionUtils.isEmpty(observables)) {
-            groups.get(index).setObservables(List.of());
-        } else {
-            groups.get(index).setObservables(
-                    observables.stream()
-                            .filter((o) -> StringUtils.isNotBlank(o.getName()) && StringUtils.isNotBlank(o.getType()))
-                            .toList()
-            );
-        }
+        groups.get(index).setDevice(group.getDevice());
+        groups.get(index).setObservables(
+                group.getObservables().stream()
+                        .filter((o) -> StringUtils.isNotBlank(o.getName()) && StringUtils.isNotBlank(o.getType()))
+                        .toList()
+        );
+        groups.get(index).setConfig(group.getConfig());
 
         writeGroupsToFile(groups);
-        log.info("Group {} was updated", id);
+        log.info("Group {} was updated", group.getId());
     }
 
     public void deleteGroup(UUID id) throws IOException, ValidationException, DashboardFileException {

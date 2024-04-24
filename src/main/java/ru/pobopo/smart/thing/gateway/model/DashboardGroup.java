@@ -5,8 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @Builder
@@ -15,6 +14,6 @@ import java.util.UUID;
 public class DashboardGroup {
     private UUID id;
     private DeviceInfo device;
-    private List<DashboardObservable> observables;
-    // todo update interval
+    private List<DashboardObservable> observables = new ArrayList<>();
+    private Map<String, Object> config = new HashMap<>();
 }
