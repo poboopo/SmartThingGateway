@@ -27,13 +27,7 @@ public class DeviceRequestMessageProcessor implements MessageProcessor {
 
         MessageResponse response = new MessageResponse();
         response.setRequestId(request.getRequestId());
-
-        try {
-            response.setResponse(apiService.execute(request.getRequest()));
-        } catch (Exception exception) {
-            response.setSuccess(false);
-            response.setError(exception.getMessage());
-        }
+        response.setResponse(apiService.execute(request.getRequest()));
 
         return response;
     }

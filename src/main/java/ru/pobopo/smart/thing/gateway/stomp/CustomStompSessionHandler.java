@@ -1,13 +1,16 @@
 package ru.pobopo.smart.thing.gateway.stomp;
 
+import com.fasterxml.jackson.databind.util.ExceptionUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
 import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
+import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
@@ -50,28 +53,8 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                log.info("Got message! {}", payload);
-                BaseMessage base = (BaseMessage) payload;
-                MessageProcessor processor = processorFactory.getProcessor(base);
-                if (processor == null) {
-                  log.error("Can't find message processor");
-                  return;
-                }
-
-                try {
-                  MessageResponse messageResponse = processor.process(payload);
-                  if (messageResponse != null) {
-                      messageResponse.setRequestId(base.getRequestId());
-                      log.info("Sending response: {}", messageResponse);
-                      cloudService.sendResponse(messageResponse);
-                  } else {
-                      log.warn("Empty message response!");
-                  }
-                } catch (LogoutException exception) {
-                  throw exception;
-                } catch (Exception exception) {
-                  log.error("Failed to process message", exception);
-                }
+                cloudService.sendResponse(processPayload(payload));
+                // session.send("/response", processPayload(payload));?
             }
         });
 
@@ -90,6 +73,35 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
         log.error("Stomp transport error: {} ({})", exception.getMessage(), exception.getClass());
         if (exception instanceof ConnectionLostException) {
             statusConsumer.accept(CloudConnectionStatus.CONNECTION_LOST);
+        }
+    }
+
+    private MessageResponse processPayload(Object payload) {
+        log.info("Got message! {}", payload);
+        BaseMessage base = (BaseMessage) payload;
+        MessageProcessor processor = processorFactory.getProcessor(base);
+        if (processor == null) {
+            return MessageResponse.builder()
+                    .requestId(base.getRequestId())
+                    .success(false)
+                    .error("Can't select processor for message")
+                    .build();
+        }
+
+        try {
+            MessageResponse messageResponse = processor.process(payload);
+            messageResponse.setRequestId(base.getRequestId());
+            return messageResponse;
+        } catch (LogoutException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            log.error("Failed to process message", exception);
+            return MessageResponse.builder()
+                    .requestId(base.getRequestId())
+                    .error(exception.getMessage())
+                    .stack(ExceptionUtils.getStackTrace(exception))
+                    .success(false)
+                    .build();
         }
     }
 }
