@@ -12,8 +12,8 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.device.api.model.Observable;
 import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
-import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
 import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.util.Collection;
@@ -58,11 +58,11 @@ public class DefaultDeviceApi extends DeviceApi {
     }
 
     @Override
-    public DeviceResponse getInfo(DeviceInfo info) {
+    public InternalHttpResponse getInfo(DeviceInfo info) {
         return sendRequest(info, SYSTEM_INFO);
     }
 
-    public DeviceResponse saveName(DeviceInfo info, String name) {
+    public InternalHttpResponse saveName(DeviceInfo info, String name) {
         return sendRequest(
                 info,
                 SYSTEM_INFO,
@@ -72,12 +72,12 @@ public class DefaultDeviceApi extends DeviceApi {
     }
 
     @Override
-    public DeviceResponse getActions(DeviceInfo info) {
+    public InternalHttpResponse getActions(DeviceInfo info) {
         return sendRequest(info, GET_ACTIONS);
     }
 
     @Override
-    public DeviceResponse callAction(DeviceInfo info, String action) {
+    public InternalHttpResponse callAction(DeviceInfo info, String action) {
         return sendRequest(
                 info,
                 CALL_ACTION + "?action=" + action,
@@ -87,7 +87,7 @@ public class DefaultDeviceApi extends DeviceApi {
     }
 
     @Override
-    public DeviceResponse getSensors(DeviceInfo info) {
+    public InternalHttpResponse getSensors(DeviceInfo info) {
         return sendRequest(
                 info,
                 SENSORS
@@ -95,22 +95,22 @@ public class DefaultDeviceApi extends DeviceApi {
     }
 
     @Override
-    public DeviceResponse getStates(DeviceInfo info) {
+    public InternalHttpResponse getStates(DeviceInfo info) {
         return sendRequest(
                 info,
                 STATES
         );
     }
 
-    public DeviceResponse getConfigInfo(DeviceInfo info) {
+    public InternalHttpResponse getConfigInfo(DeviceInfo info) {
         return sendRequest(info, GET_CONFIG);
     }
 
-    public DeviceResponse getConfigValues(DeviceInfo info) {
+    public InternalHttpResponse getConfigValues(DeviceInfo info) {
         return sendRequest(info, CONFIG_VALUES);
     }
 
-    public DeviceResponse saveConfigValues(DeviceInfo info, Map<String, Object> values) {
+    public InternalHttpResponse saveConfigValues(DeviceInfo info, Map<String, Object> values) {
         return sendRequest(
                 info,
                 SAVE_CONFIG_VALUES,
@@ -119,7 +119,7 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse deleteConfigValue(DeviceInfo info, String name) {
+    public InternalHttpResponse deleteConfigValue(DeviceInfo info, String name) {
         return sendRequest(
                 info,
                 CONFIG_VALUES,
@@ -128,7 +128,7 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse deleteAllConfigValues(DeviceInfo info) {
+    public InternalHttpResponse deleteAllConfigValues(DeviceInfo info) {
         return sendRequest(
                 info,
                 DELETE_ALL_CONFIG_VALUES,
@@ -137,14 +137,14 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse getAllHooks(DeviceInfo info) {
+    public InternalHttpResponse getAllHooks(DeviceInfo info) {
         return sendRequest(
                 info,
                 HOOKS
         );
     }
 
-    public DeviceResponse getHooks(DeviceInfo info, Observable observable) {
+    public InternalHttpResponse getHooks(DeviceInfo info, Observable observable) {
         return sendRequest(
                 info,
                 String.format(
@@ -156,7 +156,7 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse getHookById(DeviceInfo info, Observable observable, String id) {
+    public InternalHttpResponse getHookById(DeviceInfo info, Observable observable, String id) {
         return sendRequest(
                 info,
                 String.format(
@@ -169,14 +169,14 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse getHooksTemplates(DeviceInfo info, String type) {
+    public InternalHttpResponse getHooksTemplates(DeviceInfo info, String type) {
         return sendRequest(
                 info,
                 HOOKS_TEMPLATES + "?type=" + type
         );
     }
 
-    public DeviceResponse createHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
+    public InternalHttpResponse createHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
         return sendRequest(
                 info,
                 HOOKS,
@@ -188,7 +188,7 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse updateHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
+    public InternalHttpResponse updateHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
         return sendRequest(
                 info,
                 HOOKS,
@@ -200,7 +200,7 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse deleteHook(DeviceInfo info, Observable observable, String id) {
+    public InternalHttpResponse deleteHook(DeviceInfo info, Observable observable, String id) {
         return sendRequest(
                 info,
                 String.format(
@@ -215,14 +215,14 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse getMetrics(DeviceInfo info) {
+    public InternalHttpResponse getMetrics(DeviceInfo info) {
         return sendRequest(
                 info,
                 METRICS
         );
     }
 
-    public DeviceResponse exportSettings(DeviceInfo info) {
+    public InternalHttpResponse exportSettings(DeviceInfo info) {
         return sendRequest(
                 info,
                 SETTINGS,
@@ -231,7 +231,7 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse importSettings(DeviceInfo info, Map<String, Object> settings) {
+    public InternalHttpResponse importSettings(DeviceInfo info, Map<String, Object> settings) {
         return sendRequest(
                 info,
                 SETTINGS,
@@ -240,7 +240,7 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public DeviceResponse restart(DeviceInfo info) {
+    public InternalHttpResponse restart(DeviceInfo info) {
         return sendRequest(
                 info,
                 RESTART,
@@ -249,11 +249,11 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    private DeviceResponse sendRequest(DeviceInfo info, String path) {
+    private InternalHttpResponse sendRequest(DeviceInfo info, String path) {
         return sendRequest(info, path, HttpMethod.GET, null);
     }
 
-    private DeviceResponse sendRequest(DeviceInfo info, String path, HttpMethod method, Object payload) {
+    private InternalHttpResponse sendRequest(DeviceInfo info, String path, HttpMethod method, Object payload) {
         String url = buildUrl(info, path);
         log.info(
                 "Sending request [{}] {} - {}",
@@ -269,23 +269,23 @@ public class DefaultDeviceApi extends DeviceApi {
                     new HttpEntity<>(payload == null ? "" : payload),
                     String.class
             );
-            DeviceResponse deviceResponse = new DeviceResponse(
-                    response.getStatusCode(),
+            InternalHttpResponse deviceResponse = new InternalHttpResponse(
+                    response.getStatusCode().value(),
                     response.getBody(),
-                    response.getHeaders()
+                    response.getHeaders().toSingleValueMap()
             );
             log.info("Request finished: {}", deviceResponse);
             return deviceResponse;
         } catch (HttpClientErrorException | HttpServerErrorException exception) {
             log.error("Request failed: {}", exception.getMessage());
-            return new DeviceResponse(
-                    exception.getStatusCode(),
+            return new InternalHttpResponse(
+                    exception.getStatusCode().value(),
                     exception.getResponseBodyAsString(),
-                    exception.getResponseHeaders()
+                    exception.getResponseHeaders().toSingleValueMap()
             );
         } catch (Exception exception) {
             log.error("Failed to send request {}", exception.getMessage(), exception);
-            return new DeviceResponse(HttpStatusCode.valueOf(503), null, null);
+            return new InternalHttpResponse(503, null, null);
         }
     }
 

@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.pobopo.smart.thing.gateway.device.api.DeviceApi;
 import ru.pobopo.smart.thing.gateway.exception.DeviceApiException;
-import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
 import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.lang.reflect.Method;
@@ -21,7 +21,7 @@ public class DeviceApiService {
     private final List<DeviceApi> apis;
     private final ObjectMapper objectMapper;
 
-    public DeviceResponse execute(DeviceRequest request) {
+    public InternalHttpResponse execute(DeviceRequest request) {
         for (DeviceApi api : apis) {
             if (api.accept(request)) {
                 return callApi(api, request);
@@ -41,12 +41,12 @@ public class DeviceApiService {
         return res.toString();
     }
 
-    private DeviceResponse callApi(DeviceApi api, DeviceRequest request) {
+    private InternalHttpResponse callApi(DeviceApi api, DeviceRequest request) {
         Method[] methods = api.getClass().getDeclaredMethods();
         Method targetMethod = Arrays.stream(methods)
                 .filter((method) ->
                         method.getName().equals(request.getCommand()) &&
-                        method.getReturnType().equals(DeviceResponse.class)
+                        method.getReturnType().equals(InternalHttpResponse.class)
                 )
                 .findFirst()
                 .orElseThrow(() -> new DeviceApiException(String.format(
@@ -76,7 +76,7 @@ public class DeviceApiService {
                     args.add(objectMapper.convertValue(value, parameter.getType()));
                 }
             }
-            return (DeviceResponse) targetMethod.invoke(api, args.toArray());
+            return (InternalHttpResponse) targetMethod.invoke(api, args.toArray());
         } catch (Exception e) {
             log.error("Failed to call device api", e);
             throw new DeviceApiException(e.getMessage());

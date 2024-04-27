@@ -1,5 +1,6 @@
 package ru.pobopo.smart.thing.gateway.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -16,10 +17,10 @@ public class MessageProcessorConfig {
 
     @Bean
     public MessageProcessorFactory messageProcessorFactory(
-            DevicesSearchJob searchJob,
             CloudService cloudService,
             DeviceApiService deviceApiService,
-            RestTemplate restTemplate
+            RestTemplate restTemplate,
+            @Value("${server.port}") String serverPort
     ) {
         MessageProcessorFactory messageProcessorFactory = new MessageProcessorFactory();
         messageProcessorFactory.addProcessor(GatewayMessageType.DEVICE_REQUEST, new DeviceRequestMessageProcessor(
@@ -27,7 +28,8 @@ public class MessageProcessorConfig {
         ));
         messageProcessorFactory.addProcessor(GatewayMessageType.GATEWAY_COMMAND, new GatewayCommandProcessor(
                 cloudService,
-                restTemplate
+                restTemplate,
+                serverPort
         ));
         return messageProcessorFactory;
     }

@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.exception.MissingValueException;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
+import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.GatewayCommand;
 import ru.pobopo.smartthing.model.stomp.GatewayCommandMessage;
 import ru.pobopo.smartthing.model.stomp.ResponseMessage;
@@ -22,8 +23,7 @@ import java.util.Map;
 public class GatewayCommandProcessor implements MessageProcessor {
     private final CloudService cloudService;
     private final RestTemplate restTemplate;
-    @Value("${server.port}")
-    private String gatewayPort;
+    private final String gatewayPort;
 
     @Override
     public ResponseMessage process(Object payload) {
@@ -39,7 +39,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
         }
 
         switch (gatewayCommand.getCommand()) {
-            case "ping" -> response.setResponse("pong");
+            case "ping" -> response.setResponse(InternalHttpResponse.builder().data("pong").build());
             case "request" -> {
                 try {
                     response.setResponse(internalRequest(gatewayCommand.getParameters()));
@@ -62,7 +62,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
         return response;
     }
 
-    private ResponseEntity<String> internalRequest(Map<String, Object> parameters) throws MissingValueException {
+    private InternalHttpResponse internalRequest(Map<String, Object> parameters) throws MissingValueException {
         String url = (String) parameters.get("url");
         if (StringUtils.isEmpty(url)) {
             throw new MissingValueException("Url param is missing!");
@@ -75,6 +75,12 @@ public class GatewayCommandProcessor implements MessageProcessor {
 
         // add some role for internal requests?
         // so for example we gonna set /cloud/* as LOCAL and we not gonna be able to call it from outside
-        return restTemplate.exchange("http://localhost:" + gatewayPort + url,  HttpMethod.valueOf(method), entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(
+                "http://localhost:" + gatewayPort + url,
+                HttpMethod.valueOf(method),
+                entity,
+                String.class
+        );
+        return new InternalHttpResponse(response.getStatusCode().value(), response.getBody(), response.getHeaders().toSingleValueMap());
     }
 }

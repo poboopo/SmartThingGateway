@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smart.thing.gateway.controller.model.UpdateDeviceSettings;
@@ -17,6 +18,7 @@ import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
 import ru.pobopo.smart.thing.gateway.service.DeviceLogsService;
 import ru.pobopo.smart.thing.gateway.service.DeviceSettingsService;
 import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.util.List;
@@ -50,10 +52,10 @@ public class DeviceController {
     )
     @PostMapping("/api")
     public ResponseEntity<String> callApi(@RequestBody DeviceRequest request) {
-        DeviceResponse result = deviceApiService.execute(request);
+        InternalHttpResponse result = deviceApiService.execute(request);
         return new ResponseEntity<>(
-                result.getBody(),
-                result.getCode()
+                result.getData(),
+                HttpStatusCode.valueOf(result.getStatus())
         );
     }
 

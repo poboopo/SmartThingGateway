@@ -25,6 +25,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import ru.pobopo.smartthing.model.stomp.BaseMessage;
 import ru.pobopo.smartthing.model.stomp.DeviceRequestMessage;
 import ru.pobopo.smartthing.model.stomp.GatewayCommand;
+import ru.pobopo.smartthing.model.stomp.GatewayCommandMessage;
 
 import static ru.pobopo.smart.thing.gateway.service.MessageBrokerService.CONNECTION_STATUS_TOPIC;
 import static ru.pobopo.smart.thing.gateway.service.NotificationService.NOTIFICATION_TOPIC;
@@ -102,7 +103,7 @@ public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
                         return objectMapper.readValue(payload, DeviceRequestMessage.class);
                     }
                     case GATEWAY_COMMAND -> {
-                        return objectMapper.readValue(payload, GatewayCommand.class);
+                        return objectMapper.readValue(payload, GatewayCommandMessage.class);
                     }
                     default -> {
                         return base;
