@@ -1,7 +1,7 @@
 package ru.pobopo.smart.thing.gateway.stomp.processor;
 
-import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
+import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 
 public interface MessageProcessor {
-    MessageResponse process(Object payload) throws Exception;
+    ResponseMessage process(Object payload) throws Exception;
 }

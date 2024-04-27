@@ -15,7 +15,6 @@ import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.client.WebSocketClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -23,9 +22,9 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import ru.pobopo.smart.thing.gateway.stomp.message.BaseMessage;
-import ru.pobopo.smart.thing.gateway.stomp.message.DeviceRequestMessage;
-import ru.pobopo.smart.thing.gateway.stomp.message.GatewayCommand;
+import ru.pobopo.smartthing.model.stomp.BaseMessage;
+import ru.pobopo.smartthing.model.stomp.DeviceRequestMessage;
+import ru.pobopo.smartthing.model.stomp.GatewayCommand;
 
 import static ru.pobopo.smart.thing.gateway.service.MessageBrokerService.CONNECTION_STATUS_TOPIC;
 import static ru.pobopo.smart.thing.gateway.service.NotificationService.NOTIFICATION_TOPIC;

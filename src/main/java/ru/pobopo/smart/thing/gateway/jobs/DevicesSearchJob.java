@@ -18,8 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smart.thing.gateway.cache.ConcurrentSetCache;
-import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
 import ru.pobopo.smart.thing.gateway.service.DeviceService;
+import ru.pobopo.smartthing.model.DeviceInfo;
 
 @Component
 @Slf4j

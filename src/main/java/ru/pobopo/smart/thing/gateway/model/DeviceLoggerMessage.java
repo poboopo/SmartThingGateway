@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.event.Level;
+import ru.pobopo.smartthing.model.DeviceInfo;
 
 @Data
 @ToString

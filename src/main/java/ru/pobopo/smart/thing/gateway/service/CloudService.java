@@ -9,11 +9,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
 import ru.pobopo.smart.thing.gateway.exception.StorageException;
 import ru.pobopo.smart.thing.gateway.model.CloudIdentity;
 import ru.pobopo.smart.thing.gateway.model.CloudConfig;
-import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
+import ru.pobopo.smartthing.model.stomp.GatewayNotification;
+import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 
 @Component
 @Slf4j
@@ -89,7 +89,7 @@ public class CloudService {
         }
     }
 
-    public void sendResponse(MessageResponse response) {
+    public void sendResponse(ResponseMessage response) {
         basicRequest(
                 HttpMethod.POST,
                 "/gateway/requests/response",
@@ -98,7 +98,7 @@ public class CloudService {
         );
     }
 
-    public void notification(SendNotificationRequest notification) {
+    public void notification(GatewayNotification notification) {
         basicRequest(
                 HttpMethod.POST,
                 "/gateway/requests/notification",

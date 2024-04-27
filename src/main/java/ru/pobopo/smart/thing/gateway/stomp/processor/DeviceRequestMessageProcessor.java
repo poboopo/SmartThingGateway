@@ -1,12 +1,11 @@
 package ru.pobopo.smart.thing.gateway.stomp.processor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.pobopo.smart.thing.gateway.exception.MissingValueException;
 import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
-import ru.pobopo.smart.thing.gateway.stomp.message.DeviceRequestMessage;
-import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
+import ru.pobopo.smartthing.model.stomp.DeviceRequestMessage;
+import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 
 @Slf4j
 public class DeviceRequestMessageProcessor implements MessageProcessor {
@@ -19,14 +18,14 @@ public class DeviceRequestMessageProcessor implements MessageProcessor {
     }
 
     @Override
-    public MessageResponse process(Object payload) throws Exception {
+    public ResponseMessage process(Object payload) throws Exception {
         DeviceRequestMessage request = (DeviceRequestMessage) payload;
-        if (StringUtils.isBlank(request.getRequestId())) {
+        if (request.getId() == null) {
             throw new MissingValueException("Request id is missing!");
         }
 
-        MessageResponse response = new MessageResponse();
-        response.setRequestId(request.getRequestId());
+        ResponseMessage response = new ResponseMessage();
+        response.setRequestId(request.getId());
         response.setResponse(apiService.execute(request.getRequest()));
 
         return response;

@@ -12,9 +12,9 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.device.api.model.Observable;
 import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
-import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
-import ru.pobopo.smart.thing.gateway.model.DeviceRequest;
 import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
+import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.util.Collection;
 import java.util.List;

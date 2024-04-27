@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import ru.pobopo.smartthing.model.GatewayInfo;
 
 @Data
 @ToString

@@ -2,12 +2,11 @@ package ru.pobopo.smart.thing.gateway.stomp;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.pobopo.smart.thing.gateway.stomp.message.BaseMessage;
-import ru.pobopo.smart.thing.gateway.stomp.message.GatewayMessageType;
 import ru.pobopo.smart.thing.gateway.stomp.processor.MessageProcessor;
+import ru.pobopo.smartthing.model.stomp.BaseMessage;
+import ru.pobopo.smartthing.model.stomp.GatewayMessageType;
 
 @Slf4j
 public class MessageProcessorFactory {

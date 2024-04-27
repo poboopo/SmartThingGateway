@@ -6,10 +6,10 @@ import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
 import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
 import ru.pobopo.smart.thing.gateway.stomp.MessageProcessorFactory;
-import ru.pobopo.smart.thing.gateway.stomp.message.GatewayMessageType;
 import ru.pobopo.smart.thing.gateway.stomp.processor.DeviceRequestMessageProcessor;
 import ru.pobopo.smart.thing.gateway.stomp.processor.GatewayCommandProcessor;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
+import ru.pobopo.smartthing.model.stomp.GatewayMessageType;
 
 @Configuration
 public class MessageProcessorConfig {

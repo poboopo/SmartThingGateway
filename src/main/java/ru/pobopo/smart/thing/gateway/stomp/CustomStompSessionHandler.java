@@ -1,28 +1,22 @@
 package ru.pobopo.smart.thing.gateway.stomp;
 
-import com.fasterxml.jackson.databind.util.ExceptionUtil;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
-import ru.pobopo.smart.thing.gateway.exception.AccessDeniedException;
-import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
-import ru.pobopo.smart.thing.gateway.model.GatewayInfo;
-import ru.pobopo.smart.thing.gateway.model.Notification;
-import ru.pobopo.smart.thing.gateway.model.NotificationType;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
-import ru.pobopo.smart.thing.gateway.stomp.message.BaseMessage;
-import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 import ru.pobopo.smart.thing.gateway.stomp.processor.MessageProcessor;
+import ru.pobopo.smartthing.model.Notification;
+import ru.pobopo.smartthing.model.NotificationType;
+import ru.pobopo.smartthing.model.stomp.BaseMessage;
+import ru.pobopo.smartthing.model.stomp.GatewayNotification;
+import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 
 import java.lang.reflect.Type;
-import java.net.ConnectException;
 import java.util.function.Consumer;
 
 @Component
@@ -54,17 +48,15 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
                 cloudService.sendResponse(processPayload(payload));
-                // session.send("/response", processPayload(payload));?
             }
         });
 
 
-        cloudService.notification(
-                new SendNotificationRequest(new Notification(
+        cloudService.notification(GatewayNotification.builder()
+                .notification(new Notification(
                         "I am online!!!",
                         NotificationType.INFO
-                ))
-        );
+                )).build());
         statusConsumer.accept(CloudConnectionStatus.CONNECTED);
     }
 
@@ -76,28 +68,28 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
         }
     }
 
-    private MessageResponse processPayload(Object payload) {
+    private ResponseMessage processPayload(Object payload) {
         log.info("Got message! {}", payload);
         BaseMessage base = (BaseMessage) payload;
         MessageProcessor processor = processorFactory.getProcessor(base);
         if (processor == null) {
-            return MessageResponse.builder()
-                    .requestId(base.getRequestId())
+            return ResponseMessage.builder()
+                    .requestId(base.getId())
                     .success(false)
                     .error("Can't select processor for message")
                     .build();
         }
 
         try {
-            MessageResponse messageResponse = processor.process(payload);
-            messageResponse.setRequestId(base.getRequestId());
+            ResponseMessage messageResponse = processor.process(payload);
+            messageResponse.setRequestId(base.getId());
             return messageResponse;
         } catch (LogoutException exception) {
             throw exception;
         } catch (Exception exception) {
             log.error("Failed to process message", exception);
-            return MessageResponse.builder()
-                    .requestId(base.getRequestId())
+            return ResponseMessage.builder()
+                    .requestId(base.getId())
                     .error(exception.getMessage())
                     .stack(ExceptionUtils.getStackTrace(exception))
                     .success(false)

@@ -1,7 +1,6 @@
 package ru.pobopo.smart.thing.gateway.stomp.processor;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,13 +8,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.exception.MissingValueException;
-import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
-import ru.pobopo.smart.thing.gateway.stomp.message.GatewayCommand;
-import ru.pobopo.smart.thing.gateway.stomp.message.MessageResponse;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
+import ru.pobopo.smartthing.model.stomp.GatewayCommand;
+import ru.pobopo.smartthing.model.stomp.GatewayCommandMessage;
+import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 
 import java.util.Map;
 
@@ -28,11 +26,11 @@ public class GatewayCommandProcessor implements MessageProcessor {
     private String gatewayPort;
 
     @Override
-    public MessageResponse process(Object payload) {
-        GatewayCommand gatewayCommand = (GatewayCommand) payload;
+    public ResponseMessage process(Object payload) {
+        GatewayCommandMessage gatewayCommand = (GatewayCommandMessage) payload;
 
-        MessageResponse response = new MessageResponse();
-        response.setRequestId(gatewayCommand.getRequestId());
+        ResponseMessage response = new ResponseMessage();
+        response.setRequestId(gatewayCommand.getId());
 
         if (StringUtils.isBlank(gatewayCommand.getCommand())) {
             response.setSuccess(false);

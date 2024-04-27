@@ -16,6 +16,8 @@ import ru.pobopo.smart.thing.gateway.model.*;
 import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
 import ru.pobopo.smart.thing.gateway.service.DeviceLogsService;
 import ru.pobopo.smart.thing.gateway.service.DeviceSettingsService;
+import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.util.List;
 import java.util.Set;

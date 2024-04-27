@@ -2,9 +2,9 @@ package ru.pobopo.smart.thing.gateway.device.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
-import ru.pobopo.smart.thing.gateway.model.DeviceRequest;
 import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
+import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 @Slf4j
 public abstract class DeviceApi {

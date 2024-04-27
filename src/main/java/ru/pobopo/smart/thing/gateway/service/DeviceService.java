@@ -8,7 +8,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
+import ru.pobopo.smartthing.model.DeviceInfo;
 
 @Component
 @Slf4j

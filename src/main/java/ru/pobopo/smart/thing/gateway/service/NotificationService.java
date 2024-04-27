@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smart.thing.gateway.controller.model.SendNotificationRequest;
+import ru.pobopo.smartthing.model.stomp.GatewayNotification;
 
 @Component
 @Slf4j
@@ -16,7 +16,7 @@ public class NotificationService {
     private final CloudService cloudService;
 
 
-    public void sendNotification(SendNotificationRequest request) {
+    public void sendNotification(GatewayNotification request) {
         log.info("Device {} sending notification {}", request.getDevice(), request.getNotification());
 
         messagingTemplate.convertAndSend(

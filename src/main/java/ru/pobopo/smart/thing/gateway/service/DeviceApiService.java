@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.pobopo.smart.thing.gateway.device.api.DeviceApi;
 import ru.pobopo.smart.thing.gateway.exception.DeviceApiException;
-import ru.pobopo.smart.thing.gateway.model.DeviceInfo;
-import ru.pobopo.smart.thing.gateway.model.DeviceRequest;
 import ru.pobopo.smart.thing.gateway.model.DeviceResponse;
+import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
