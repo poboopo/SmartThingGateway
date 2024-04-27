@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smart.thing.gateway.event.CloudLogoutEvent;
 import ru.pobopo.smart.thing.gateway.exception.LogoutException;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
@@ -30,6 +32,7 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
 
     private final MessageProcessorFactory processorFactory;
     private final CloudService cloudService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public void handleException(StompSession session, StompCommand command, StompHeaders headers, byte[] payload, Throwable exception) {
@@ -47,7 +50,11 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                cloudService.sendResponse(processPayload(payload));
+                try {
+                    cloudService.sendResponse(processPayload(payload));
+                } catch (LogoutException exception) {
+                    applicationEventPublisher.publishEvent(new CloudLogoutEvent(this));
+                }
             }
         });
 

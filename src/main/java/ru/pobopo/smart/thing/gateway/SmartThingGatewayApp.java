@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
 import ru.pobopo.smart.thing.gateway.service.MessageBrokerService;
 
@@ -37,7 +38,7 @@ public class SmartThingGatewayApp {
                 log.error("Failed to login in cloud: {}", exception.getMessage());
             }
             try {
-                brokerService.connect();
+                brokerService.connect(CloudConnectionStatus.NOT_CONNECTED);
             } catch (Throwable exception) {
                 log.error("Failed to connect to cloud: {}", exception.getMessage());
             }

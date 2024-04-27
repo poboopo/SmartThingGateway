@@ -72,7 +72,7 @@ public class MessageBrokerService {
         setStatus(CloudConnectionStatus.NOT_CONNECTED);
     }
 
-    public void connect() {
+    public void connect(CloudConnectionStatus fallbackStatus) {
         stopReconnectThread();
         disconnect();
         try {
@@ -83,7 +83,7 @@ public class MessageBrokerService {
             connectWs();
         } catch (Exception e) {
             log.error("Failed to connect", e);
-            setStatus(CloudConnectionStatus.FAILED_TO_CONNECT);
+            setStatus(fallbackStatus != null ? fallbackStatus : CloudConnectionStatus.FAILED_TO_CONNECT);
         }
     }
 

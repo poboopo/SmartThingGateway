@@ -3,7 +3,9 @@ package ru.pobopo.smart.thing.gateway.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.*;
+import ru.pobopo.smart.thing.gateway.event.CloudLogoutEvent;
 import ru.pobopo.smart.thing.gateway.exception.StorageException;
 import ru.pobopo.smart.thing.gateway.model.CloudIdentity;
 import ru.pobopo.smart.thing.gateway.model.CloudConfig;
@@ -33,6 +35,7 @@ public class CloudController {
             description = "Logout from cloud, closes active connection and clear cloud configuration"
     )
     @DeleteMapping("/logout")
+    @EventListener(CloudLogoutEvent.class)
     public void logout() {
         cloudService.logout();
         messageService.logout();
@@ -47,7 +50,7 @@ public class CloudController {
     @Operation(summary = "Connect to configured cloud")
     @PutMapping("/connection/connect")
     public void connect() {
-        messageService.connect();
+        messageService.connect(null);
     }
 
     @Operation(summary = "Disconnect from cloud")

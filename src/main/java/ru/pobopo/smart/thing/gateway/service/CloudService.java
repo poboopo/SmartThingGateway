@@ -75,10 +75,10 @@ public class CloudService {
         } catch (Exception e) {
             log.error("Failed to logout in cloud: {}", e.getMessage());
         }
-        removeCloudConfigs();
+        removeCloudCache();
     }
 
-    public void removeCloudConfigs() {
+    public void removeCloudCache() {
         cloudIdentity = null;
         cloudConfig = null;
         try {
