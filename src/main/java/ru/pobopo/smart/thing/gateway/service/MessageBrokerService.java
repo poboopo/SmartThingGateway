@@ -17,6 +17,7 @@ import ru.pobopo.smart.thing.gateway.model.CloudConfig;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatusMessage;
 import ru.pobopo.smart.thing.gateway.stomp.CustomStompSessionHandler;
+import ru.pobopo.smartthing.model.stomp.GatewayEventType;
 
 import java.util.concurrent.ExecutionException;
 
@@ -54,16 +55,21 @@ public class MessageBrokerService {
     }
 
     synchronized public void setStatus(CloudConnectionStatus status) {
+        if (connectionStatus.equals(status)) {
+            return;
+        }
         log.info("New connection status: {}", status);
         this.connectionStatus = status;
         this.messagingTemplate.convertAndSend(CONNECTION_STATUS_TOPIC, new CloudConnectionStatusMessage(status));
 
-        if (status == CloudConnectionStatus.CONNECTION_LOST) {
-             startReconnectThread();
-        }
-        if (status == CloudConnectionStatus.CONNECTED) {
-            stopReconnectThread();
-            reconnectFailed = false;
+        switch (status) {
+            case CONNECTED -> {
+                stopReconnectThread();
+                reconnectFailed = false;
+                cloudService.event(GatewayEventType.CONNECTED);
+            }
+            case CONNECTION_LOST -> startReconnectThread();
+            case DISCONNECTED -> cloudService.event(GatewayEventType.DISCONNECTED);
         }
     }
 
@@ -114,8 +120,8 @@ public class MessageBrokerService {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
             log.info("Stop session disconnected");
+            setStatus(CloudConnectionStatus.DISCONNECTED);
         }
-        setStatus(CloudConnectionStatus.DISCONNECTED);
     }
 
     private void stopReconnectThread() {

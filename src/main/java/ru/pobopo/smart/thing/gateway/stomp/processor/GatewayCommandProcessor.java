@@ -32,15 +32,15 @@ public class GatewayCommandProcessor implements MessageProcessor {
         ResponseMessage response = new ResponseMessage();
         response.setRequestId(gatewayCommand.getId());
 
-        if (StringUtils.isBlank(gatewayCommand.getCommand())) {
+        if (gatewayCommand.getCommand() == null) {
             response.setSuccess(false);
             response.setError("Command is missing!");
             return response;
         }
 
         switch (gatewayCommand.getCommand()) {
-            case "ping" -> response.setResponse(InternalHttpResponse.builder().data("pong").build());
-            case "request" -> {
+            case PING -> response.setResponse(InternalHttpResponse.builder().data("pong").build());
+            case REQUEST -> {
                 try {
                     response.setResponse(internalRequest(gatewayCommand.getParameters()));
                 } catch (MissingValueException exception) {
@@ -48,7 +48,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
                     response.setSuccess(false);
                 }
             }
-            case "logout" -> {
+            case LOGOUT -> {
                 log.info("Logout event! Removing token from config.");
                 cloudService.logout();
                 throw new LogoutException();

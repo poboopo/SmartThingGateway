@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.exception.StorageException;
 import ru.pobopo.smart.thing.gateway.model.CloudIdentity;
 import ru.pobopo.smart.thing.gateway.model.CloudConfig;
+import ru.pobopo.smartthing.model.stomp.GatewayEventType;
 import ru.pobopo.smartthing.model.stomp.GatewayNotification;
 import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 
@@ -103,6 +104,15 @@ public class CloudService {
                 HttpMethod.POST,
                 "/gateway/requests/notification",
                 notification,
+                Void.class
+        );
+    }
+
+    public void event(GatewayEventType event) {
+        basicRequest(
+                HttpMethod.POST,
+                "/gateway/requests/event?event=" + event.name(),
+                null,
                 Void.class
         );
     }
