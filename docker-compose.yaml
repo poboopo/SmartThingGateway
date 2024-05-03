@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: smart_thing_gateway
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8081:8081
+    network_mode: host
