@@ -30,12 +30,12 @@ public class DashboardService {
     private final ObjectMapper objectMapper;
     private final File settingsFile;
 
-    public DashboardService(@Value("${dashboard.settings:}") String dirPath, ObjectMapper objectMapper) throws IOException {
-        if (StringUtils.isNotBlank(dirPath) && !StringUtils.endsWith(dirPath, ".json")) {
+    public DashboardService(@Value("${dashboard.settings.file:}") String file, ObjectMapper objectMapper) throws IOException {
+        if (StringUtils.isNotBlank(file) && !StringUtils.endsWith(file, ".json")) {
             throw new IllegalStateException("Wrong dashboard groups settings file name (.json suffix is missing)");
         }
 
-        Path filePath = StringUtils.isBlank(dirPath) ? DASHBOARD_FILE_DEFAULT_PATH : Paths.get(dirPath);
+        Path filePath = StringUtils.isBlank(file) ? DASHBOARD_FILE_DEFAULT_PATH : Paths.get(file);
 
         log.info("Using dashboard settings file {}", filePath);
         if (Files.isDirectory(filePath)) {

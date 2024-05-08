@@ -2,6 +2,7 @@ package ru.pobopo.smart.thing.gateway.service;
 
 import jakarta.annotation.PreDestroy;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.IncompatibleConfigurationException;
@@ -31,9 +32,9 @@ public class MessageBrokerService {
     private final SimpMessagingTemplate messagingTemplate;
     private final CloudService cloudService;
 
-    @Value("${server.reconnect.attempts}")
+    @Value("${cloud.reconnect.attempts}")
     private int reconnectAttempts;
-    @Value("${server.reconnect.pause}")
+    @Value("${cloud.reconnect.pause}")
     private int reconnectPause;
 
     private CloudConnectionStatus connectionStatus = CloudConnectionStatus.NOT_CONNECTED;
@@ -78,6 +79,7 @@ public class MessageBrokerService {
         setStatus(CloudConnectionStatus.NOT_CONNECTED);
     }
 
+    @SneakyThrows
     public void connect(CloudConnectionStatus fallbackStatus) {
         stopReconnectThread();
         disconnect();
@@ -88,8 +90,8 @@ public class MessageBrokerService {
             setStatus(CloudConnectionStatus.CONNECTING);
             connectWs();
         } catch (Exception e) {
-            log.error("Failed to connect", e);
             setStatus(fallbackStatus != null ? fallbackStatus : CloudConnectionStatus.FAILED_TO_CONNECT);
+            throw e;
         }
     }
 

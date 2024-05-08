@@ -19,7 +19,7 @@ import ru.pobopo.smart.thing.gateway.model.CloudIdentity;
 
 @Component
 @Slf4j
-public class StorageService {
+public class CloudFilesStorageService {
     private static final String CLOUD_CONFIG_FILE = "cloud_config.json";
     private static final String CLOUD_IDENTITY_FILE = "cloud_identity.json";
 
@@ -30,10 +30,10 @@ public class StorageService {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public StorageService(Environment environment, ObjectMapper objectMapper) {
+    public CloudFilesStorageService(Environment environment, ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
 
-        String configFile = environment.getProperty("storage.dir.path");
+        String configFile = environment.getProperty("cloud.config.dir");
         if (StringUtils.isNotBlank(configFile)) {
             baseDir = configFile;
         } else {

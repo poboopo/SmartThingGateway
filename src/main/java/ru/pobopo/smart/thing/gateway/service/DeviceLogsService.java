@@ -22,7 +22,7 @@ public class DeviceLogsService {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    @Value("${device.logs.cache.max:100}")
+    @Value("${device.logs.cache.size:100}")
     private int cacheSize;
     @Value("${device.logs.level:INFO}")
     private Level logLevel;

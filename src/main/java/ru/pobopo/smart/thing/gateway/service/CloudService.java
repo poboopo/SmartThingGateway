@@ -21,7 +21,7 @@ import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 public class CloudService {
     public static final String AUTH_TOKEN_HEADER = "SmartThing-Token-Gateway";
 
-    private final StorageService storageService;
+    private final CloudFilesStorageService cloudFilesStorageService;
     private final RestTemplate restTemplate;
 
     private CloudIdentity cloudIdentity;
@@ -29,13 +29,13 @@ public class CloudService {
     private CloudConfig cloudConfig;
 
     @Autowired
-    public CloudService(StorageService storageService, RestTemplate restTemplate) {
-        this.storageService = storageService;
+    public CloudService(CloudFilesStorageService cloudFilesStorageService, RestTemplate restTemplate) {
+        this.cloudFilesStorageService = cloudFilesStorageService;
         this.restTemplate = restTemplate;
 
         try {
-            cloudConfig = storageService.loadCloudConfig();
-            cloudIdentity = storageService.loadCloudIdentity();
+            cloudConfig = cloudFilesStorageService.loadCloudConfig();
+            cloudIdentity = cloudFilesStorageService.loadCloudIdentity();
         } catch (StorageException exception) {
             log.warn("Failed to load cloud config or identity: {}", exception.getMessage());
         }
@@ -53,7 +53,7 @@ public class CloudService {
         this.cloudConfig = cloudConfig;
         try {
             login();
-            storageService.saveCloudConfig(cloudConfig);
+            cloudFilesStorageService.saveCloudConfig(cloudConfig);
             return cloudIdentity;
         } catch (Exception exception) {
             this.cloudConfig = null;
@@ -64,7 +64,7 @@ public class CloudService {
     public void login() {
         cloudIdentity = basicRequest(HttpMethod.GET, "/auth", null, CloudIdentity.class);
         try {
-            storageService.saveCloudIdentity(cloudIdentity);
+            cloudFilesStorageService.saveCloudIdentity(cloudIdentity);
         } catch (StorageException exception) {
             log.error("Failed to save cloud identity: {}", exception.getMessage());
         }
@@ -83,8 +83,8 @@ public class CloudService {
         cloudIdentity = null;
         cloudConfig = null;
         try {
-            storageService.saveCloudIdentity(null);
-            storageService.saveCloudConfig(null);
+            cloudFilesStorageService.saveCloudIdentity(null);
+            cloudFilesStorageService.saveCloudConfig(null);
         } catch (StorageException exception) {
             log.error("Failed to clear cloud configs: {}", exception.getMessage());
         }

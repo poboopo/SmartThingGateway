@@ -1,0 +1,31 @@
+server:
+  port: 8081
+  ip: 192.168.2.81
+
+cloud:
+  reconnect:
+    attempts: 10
+    pause: 10000
+  config:
+    dir: ""
+
+dashboard:
+  settings:
+    file: ""
+
+device:
+  logs:
+    multicast:
+      group: 224.1.1.1
+      port: 7779
+    tcp:
+      port: 7779
+    cache:
+      size: 100
+    level: DEBUG
+  settings:
+    dir: ""
+  api:
+    cache:
+      enabled: true
+      ttl: 1500
