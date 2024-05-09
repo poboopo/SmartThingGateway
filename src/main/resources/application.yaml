@@ -1,6 +1,6 @@
 server:
   port: 8081
-  ip: 192.168.2.81
+  ip: 192.168.0.151
 
 cloud:
   reconnect:
@@ -25,6 +25,8 @@ device:
     level: DEBUG
   settings:
     dir: ""
+  saved:
+    file: ""
   api:
     cache:
       enabled: true

@@ -11,9 +11,14 @@ import ru.pobopo.smart.thing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smart.thing.gateway.service.CloudService;
 import ru.pobopo.smart.thing.gateway.service.MessageBrokerService;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Slf4j
 @SpringBootApplication
 public class SmartThingGatewayApp {
+    public static final Path DEFAULT_APP_DIR = Paths.get(System.getProperty("user.home"), ".smartthing");
+
     public static void main(String[] args) {
         SpringApplication.run(SmartThingGatewayApp.class, args);
     }

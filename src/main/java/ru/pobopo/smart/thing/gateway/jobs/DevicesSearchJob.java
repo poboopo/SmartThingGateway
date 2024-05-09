@@ -1,9 +1,7 @@
 package ru.pobopo.smart.thing.gateway.jobs;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -54,15 +52,15 @@ public class DevicesSearchJob implements BackgroundJob {
     }
 
     private void search() throws IOException {
-        MulticastSocket s = new MulticastSocket(PORT);
-        InetAddress group = InetAddress.getByName(GROUP);
+        SocketAddress address = new InetSocketAddress(InetAddress.getByName(GROUP), PORT);
+        MulticastSocket multicastSocket = new MulticastSocket(address);
         byte[] buf = new byte[4096];
 
         try {
-            s.joinGroup(group);
-            for (; ; ) {
+            multicastSocket.joinGroup(address, multicastSocket.getNetworkInterface());
+            while(!Thread.interrupted()) {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                s.receive(packet);
+                multicastSocket.receive(packet);
 
                 String message = new String(
                         packet.getData(),
@@ -88,8 +86,8 @@ public class DevicesSearchJob implements BackgroundJob {
             log.error("Search job failed", exception);
             throw new RuntimeException(exception);
         } finally {
-            s.leaveGroup(group);
-            s.close();
+            multicastSocket.leaveGroup(address, multicastSocket.getNetworkInterface());
+            multicastSocket.close();
         }
     }
 
@@ -99,7 +97,7 @@ public class DevicesSearchJob implements BackgroundJob {
     }
 
     private void setupDevice(DeviceInfo info) {
-        if (foundIps.contains(info.getIp())) {
+        if (StringUtils.isBlank(gatewayIp) || foundIps.contains(info.getIp())) {
             return;
         }
 

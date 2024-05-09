@@ -21,11 +21,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static ru.pobopo.smart.thing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
+
 @Slf4j
 @Service
 public class DeviceSettingsService {
     private static final Path SETTINGS_DIR_DEFAULT_PATH =
-            Paths.get(System.getProperty("user.home"), ".smartthing/device/settings/");
+            Paths.get(DEFAULT_APP_DIR.toString(), ".smartthing/device/settings/");
 
     private final Path directoryPath;
 

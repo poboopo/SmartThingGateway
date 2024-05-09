@@ -17,14 +17,13 @@ import ru.pobopo.smart.thing.gateway.exception.StorageException;
 import ru.pobopo.smart.thing.gateway.model.CloudConfig;
 import ru.pobopo.smart.thing.gateway.model.CloudIdentity;
 
+import static ru.pobopo.smart.thing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
+
 @Component
 @Slf4j
 public class CloudFilesStorageService {
     private static final String CLOUD_CONFIG_FILE = "cloud_config.json";
     private static final String CLOUD_IDENTITY_FILE = "cloud_identity.json";
-
-    private static final Path CONFIG_FILE_DEFAULT_PATH =
-        Paths.get(System.getProperty("user.home"), ".smartthing");
 
     private final String baseDir;
     private final ObjectMapper objectMapper;
@@ -37,7 +36,7 @@ public class CloudFilesStorageService {
         if (StringUtils.isNotBlank(configFile)) {
             baseDir = configFile;
         } else {
-            baseDir = CONFIG_FILE_DEFAULT_PATH.toString();
+            baseDir = DEFAULT_APP_DIR.toString();
         }
         log.info("Using storage directory: {}", baseDir);
     }

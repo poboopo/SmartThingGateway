@@ -16,11 +16,13 @@ import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
 import ru.pobopo.smart.thing.gateway.model.*;
 import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
 import ru.pobopo.smart.thing.gateway.service.DeviceLogsService;
+import ru.pobopo.smart.thing.gateway.service.DeviceRepository;
 import ru.pobopo.smart.thing.gateway.service.DeviceSettingsService;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -34,11 +36,32 @@ public class DeviceController {
     private final DeviceLogsService deviceLogsService;
     private final DeviceApiService deviceApiService;
     private final DevicesSearchJob searchJob;
+    private final DeviceRepository deviceRepository;
 
     @Operation(summary = "Get recent found devices in local network")
     @GetMapping("/found")
     public Set<DeviceInfo> getDevices() {
         return searchJob.getRecentFoundDevices();
+    }
+
+    @GetMapping("/saved")
+    public Collection<DeviceInfo> getSavedDevices() {
+        return deviceRepository.getDevices();
+    }
+
+    @PostMapping("/saved")
+    public DeviceInfo addDevice(@RequestParam String ip) throws BadRequestException {
+        return deviceRepository.addDevice(ip);
+    }
+
+    @PutMapping("/saved")
+    public DeviceInfo updateDeviceInfo(@RequestParam String ip) throws BadRequestException {
+        return deviceRepository.updateDeviceInfo(ip);
+    }
+
+    @DeleteMapping("/saved")
+    public void deleteDevice(@RequestParam String ip) throws BadRequestException {
+        deviceRepository.deleteDevice(ip);
     }
 
     // TODO more info about how ApiSelector works?

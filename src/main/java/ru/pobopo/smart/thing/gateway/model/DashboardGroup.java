@@ -16,5 +16,5 @@ public class DashboardGroup {
     private UUID id;
     private DeviceInfo device;
     private List<DashboardObservable> observables = new ArrayList<>();
-    private Map<String, Object> config = new HashMap<>();
+    private DashboardGroupConfig config = new DashboardGroupConfig();
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.validation.ValidationException;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,16 +22,20 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.pobopo.smart.thing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
+
 @Slf4j
 @Service
 public class DashboardService {
     private static final Path DASHBOARD_FILE_DEFAULT_PATH =
-            Paths.get(System.getProperty("user.home"), ".smartthing/dashboard/settings.json");
+            Paths.get(DEFAULT_APP_DIR.toString(), ".smartthing/dashboard/settings.json");
 
     private final ObjectMapper objectMapper;
     private final File settingsFile;
+    @Getter
+    private final List<DashboardGroup> groups;
 
-    public DashboardService(@Value("${dashboard.settings.file:}") String file, ObjectMapper objectMapper) throws IOException {
+    public DashboardService(@Value("${dashboard.settings.file:}") String file, ObjectMapper objectMapper) throws IOException, DashboardFileException {
         if (StringUtils.isNotBlank(file) && !StringUtils.endsWith(file, ".json")) {
             throw new IllegalStateException("Wrong dashboard groups settings file name (.json suffix is missing)");
         }
@@ -49,24 +54,21 @@ public class DashboardService {
 
         this.settingsFile = filePath.toFile();
         this.objectMapper = objectMapper;
-    }
 
-
-    public List<DashboardGroup> getGroups() throws IOException, DashboardFileException {
         try {
-            return objectMapper.readValue(settingsFile, new TypeReference<>() {});
+            groups = objectMapper.readValue(settingsFile, new TypeReference<>() {});
+            log.info("Loaded groups: {}", groups);
         } catch (MismatchedInputException exception) {
             throw new DashboardFileException("Failed to parse file date. Bad json?");
         }
     }
 
-    public DashboardGroup createGroup(DashboardGroup group) throws IOException, ValidationException, DashboardFileException {
+    public DashboardGroup createGroup(DashboardGroup group) throws IOException, ValidationException {
         Objects.requireNonNull(group);
         if (group.getDevice() == null) {
             throw new ValidationException("Device can't be null!");
         }
 
-        List<DashboardGroup> groups = getGroups();
         Optional<DashboardGroup> existingGroup = groups.stream()
                 .filter((g) -> g.getDevice().equals(group.getDevice()))
                 .findFirst();
@@ -83,16 +85,13 @@ public class DashboardService {
         group.setId(uuid);
         groups.add(group);
 
-        writeGroupsToFile(groups);
+        writeGroupsToFile();
 
         log.info("Created new group {}", group);
         return group;
     }
 
-    // todo update device info?
-
-    public void updateGroup(DashboardGroup group) throws IOException, ValidationException, DashboardFileException {
-        List<DashboardGroup> groups = getGroups();
+    public void updateGroup(DashboardGroup group) throws IOException, ValidationException {
         int index = findGroupIndexById(groups, group.getId());
         if (index == -1) {
             throw new ValidationException("Can't find group by id " + group.getId());
@@ -106,25 +105,24 @@ public class DashboardService {
         );
         groups.get(index).setConfig(group.getConfig());
 
-        writeGroupsToFile(groups);
+        writeGroupsToFile();
         log.info("Group {} was updated", group.getId());
     }
 
-    public void deleteGroup(UUID id) throws IOException, ValidationException, DashboardFileException {
+    public void deleteGroup(UUID id) throws IOException, ValidationException {
         Objects.requireNonNull(id);
 
-        List<DashboardGroup> groups = getGroups();
         int index = findGroupIndexById(groups, id);
         if (index == -1) {
             throw new ValidationException("Can't find group by id " + id);
         }
         groups.remove(index);
 
-        writeGroupsToFile(groups);
+        writeGroupsToFile();
         log.info("Group {} was deleted", id);
     }
 
-    private void writeGroupsToFile(List<DashboardGroup> groups) throws IOException {
+    private void writeGroupsToFile() throws IOException {
         log.info("Writing groups in file groups");
         objectMapper.writeValue(settingsFile, groups);
     }
@@ -136,5 +134,9 @@ public class DashboardService {
             }
         }
         return -1;
+    }
+
+    private void updateValues(DashboardGroup group) {
+        
     }
 }
