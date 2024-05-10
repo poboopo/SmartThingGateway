@@ -10,6 +10,8 @@ import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 public abstract class DeviceApi {
     public abstract boolean accept(DeviceRequest request);
 
+    public abstract InternalHttpResponse health(DeviceInfo info);
+
     public abstract InternalHttpResponse getInfo(DeviceInfo info);
 
     public InternalHttpResponse getActions(DeviceInfo info) {

@@ -23,6 +23,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class DefaultDeviceApi extends DeviceApi {
     public final static Collection<String> SUPPORTED_VERSIONS = List.of("0.5", "0.6");
+    public final static String HEALTH = "/health";
     public final static String SYSTEM_INFO = "/info/system";
     public final static String GET_ACTIONS = "/info/actions";
     public final static String GET_CONFIG = "/info/config";
@@ -54,6 +55,11 @@ public class DefaultDeviceApi extends DeviceApi {
         devices.addAll(searchJob.getRecentFoundDevices());
         devices.addAll(deviceRepository.getDevices());
         return devices.stream().anyMatch((d) -> d.getIp().equals(request.getDevice().getIp()) && SUPPORTED_VERSIONS.contains(d.getVersion()));
+    }
+
+    @Override
+    public InternalHttpResponse health(DeviceInfo info) {
+        return sendRequest(info, HEALTH);
     }
 
     @Override
