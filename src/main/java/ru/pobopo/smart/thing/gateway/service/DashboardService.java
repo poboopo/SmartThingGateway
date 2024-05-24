@@ -8,11 +8,15 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import ru.pobopo.smart.thing.gateway.exception.DashboardFileException;
 import ru.pobopo.smart.thing.gateway.model.DashboardGroup;
-import ru.pobopo.smart.thing.gateway.model.DashboardObservable;
+import ru.pobopo.smart.thing.gateway.model.DashboardGroupValues;
+import ru.pobopo.smart.thing.gateway.model.DashboardValues;
+import ru.pobopo.smart.thing.gateway.runnable.DashboardGroupWorker;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static ru.pobopo.smart.thing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
@@ -27,15 +32,27 @@ import static ru.pobopo.smart.thing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR
 @Slf4j
 @Service
 public class DashboardService {
+    public static final String DASHBOARD_TOPIC_PREFIX = "/dashboard";
+
     private static final Path DASHBOARD_FILE_DEFAULT_PATH =
             Paths.get(DEFAULT_APP_DIR.toString(), ".smartthing/dashboard/settings.json");
 
     private final ObjectMapper objectMapper;
     private final File settingsFile;
+    private final DeviceApiService apiService;
+    private final SimpMessagingTemplate template;
+
     @Getter
     private final List<DashboardGroup> groups;
+    private final Map<UUID, DashboardGroupWorker> workers = new ConcurrentHashMap<>();
 
-    public DashboardService(@Value("${dashboard.settings.file:}") String file, ObjectMapper objectMapper) throws IOException, DashboardFileException {
+    public DashboardService(
+            @Value("${dashboard.settings.file:}") String file,
+            ObjectMapper objectMapper,
+            DeviceApiService apiService,
+            SimpMessagingTemplate template
+    ) throws IOException, DashboardFileException {
+        this.apiService = apiService;
         if (StringUtils.isNotBlank(file) && !StringUtils.endsWith(file, ".json")) {
             throw new IllegalStateException("Wrong dashboard groups settings file name (.json suffix is missing)");
         }
@@ -54,6 +71,7 @@ public class DashboardService {
 
         this.settingsFile = filePath.toFile();
         this.objectMapper = objectMapper;
+        this.template = template;
 
         try {
             groups = objectMapper.readValue(settingsFile, new TypeReference<>() {});
@@ -86,6 +104,7 @@ public class DashboardService {
         groups.add(group);
 
         writeGroupsToFile();
+        startGroupWorker(group);
 
         log.info("Created new group {}", group);
         return group;
@@ -107,6 +126,11 @@ public class DashboardService {
 
         writeGroupsToFile();
         log.info("Group {} was updated", group.getId());
+
+        if (workers.containsKey(group.getId())) {
+            log.info("Fetching group values");
+            workers.get(group.getId()).update();
+        }
     }
 
     public void deleteGroup(UUID id) throws IOException, ValidationException {
@@ -116,14 +140,74 @@ public class DashboardService {
         if (index == -1) {
             throw new ValidationException("Can't find group by id " + id);
         }
+        DashboardGroupWorker worker = workers.get(id);
+        if (worker != null) {
+            log.info("Trying to stop group worker");
+            worker.interrupt();
+            workers.remove(id);
+            log.info("Worker stopped and removed");
+        }
         groups.remove(index);
 
         writeGroupsToFile();
         log.info("Group {} was deleted", id);
     }
 
+    public List<DashboardGroupValues> getValues() {
+        return workers.values().stream().map((w) -> new DashboardGroupValues(w.getGroup(), w.getValues())).toList();
+    }
+
+    public DashboardValues getGroupValues(UUID id) {
+        Objects.requireNonNull(id);
+
+        if (!workers.containsKey(id)) {
+            log.info("Worker for group {} not found", id); // todo throw exception?
+            return null;
+        }
+
+        return workers.get(id).getValues();
+    }
+
+    public DashboardValues updateGroupValues(UUID id) {
+        Objects.requireNonNull(id);
+
+        if (!workers.containsKey(id)) {
+            log.info("Worker for group {} not found", id); // todo throw exception?
+            return null;
+        }
+
+        workers.get(id).update();
+        return workers.get(id).getValues();
+    }
+
+    @EventListener
+    public void startWorkers(ApplicationReadyEvent event) {
+        log.info("Trying to start groups workers");
+        if (groups.isEmpty()) {
+            log.info("Empty groups, nothing to start");
+        } else {
+            for (DashboardGroup group: groups) {
+                startGroupWorker(group);
+            }
+        }
+    }
+
+    private void startGroupWorker(DashboardGroup group) {
+        if (workers.containsKey(group.getId())) {
+            throw new IllegalStateException("Worker for group " + group.getDevice().getName() + " already exists");
+        }
+        log.info("Creating new dashboard worker for group {}", group);
+        DashboardGroupWorker worker = new DashboardGroupWorker(group, apiService, objectMapper, template);
+        try {
+            worker.start();
+            workers.put(group.getId(), worker);
+        } catch (Exception e) {
+            log.error("Failed to start group worker", e);
+        }
+    }
+
     private void writeGroupsToFile() throws IOException {
-        log.info("Writing groups in file groups");
+        log.info("Writing groups in file {}", settingsFile);
         objectMapper.writeValue(settingsFile, groups);
     }
 
@@ -134,9 +218,5 @@ public class DashboardService {
             }
         }
         return -1;
-    }
-
-    private void updateValues(DashboardGroup group) {
-        
     }
 }

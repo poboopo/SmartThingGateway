@@ -49,6 +49,7 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
             public void handleFrame(StompHeaders headers, Object payload) {
                 try {
                     cloudService.sendResponse(processPayload(payload));
+                    session.send("/topic/response", payload);
                 } catch (LogoutException exception) {
                     applicationEventPublisher.publishEvent(new CloudLogoutEvent(this));
                 }

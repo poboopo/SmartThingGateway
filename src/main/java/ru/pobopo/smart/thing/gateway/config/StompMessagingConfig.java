@@ -24,9 +24,9 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import ru.pobopo.smartthing.model.stomp.BaseMessage;
 import ru.pobopo.smartthing.model.stomp.DeviceRequestMessage;
-import ru.pobopo.smartthing.model.stomp.GatewayCommand;
 import ru.pobopo.smartthing.model.stomp.GatewayCommandMessage;
 
+import static ru.pobopo.smart.thing.gateway.service.DashboardService.DASHBOARD_TOPIC_PREFIX;
 import static ru.pobopo.smart.thing.gateway.service.MessageBrokerService.CONNECTION_STATUS_TOPIC;
 import static ru.pobopo.smart.thing.gateway.service.NotificationService.NOTIFICATION_TOPIC;
 
@@ -38,7 +38,8 @@ public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker(
                 "/devices",
                 NOTIFICATION_TOPIC,
-                CONNECTION_STATUS_TOPIC
+                CONNECTION_STATUS_TOPIC,
+                DASHBOARD_TOPIC_PREFIX
         );
     }
 

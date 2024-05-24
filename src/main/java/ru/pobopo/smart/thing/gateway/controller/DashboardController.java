@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smart.thing.gateway.exception.DashboardFileException;
 import ru.pobopo.smart.thing.gateway.model.DashboardGroup;
+import ru.pobopo.smart.thing.gateway.model.DashboardGroupValues;
+import ru.pobopo.smart.thing.gateway.model.DashboardValues;
 import ru.pobopo.smart.thing.gateway.service.DashboardService;
 
 import java.io.IOException;
@@ -19,23 +21,38 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping
-    public List<DashboardGroup> getGroups() throws IOException, DashboardFileException {
+    public List<DashboardGroup> getGroups() {
         return dashboardService.getGroups();
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public DashboardGroup createGroup(@RequestBody DashboardGroup group) throws ValidationException, IOException, DashboardFileException {
+    public DashboardGroup createGroup(@RequestBody DashboardGroup group) throws ValidationException, IOException {
         return dashboardService.createGroup(group);
     }
 
     @PutMapping
-    public void updateGroup(@RequestBody DashboardGroup group) throws ValidationException, IOException, DashboardFileException {
+    public void updateGroup(@RequestBody DashboardGroup group) throws ValidationException, IOException {
         dashboardService.updateGroup(group);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteGroup(@PathVariable UUID id) throws ValidationException, IOException, DashboardFileException {
+    public void deleteGroup(@PathVariable UUID id) throws ValidationException, IOException {
         dashboardService.deleteGroup(id);
+    }
+
+    @GetMapping("/values")
+    public List<DashboardGroupValues> values() {
+        return dashboardService.getValues();
+    }
+
+    @GetMapping("/values/{id}")
+    public DashboardValues groupValues(@PathVariable UUID id) {
+        return dashboardService.getGroupValues(id);
+    }
+
+    @PutMapping("/values/{id}")
+    public DashboardValues groupValuesUpdate(@PathVariable UUID id) {
+        return dashboardService.updateGroupValues(id);
     }
 }

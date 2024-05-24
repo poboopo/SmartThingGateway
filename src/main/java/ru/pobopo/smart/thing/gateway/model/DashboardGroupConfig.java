@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class DashboardGroupConfig {
-    private Integer updateDelay;
+    private Integer updateDelay = 60000;
 }

@@ -1,14 +1,12 @@
 package ru.pobopo.smart.thing.gateway.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = "units")
 public class DashboardObservable {
     private String type; //todo enum?
     private String name;
