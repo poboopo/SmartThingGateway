@@ -40,7 +40,7 @@ public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
                 NOTIFICATION_TOPIC,
                 CONNECTION_STATUS_TOPIC,
                 DASHBOARD_TOPIC_PREFIX
-        );
+        ).setTaskScheduler(taskScheduler()).setHeartbeatValue(new long[] {10000, 10000});;
     }
 
     @Override

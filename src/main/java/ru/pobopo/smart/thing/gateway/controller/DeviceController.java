@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smart.thing.gateway.controller.model.UpdateDeviceSettings;
 import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.exception.DeviceSettingsException;
-import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
+import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchService;
 import ru.pobopo.smart.thing.gateway.model.*;
 import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
 import ru.pobopo.smart.thing.gateway.service.DeviceLogsService;
-import ru.pobopo.smart.thing.gateway.service.DeviceRepository;
+import ru.pobopo.smart.thing.gateway.repository.DeviceRepository;
 import ru.pobopo.smart.thing.gateway.service.DeviceSettingsService;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
@@ -35,7 +35,7 @@ public class DeviceController {
     private final DeviceSettingsService settingsService;
     private final DeviceLogsService deviceLogsService;
     private final DeviceApiService deviceApiService;
-    private final DevicesSearchJob searchJob;
+    private final DevicesSearchService searchJob;
     private final DeviceRepository deviceRepository;
 
     @Operation(summary = "Get recent found devices in local network")
@@ -80,6 +80,15 @@ public class DeviceController {
                 result.getData(),
                 HttpStatusCode.valueOf(result.getStatus())
         );
+    }
+    @GetMapping("/api/{target}")
+    public ResponseEntity<String> callApiByTarget(
+            @PathVariable String target,
+            @RequestParam String command,
+            @RequestParam(required = false) String params
+    ) throws BadRequestException {
+        InternalHttpResponse result = deviceApiService.execute(target, command, params);
+        return new ResponseEntity<>(result.getData(), HttpStatusCode.valueOf(result.getStatus()));
     }
 
     @Operation(

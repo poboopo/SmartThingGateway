@@ -1,4 +1,4 @@
-package ru.pobopo.smart.thing.gateway.service;
+package ru.pobopo.smart.thing.gateway.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

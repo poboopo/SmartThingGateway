@@ -49,7 +49,6 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
             public void handleFrame(StompHeaders headers, Object payload) {
                 try {
                     cloudService.sendResponse(processPayload(payload));
-                    session.send("/topic/response", payload);
                 } catch (LogoutException exception) {
                     applicationEventPublisher.publishEvent(new CloudLogoutEvent(this));
                 }
@@ -80,6 +79,7 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
         }
 
         try {
+            log.info("Starting message processing with class {}", processor.getClass().getName());
             ResponseMessage messageResponse = processor.process(payload);
             messageResponse.setRequestId(base.getId());
             return messageResponse;
@@ -93,6 +93,8 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
                     .stack(ExceptionUtils.getStackTrace(exception))
                     .success(false)
                     .build();
+        } finally {
+            log.info("Message processing finished");
         }
     }
 }

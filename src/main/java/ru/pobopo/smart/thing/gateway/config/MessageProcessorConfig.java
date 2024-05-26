@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
 import ru.pobopo.smart.thing.gateway.service.DeviceApiService;
 import ru.pobopo.smart.thing.gateway.stomp.MessageProcessorFactory;
 import ru.pobopo.smart.thing.gateway.stomp.processor.DeviceRequestMessageProcessor;

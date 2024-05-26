@@ -11,11 +11,8 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.device.api.model.Observable;
-import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchJob;
-import ru.pobopo.smart.thing.gateway.service.DeviceRepository;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
-import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.util.*;
 
@@ -45,23 +42,14 @@ public class DefaultDeviceApi extends DeviceApi {
     public final static String SETTINGS = "/settings";
     public final static String RESTART = "/restart";
 
-    private final DevicesSearchJob searchJob;
-    private final DeviceRepository deviceRepository;
     private final RestTemplate restTemplate;
 
     @Override
-    public boolean accept(DeviceRequest request) {
-        // todo select by version and then find in recent?
-        Collection<DeviceInfo> devices = new ArrayList<>();
-        devices.addAll(searchJob.getRecentFoundDevices());
-        devices.addAll(deviceRepository.getDevices());
-        return devices.stream()
-                .anyMatch((d) -> {
-                    if (!StringUtils.equals(d.getIp(), request.getDevice().getIp()) && !StringUtils.equals(d.getName(), request.getDevice().getName())) {
-                        return false;
-                    }
-                    return SUPPORTED_VERSIONS.contains(d.getVersion());
-                });
+    public boolean accept(DeviceInfo deviceInfo) {
+        if (StringUtils.isBlank(deviceInfo.getIp())) {
+            return false;
+        }
+        return SUPPORTED_VERSIONS.contains(deviceInfo.getVersion());
     }
 
     @Override

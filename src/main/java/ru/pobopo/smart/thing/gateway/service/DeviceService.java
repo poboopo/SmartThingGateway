@@ -1,37 +1,34 @@
 package ru.pobopo.smart.thing.gateway.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import ru.pobopo.smart.thing.gateway.jobs.DevicesSearchService;
+import ru.pobopo.smart.thing.gateway.repository.DeviceRepository;
 import ru.pobopo.smartthing.model.DeviceInfo;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class DeviceService {
-    @Autowired
-    private RestTemplate restTemplate;
+    private final DevicesSearchService searchJob;
+    private final DeviceRepository deviceRepository;
 
-    public Map<String, Object> getConfigValues(DeviceInfo info) {
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                String.format("http://%s/config", info.getIp()),
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<Map<String, Object>>() {}
-        );
-        return response.getBody();
-    }
-
-    public boolean addConfigValues(DeviceInfo info, Map<String, Object> values) {
-        ResponseEntity<Void> response = restTemplate.postForEntity(
-                String.format("http://%s/config/save", info.getIp()),
-                values,
-                Void.class
-        );
-        return response.getStatusCode() == HttpStatus.OK;
+    public Optional<DeviceInfo> findDevice(String name, String ip) {
+        Collection<DeviceInfo> devices = new ArrayList<>();
+        devices.addAll(searchJob.getRecentFoundDevices());
+        devices.addAll(deviceRepository.getDevices());
+        return devices.stream()
+                .filter((d) -> StringUtils.equals(d.getIp(), ip) || StringUtils.equals(d.getName(), name))
+                .findFirst();
     }
 }
