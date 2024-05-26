@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.exception.StorageException;
 import ru.pobopo.smart.thing.gateway.model.CloudIdentity;
 import ru.pobopo.smart.thing.gateway.model.CloudConfig;
+import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 import ru.pobopo.smartthing.model.stomp.GatewayEventType;
 import ru.pobopo.smartthing.model.stomp.GatewayNotification;
 import ru.pobopo.smartthing.model.stomp.ResponseMessage;
@@ -62,8 +63,8 @@ public class CloudService {
     }
 
     public void login() {
-        cloudIdentity = basicRequest(HttpMethod.GET, "/auth", null, CloudIdentity.class);
         try {
+            cloudIdentity = basicRequest(HttpMethod.GET, "/auth", null, CloudIdentity.class).getBody();
             cloudFilesStorageService.saveCloudIdentity(cloudIdentity);
         } catch (StorageException exception) {
             log.error("Failed to save cloud identity: {}", exception.getMessage());
@@ -99,6 +100,15 @@ public class CloudService {
         );
     }
 
+    public ResponseEntity<String> sendDeviceRequest(DeviceRequest request) {
+        return basicRequest(
+                HttpMethod.POST,
+                "/gateway/requests/device",
+                request,
+                String.class
+        );
+    }
+
     public void notification(GatewayNotification notification) {
         basicRequest(
                 HttpMethod.POST,
@@ -118,7 +128,7 @@ public class CloudService {
     }
 
     @Nullable
-    private <T, P> T basicRequest(HttpMethod method, String path, P payload, Class<T> tClass) {
+    private <T, P> ResponseEntity<T> basicRequest(HttpMethod method, String path, P payload, Class<T> tClass) {
         if (path == null) {
             path = "";
         }
@@ -137,7 +147,7 @@ public class CloudService {
             log.info("Sending request: url={}, method={}, entity={}", url, method.name(), entity);
             ResponseEntity<T> response = restTemplate.exchange(url, method, entity, tClass);
             log.info("Success!");
-            return response.getBody();
+            return response;
         } catch (ResourceAccessException exception) {
             log.error("Request failed: {}", exception.getMessage());
             throw exception;

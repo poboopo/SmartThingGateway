@@ -2,11 +2,17 @@ package ru.pobopo.smart.thing.gateway.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.pobopo.smart.thing.gateway.cache.CacheItem;
 import ru.pobopo.smart.thing.gateway.device.api.DeviceApi;
+import ru.pobopo.smart.thing.gateway.exception.BadRequestException;
 import ru.pobopo.smart.thing.gateway.exception.DeviceApiException;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
@@ -25,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class DeviceApiService {
     private final List<DeviceApi> apis;
     private final ObjectMapper objectMapper;
+    private final CloudService cloudService;
 
     @Value("${device.api.cache.enabled:true}")
     private boolean cacheEnabled;
@@ -39,25 +46,33 @@ public class DeviceApiService {
             log.debug("Got request {} result from cache: {}", request, fromCache);
             return fromCache;
         }
-        for (DeviceApi api : apis) {
-            if (api.accept(request)) {
-                InternalHttpResponse result = callApi(api, request);
-                if (cacheEnabled) {
-                    log.debug("Saving request {} result {} in cache", request, result);
-                    cache.put(request, new CacheItem<>(result, LocalDateTime.now()));
-                }
-                return result;
-            }
+
+        InternalHttpResponse result = sendRequest(request);
+        if (cacheEnabled) {
+            log.debug("Saving request {} result {} in cache", request, result);
+            cache.put(request, new CacheItem<>(result, LocalDateTime.now()));
         }
-        throw new DeviceApiException("Api not found for this target");
+        return result;
     }
 
-    private InternalHttpResponse callApi(DeviceApi api, DeviceRequest request) {
+    private InternalHttpResponse sendRequest(DeviceRequest request) {
+        if (StringUtils.isNotBlank(request.getGatewayId())) {
+            return sendRemoteRequest(request);
+        }
+        return sendLocalRequest(request);
+    }
+
+    private InternalHttpResponse sendLocalRequest(DeviceRequest request) {
+        Optional<DeviceApi> optionalApi = apis.stream().filter((api) -> api.accept(request)).findFirst();
+        if (optionalApi.isEmpty()) {
+            throw new DeviceApiException("Api not found for this target");
+        }
+        DeviceApi api = optionalApi.get();
         Method[] methods = api.getClass().getDeclaredMethods();
         Method targetMethod = Arrays.stream(methods)
                 .filter((method) ->
                         method.getName().equals(request.getCommand()) &&
-                        method.getReturnType().equals(InternalHttpResponse.class)
+                                method.getReturnType().equals(InternalHttpResponse.class)
                 )
                 .findFirst()
                 .orElseThrow(() -> new DeviceApiException(String.format(
@@ -92,6 +107,22 @@ public class DeviceApiService {
             log.error("Failed to call device api", e);
             throw new DeviceApiException(e.getMessage());
         }
+    }
+
+    @SneakyThrows
+    private InternalHttpResponse sendRemoteRequest(DeviceRequest request) {
+        //todo handle gateway not found exception
+        // add internal exception codes?
+        ResponseEntity<String> response = cloudService.sendDeviceRequest(request);
+        Objects.requireNonNull(response);
+        if (response.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
+            throw new BadRequestException("Gateway with id=" + request.getGatewayId() + " not found!");
+        }
+        return InternalHttpResponse.builder()
+                .data(response.getBody())
+                .status(response.getStatusCode().value())
+                .headers(response.getHeaders().toSingleValueMap())
+                .build();
     }
 
     private InternalHttpResponse getFromCache(DeviceRequest request) {

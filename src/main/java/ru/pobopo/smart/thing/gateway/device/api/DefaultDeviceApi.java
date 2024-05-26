@@ -2,6 +2,7 @@ package ru.pobopo.smart.thing.gateway.device.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +55,13 @@ public class DefaultDeviceApi extends DeviceApi {
         Collection<DeviceInfo> devices = new ArrayList<>();
         devices.addAll(searchJob.getRecentFoundDevices());
         devices.addAll(deviceRepository.getDevices());
-        return devices.stream().anyMatch((d) -> d.getIp().equals(request.getDevice().getIp()) && SUPPORTED_VERSIONS.contains(d.getVersion()));
+        return devices.stream()
+                .anyMatch((d) -> {
+                    if (!StringUtils.equals(d.getIp(), request.getDevice().getIp()) && !StringUtils.equals(d.getName(), request.getDevice().getName())) {
+                        return false;
+                    }
+                    return SUPPORTED_VERSIONS.contains(d.getVersion());
+                });
     }
 
     @Override
@@ -284,20 +291,19 @@ public class DefaultDeviceApi extends DeviceApi {
                     new HttpEntity<>(payload == null ? "" : payload),
                     String.class
             );
-            InternalHttpResponse deviceResponse = new InternalHttpResponse(
-                    response.getStatusCode().value(),
-                    response.getBody(),
-                    response.getHeaders().toSingleValueMap()
-            );
+            InternalHttpResponse deviceResponse = InternalHttpResponse.builder()
+                    .data(response.getBody())
+                    .status(response.getStatusCode().value())
+                    .headers(response.getHeaders().toSingleValueMap())
+                    .build();
             log.info("Request finished: {}", deviceResponse);
             return deviceResponse;
         } catch (HttpClientErrorException | HttpServerErrorException exception) {
             log.error("Request failed: {}", exception.getMessage());
-            return new InternalHttpResponse(
-                    exception.getStatusCode().value(),
-                    exception.getResponseBodyAsString(),
-                    exception.getResponseHeaders().toSingleValueMap()
-            );
+            return InternalHttpResponse.builder()
+                    .data(exception.getMessage())
+                    .status(exception.getStatusCode().value())
+                    .build();
         } catch (Exception exception) {
             log.error("Failed to send request {}", exception.getMessage(), exception);
             return new InternalHttpResponse(503, null, null);
