@@ -36,6 +36,7 @@ public class DefaultDeviceApi extends DeviceApi {
     public final static String HOOKS_BY_OBSERVABLE = HOOKS + "/by/observable";
     public final static String HOOKS_BY_ID = HOOKS + "/by/id";
     public final static String HOOKS_TEMPLATES = HOOKS + "/templates";
+    public final static String HOOK_TEST = HOOKS + "/test";
 
     public final static String FEATURES = "/features";
     public final static String METRICS = "/metrics";
@@ -212,6 +213,20 @@ public class DefaultDeviceApi extends DeviceApi {
                 ),
                 HttpMethod.DELETE,
                 null
+        );
+    }
+
+    public InternalHttpResponse testHook(DeviceInfo info, Observable observable, String id, String value) {
+        return sendRequest(
+                info,
+                String.format(
+                        "%s?type=%s&name=%s&id=%s&value=%s",
+                        HOOK_TEST,
+                        observable.getType(),
+                        observable.getName(),
+                        id,
+                        value == null ? "" : value
+                )
         );
     }
 
