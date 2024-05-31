@@ -18,17 +18,9 @@ public class DeviceRequestMessageProcessor implements MessageProcessor {
     }
 
     @Override
-    public ResponseMessage process(Object payload) throws Exception {
+    public Object process(Object payload) throws Exception {
         DeviceRequestMessage request = (DeviceRequestMessage) payload;
-        if (request.getId() == null) {
-            throw new MissingValueException("Request id is missing!");
-        }
-
-        ResponseMessage response = new ResponseMessage();
-        response.setRequestId(request.getId());
-        response.setResponse(apiService.execute(request.getRequest()));
-
-        return response;
+        return apiService.execute(request.getRequest());
     }
 
 }

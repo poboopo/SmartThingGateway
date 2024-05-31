@@ -98,7 +98,6 @@ public class DashboardGroupWorker extends Thread {
             log.info("No {}s, skipping update", type);
             return;
         }
-        //todo command constant is bad
         InternalHttpResponse response = apiService.execute(
                 DeviceRequest.builder().device(group.getDevice()).command(command).build()
         );
