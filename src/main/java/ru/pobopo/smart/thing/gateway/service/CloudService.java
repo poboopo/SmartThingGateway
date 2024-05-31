@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smart.thing.gateway.exception.StorageException;
 import ru.pobopo.smart.thing.gateway.model.CloudIdentity;
 import ru.pobopo.smart.thing.gateway.model.CloudConfig;
+import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 import ru.pobopo.smartthing.model.stomp.GatewayEventType;
 import ru.pobopo.smartthing.model.stomp.GatewayNotification;
 import ru.pobopo.smartthing.model.stomp.ResponseMessage;
@@ -21,7 +22,7 @@ import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 public class CloudService {
     public static final String AUTH_TOKEN_HEADER = "SmartThing-Token-Gateway";
 
-    private final CloudFilesStorageService cloudFilesStorageService;
+    private final CloudDataRepository cloudDataRepository;
     private final RestTemplate restTemplate;
 
     private CloudIdentity cloudIdentity;
@@ -29,13 +30,13 @@ public class CloudService {
     private CloudConfig cloudConfig;
 
     @Autowired
-    public CloudService(CloudFilesStorageService cloudFilesStorageService, RestTemplate restTemplate) {
-        this.cloudFilesStorageService = cloudFilesStorageService;
+    public CloudService(CloudDataRepository cloudDataRepository, RestTemplate restTemplate) {
+        this.cloudDataRepository = cloudDataRepository;
         this.restTemplate = restTemplate;
 
         try {
-            cloudConfig = cloudFilesStorageService.loadCloudConfig();
-            cloudIdentity = cloudFilesStorageService.loadCloudIdentity();
+            cloudConfig = cloudDataRepository.loadCloudConfig();
+            cloudIdentity = cloudDataRepository.loadCloudIdentity();
         } catch (StorageException exception) {
             log.warn("Failed to load cloud config or identity: {}", exception.getMessage());
         }
@@ -53,7 +54,7 @@ public class CloudService {
         this.cloudConfig = cloudConfig;
         try {
             login();
-            cloudFilesStorageService.saveCloudConfig(cloudConfig);
+            cloudDataRepository.saveCloudConfig(cloudConfig);
             return cloudIdentity;
         } catch (Exception exception) {
             this.cloudConfig = null;
@@ -62,9 +63,9 @@ public class CloudService {
     }
 
     public void login() {
-        cloudIdentity = basicRequest(HttpMethod.GET, "/auth", null, CloudIdentity.class);
         try {
-            cloudFilesStorageService.saveCloudIdentity(cloudIdentity);
+            cloudIdentity = basicRequest(HttpMethod.GET, "/auth", null, CloudIdentity.class).getBody();
+            cloudDataRepository.saveCloudIdentity(cloudIdentity);
         } catch (StorageException exception) {
             log.error("Failed to save cloud identity: {}", exception.getMessage());
         }
@@ -83,8 +84,8 @@ public class CloudService {
         cloudIdentity = null;
         cloudConfig = null;
         try {
-            cloudFilesStorageService.saveCloudIdentity(null);
-            cloudFilesStorageService.saveCloudConfig(null);
+            cloudDataRepository.saveCloudIdentity(null);
+            cloudDataRepository.saveCloudConfig(null);
         } catch (StorageException exception) {
             log.error("Failed to clear cloud configs: {}", exception.getMessage());
         }
@@ -96,6 +97,15 @@ public class CloudService {
                 "/gateway/requests/response",
                 response,
                 Void.class
+        );
+    }
+
+    public ResponseEntity<String> sendDeviceRequest(DeviceRequest request) {
+        return basicRequest(
+                HttpMethod.POST,
+                "/gateway/requests/device",
+                request,
+                String.class
         );
     }
 
@@ -118,7 +128,7 @@ public class CloudService {
     }
 
     @Nullable
-    private <T, P> T basicRequest(HttpMethod method, String path, P payload, Class<T> tClass) {
+    private <T, P> ResponseEntity<T> basicRequest(HttpMethod method, String path, P payload, Class<T> tClass) {
         if (path == null) {
             path = "";
         }
@@ -135,9 +145,7 @@ public class CloudService {
 
             String url = buildUrl(cloudConfig, path);
             log.info("Sending request: url={}, method={}, entity={}", url, method.name(), entity);
-            ResponseEntity<T> response = restTemplate.exchange(url, method, entity, tClass);
-            log.info("Success!");
-            return response.getBody();
+            return restTemplate.exchange(url, method, entity, tClass);
         } catch (ResourceAccessException exception) {
             log.error("Request failed: {}", exception.getMessage());
             throw exception;

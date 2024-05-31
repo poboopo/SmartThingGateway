@@ -21,7 +21,7 @@ import static ru.pobopo.smart.thing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR
 
 @Component
 @Slf4j
-public class CloudFilesStorageService {
+public class CloudDataRepository {
     private static final String CLOUD_CONFIG_FILE = "cloud_config.json";
     private static final String CLOUD_IDENTITY_FILE = "cloud_identity.json";
 
@@ -29,7 +29,7 @@ public class CloudFilesStorageService {
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public CloudFilesStorageService(Environment environment, ObjectMapper objectMapper) {
+    public CloudDataRepository(Environment environment, ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
 
         String configFile = environment.getProperty("cloud.config.dir");

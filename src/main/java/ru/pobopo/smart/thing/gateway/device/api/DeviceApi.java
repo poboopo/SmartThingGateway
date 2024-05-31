@@ -8,7 +8,7 @@ import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 @Slf4j
 public abstract class DeviceApi {
-    public abstract boolean accept(DeviceRequest request);
+    public abstract boolean accept(DeviceInfo deviceInfo);
 
     public abstract InternalHttpResponse health(DeviceInfo info);
 
