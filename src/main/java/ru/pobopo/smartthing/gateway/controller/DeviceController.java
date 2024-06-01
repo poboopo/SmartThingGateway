@@ -9,9 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.controller.model.UpdateDeviceSettings;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.exception.DeviceSettingsException;
+import ru.pobopo.smartthing.gateway.exception.ForbiddenCloudEndpointException;
 import ru.pobopo.smartthing.gateway.jobs.DevicesSearchService;
 import ru.pobopo.smartthing.gateway.model.*;
 import ru.pobopo.smartthing.gateway.service.DeviceApiService;
@@ -28,13 +30,13 @@ import java.util.Set;
 
 @Slf4j
 @RestController
-@RequestMapping("/device")
+@RequestMapping("/devices")
+@AcceptCloudRequest
 @RequiredArgsConstructor
-@Tag(name = "Devices controller", description = "Find devices, call device api and export/import device settings")
+@Tag(name = "Devices controller", description = "Find and save devices, export and import device settings, get devices logs")
 public class DeviceController {
     private final DeviceSettingsService settingsService;
     private final DeviceLogsService deviceLogsService;
-    private final DeviceApiService deviceApiService;
     private final DevicesSearchService searchJob;
     private final DeviceRepository deviceRepository;
 
@@ -62,33 +64,6 @@ public class DeviceController {
     @DeleteMapping("/saved")
     public void deleteDevice(@RequestParam String ip) throws BadRequestException {
         deviceRepository.deleteDevice(ip);
-    }
-
-    // TODO more info about how ApiSelector works?
-    @Operation(
-            summary = "Call device api method",
-            description = "Api for target device will be selected from possible implementations." +
-                    "If there is no api implementation for target device DeviceApiException thrown.",
-            responses = @ApiResponse(
-                    description = "Returns device api call response"
-            )
-    )
-    @PostMapping("/api")
-    public ResponseEntity<String> callApi(@RequestBody DeviceRequest request) {
-        InternalHttpResponse result = deviceApiService.execute(request);
-        return new ResponseEntity<>(
-                result.getData(),
-                HttpStatusCode.valueOf(result.getStatus())
-        );
-    }
-    @GetMapping("/api/{target}")
-    public ResponseEntity<String> callApiByTarget(
-            @PathVariable String target,
-            @RequestParam String command,
-            @RequestParam(required = false) String params
-    ) throws BadRequestException {
-        InternalHttpResponse result = deviceApiService.execute(target, command, params);
-        return new ResponseEntity<>(result.getData(), HttpStatusCode.valueOf(result.getStatus()));
     }
 
     @Operation(

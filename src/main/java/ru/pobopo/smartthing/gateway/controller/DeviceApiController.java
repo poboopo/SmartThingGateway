@@ -1,0 +1,51 @@
+package ru.pobopo.smartthing.gateway.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.pobopo.smartthing.gateway.exception.BadRequestException;
+import ru.pobopo.smartthing.gateway.service.DeviceApiService;
+import ru.pobopo.smartthing.model.InternalHttpResponse;
+import ru.pobopo.smartthing.model.stomp.DeviceRequest;
+
+@Slf4j
+@RestController
+@RequestMapping("/device/api")
+@RequiredArgsConstructor
+@Tag(name = "Devices controller", description = "Call device api")
+public class DeviceApiController {
+    private final DeviceApiService deviceApiService;
+
+    // TODO more info about how ApiSelector works?
+    @Operation(
+            summary = "Call device api method",
+            description = "Api for target device will be selected from possible implementations." +
+                    "If there is no api implementation for target device DeviceApiException thrown.",
+            responses = @ApiResponse(
+                    description = "Returns device api call response"
+            )
+    )
+    @PostMapping
+    public ResponseEntity<String> callApi(@RequestBody DeviceRequest request) {
+        InternalHttpResponse result = deviceApiService.execute(request);
+        return new ResponseEntity<>(
+                result.getData(),
+                HttpStatusCode.valueOf(result.getStatus())
+        );
+    }
+    @GetMapping("/{target}")
+    public ResponseEntity<String> callApiByTarget(
+            @PathVariable String target,
+            @RequestParam String command,
+            @RequestParam(required = false) String params
+    ) throws BadRequestException {
+        InternalHttpResponse result = deviceApiService.execute(target, command, params);
+        return new ResponseEntity<>(result.getData(), HttpStatusCode.valueOf(result.getStatus()));
+    }
+
+}

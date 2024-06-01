@@ -43,7 +43,7 @@ public class CloudController {
 
     @Operation(summary = "Get cloud connection status")
     @GetMapping("/connection/status")
-    public CloudConnectionStatus isConnected() {
+    public CloudConnectionStatus connectionStatus() {
         return messageService.getStatus();
     }
 

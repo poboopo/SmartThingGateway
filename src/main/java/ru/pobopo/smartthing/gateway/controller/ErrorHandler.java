@@ -1,6 +1,5 @@
 package ru.pobopo.smartthing.gateway.controller;
 
-import com.fasterxml.jackson.databind.util.ExceptionUtil;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;

@@ -164,7 +164,7 @@ public class MessageBrokerService {
             }
             log.info("Reconnect thread stopped");
             if (stompSession == null || !stompSession.isConnected()) {
-                setStatus(CloudConnectionStatus.CONNECTION_LOST);
+                setStatus(CloudConnectionStatus.FAILED_TO_CONNECT);
                 reconnectFailed = true;
             }
         });

@@ -4,6 +4,7 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.exception.DashboardFileException;
 import ru.pobopo.smartthing.gateway.model.DashboardGroup;
 import ru.pobopo.smartthing.gateway.model.DashboardGroupValues;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+@AcceptCloudRequest
 @RestController
 @RequestMapping("/dashboard")
 @RequiredArgsConstructor
