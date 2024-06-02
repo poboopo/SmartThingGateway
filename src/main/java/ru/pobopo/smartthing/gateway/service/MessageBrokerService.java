@@ -19,14 +19,15 @@ import ru.pobopo.smartthing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smartthing.gateway.model.CloudConnectionStatusMessage;
 import ru.pobopo.smartthing.gateway.stomp.CustomStompSessionHandler;
 import ru.pobopo.smartthing.model.stomp.GatewayEventType;
+import ru.pobopo.smartthing.model.stomp.ProxyTopicMessage;
 
 import java.util.concurrent.ExecutionException;
+
+import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.CONNECTION_STATUS_TOPIC;
 
 @Component
 @Slf4j
 public class MessageBrokerService {
-    public static final String CONNECTION_STATUS_TOPIC = "/connection/status";
-
     private final WebSocketStompClient stompClient;
     private final CustomStompSessionHandler sessionHandler;
     private final SimpMessagingTemplate messagingTemplate;
@@ -102,7 +103,7 @@ public class MessageBrokerService {
         }
 
         String url = String.format(
-                "ws://%s:%d/ws",
+                "ws://%s:%d/smt-ws",
                 cloudConfig.getCloudIp(),
                 cloudConfig.getCloudPort()
         );
@@ -173,5 +174,4 @@ public class MessageBrokerService {
         log.info("Starting reconnect thread");
         reconnectThread.start();
     }
-
 }

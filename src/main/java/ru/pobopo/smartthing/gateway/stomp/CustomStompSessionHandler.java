@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 @Slf4j
 @RequiredArgsConstructor
 public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
-    private final static String TOPIC = "/secured/queue/gateway/";
+    private final static String TOPIC = "/secured/gateway/request";
 
     @Setter
     private Consumer<CloudConnectionStatus> statusConsumer;

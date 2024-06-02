@@ -32,8 +32,6 @@ import static ru.pobopo.smartthing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
 @Slf4j
 @Service
 public class DashboardService {
-    public static final String DASHBOARD_TOPIC_PREFIX = "/dashboard";
-
     private static final Path DASHBOARD_FILE_DEFAULT_PATH =
             Paths.get(DEFAULT_APP_DIR.toString(), ".smartthing/dashboard/settings.json");
 

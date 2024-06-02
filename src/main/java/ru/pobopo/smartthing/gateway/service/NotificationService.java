@@ -6,12 +6,12 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.model.stomp.GatewayNotification;
 
+import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.NOTIFICATION_TOPIC;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class NotificationService {
-    public static final String NOTIFICATION_TOPIC = "/notification";
-
     private final SimpMessagingTemplate messagingTemplate;
     private final CloudService cloudService;
 

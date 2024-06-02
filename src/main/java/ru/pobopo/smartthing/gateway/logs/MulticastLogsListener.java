@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smartthing.gateway.model.DeviceLogSource;
-import ru.pobopo.smartthing.gateway.model.DeviceLoggerMessage;
 import ru.pobopo.smartthing.gateway.service.DeviceLogsService;
+import ru.pobopo.smartthing.model.DeviceLogSource;
+import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;

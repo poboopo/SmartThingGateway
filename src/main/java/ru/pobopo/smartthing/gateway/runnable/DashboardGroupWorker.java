@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-import static ru.pobopo.smartthing.gateway.service.DashboardService.DASHBOARD_TOPIC_PREFIX;
+import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.DASHBOARD_TOPIC_PREFIX;
 
 @Slf4j
 public class DashboardGroupWorker extends Thread {

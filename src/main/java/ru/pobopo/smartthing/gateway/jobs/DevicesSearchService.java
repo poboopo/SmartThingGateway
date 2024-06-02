@@ -14,12 +14,14 @@ import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.gateway.cache.ConcurrentSetCache;
 import ru.pobopo.smartthing.model.DeviceInfo;
 
+import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.DEVICES_TOPIC;
+
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class DevicesSearchService implements BackgroundJob {
     // TODO MOVE ALL TO ENV
-    public static final String DEVICES_SEARCH_TOPIC = "/devices/search";
+    public static final String DEVICES_SEARCH_TOPIC = DEVICES_TOPIC + "/search";
     private final static String GROUP = "224.1.1.1";
     private final static int PORT = 7778;
 

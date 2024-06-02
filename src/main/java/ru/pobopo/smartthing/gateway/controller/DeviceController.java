@@ -21,6 +21,7 @@ import ru.pobopo.smartthing.gateway.service.DeviceLogsService;
 import ru.pobopo.smartthing.gateway.repository.DeviceRepository;
 import ru.pobopo.smartthing.gateway.service.DeviceSettingsService;
 import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 

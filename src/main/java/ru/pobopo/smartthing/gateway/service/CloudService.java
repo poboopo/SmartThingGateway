@@ -12,10 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smartthing.gateway.exception.StorageException;
 import ru.pobopo.smartthing.gateway.model.CloudIdentity;
 import ru.pobopo.smartthing.gateway.model.CloudConfig;
-import ru.pobopo.smartthing.model.stomp.DeviceRequest;
-import ru.pobopo.smartthing.model.stomp.GatewayEventType;
-import ru.pobopo.smartthing.model.stomp.GatewayNotification;
-import ru.pobopo.smartthing.model.stomp.ResponseMessage;
+import ru.pobopo.smartthing.model.stomp.*;
 
 @Component
 @Slf4j

@@ -4,21 +4,25 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-import ru.pobopo.smartthing.gateway.model.DeviceLoggerMessage;
+import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.DEVICES_TOPIC;
 
 @Service
 @RequiredArgsConstructor
 public class DeviceLogsService {
-    public static final String DEVICES_LOGS_TOPIC = "/devices/logs";
+    public static final String DEVICES_LOGS_TOPIC = DEVICES_TOPIC + "/logs";
     private final Logger log = LoggerFactory.getLogger("device-logs");
     private final ConcurrentLinkedQueue<DeviceLoggerMessage> logsQueue = new ConcurrentLinkedQueue<>();
+    private final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -32,24 +36,23 @@ public class DeviceLogsService {
     }
 
     public void addLog(DeviceLoggerMessage message) {
-        if (message == null) {
-            log.error("Message is null!");
-            return;
-        }
+        executorService.submit(() -> processLog(message));
+    }
 
-        if (logLevel.compareTo(message.getLevel()) < 0) {
-            return;
-        }
-
+    private void processLog(DeviceLoggerMessage message) {
         log.atLevel(message.getLevel()).log(message.toString());
         if (logsQueue.size() > cacheSize) {
             logsQueue.remove();
         }
         logsQueue.add(message);
 
-        messagingTemplate.convertAndSend(
-                DEVICES_LOGS_TOPIC,
-                message
-        );
+        try {
+            messagingTemplate.convertAndSend(
+                    DEVICES_LOGS_TOPIC,
+                    message
+            );
+        } catch (Exception exception) {
+            log.error("Failed to send log message in topics", exception);
+        }
     }
 }
