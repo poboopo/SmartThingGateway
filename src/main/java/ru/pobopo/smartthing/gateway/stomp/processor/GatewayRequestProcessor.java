@@ -41,16 +41,16 @@ public class GatewayRequestProcessor implements MessageProcessor {
                     String.class
             );
             return new InternalHttpResponse(
-                    response.getStatusCode().value(),
+                    response.getStatusCode(),
                     response.getBody(),
-                    response.getHeaders().toSingleValueMap()
+                    response.getHeaders()
             );
         } catch (HttpServerErrorException | HttpClientErrorException exception) {
             log.error("Request failed: {} {}", exception.getMessage(), exception.getStatusCode());
             return new InternalHttpResponse(
-                    exception.getStatusCode().value(),
+                    exception.getStatusCode(),
                     exception.getResponseBodyAs(String.class),
-                    Map.of()
+                    new HttpHeaders()
             );
         }
     }

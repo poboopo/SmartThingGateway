@@ -16,20 +16,20 @@ public abstract class DeviceApi {
 
     public InternalHttpResponse getActions(DeviceInfo info) {
         log.info("Calling default getActions method");
-        return new InternalHttpResponse(HttpStatus.OK.value(), "[]", null);
+        return new InternalHttpResponse(HttpStatus.OK, "[]", null);
     }
     public InternalHttpResponse callAction(DeviceInfo info, String action) {
         log.info("Calling default callAction method");
-        return new InternalHttpResponse(HttpStatus.BAD_REQUEST.value(), "There is no action handler", null);
+        return new InternalHttpResponse(HttpStatus.BAD_REQUEST, "There is no action handler", null);
     }
 
     public InternalHttpResponse getSensors(DeviceInfo info) {
         log.info("Calling default getSensors method");
-        return new InternalHttpResponse(HttpStatus.OK.value(), "[]", null);
+        return new InternalHttpResponse(HttpStatus.OK, "[]", null);
     }
 
     public InternalHttpResponse getStates(DeviceInfo info) {
         log.info("Calling default getStates method");
-        return new InternalHttpResponse(HttpStatus.OK.value(), "[]", null);
+        return new InternalHttpResponse(HttpStatus.OK, "[]", null);
     }
 }

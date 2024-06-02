@@ -5,13 +5,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
+import ru.pobopo.smartthing.gateway.model.DeviceApiMethod;
 import ru.pobopo.smartthing.gateway.service.DeviceApiService;
+import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -35,7 +40,8 @@ public class DeviceApiController {
         InternalHttpResponse result = deviceApiService.execute(request);
         return new ResponseEntity<>(
                 result.getData(),
-                HttpStatusCode.valueOf(result.getStatus())
+                result.getHeaders(),
+                result.getStatus()
         );
     }
     @GetMapping("/{target}")
@@ -45,7 +51,22 @@ public class DeviceApiController {
             @RequestParam(required = false) String params
     ) throws BadRequestException {
         InternalHttpResponse result = deviceApiService.execute(target, command, params);
-        return new ResponseEntity<>(result.getData(), HttpStatusCode.valueOf(result.getStatus()));
+        return new ResponseEntity<>(
+                result.getData(),
+                result.getHeaders(),
+                result.getStatus()
+        );
+    }
+
+    @GetMapping("/methods")
+    public List<DeviceApiMethod> getApiMethods(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String ip
+    ) throws BadRequestException {
+        if (StringUtils.isBlank(name) && StringUtils.isBlank(ip)) {
+            throw new BadRequestException("Name and ip can't be blank!");
+        }
+        return deviceApiService.getApiMethods(DeviceInfo.builder().name(name).ip(ip).build());
     }
 
 }

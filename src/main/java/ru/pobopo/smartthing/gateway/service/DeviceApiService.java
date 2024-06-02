@@ -14,11 +14,13 @@ import ru.pobopo.smartthing.gateway.device.api.DeviceApi;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.exception.DeviceApiException;
 import ru.pobopo.smartthing.gateway.model.CloudIdentity;
+import ru.pobopo.smartthing.gateway.model.DeviceApiMethod;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -44,7 +46,22 @@ public class DeviceApiService {
 
     private final Map<DeviceRequest, CacheItem<InternalHttpResponse>> cache = new ConcurrentHashMap<>();
 
-    // todo check request with params
+    public InternalHttpResponse execute(DeviceRequest request) {
+        Objects.requireNonNull(request, "Incoming request can't be null!");
+        log.info("Executing device request: {}", request);
+        InternalHttpResponse fromCache = getFromCache(request);
+        if (fromCache != null) {
+            log.info("Got request {} result from cache: {}", request, fromCache);
+            return fromCache;
+        }
+
+        InternalHttpResponse result = sendRequest(request);
+        if (cacheEnabled) {
+            log.info("Saving request {} result {} in cache", request, result);
+            cache.put(request, new CacheItem<>(result, LocalDateTime.now()));
+        }
+        return result;
+    }
 
     public InternalHttpResponse execute(String target, String command, String params) throws BadRequestException {
         if (StringUtils.isBlank(target)) {
@@ -84,23 +101,6 @@ public class DeviceApiService {
         return execute(requestBuilder.build());
     }
 
-    public InternalHttpResponse execute(DeviceRequest request) {
-        Objects.requireNonNull(request, "Incoming request can't be null!");
-        log.info("Executing device request: {}", request);
-        InternalHttpResponse fromCache = getFromCache(request);
-        if (fromCache != null) {
-            log.info("Got request {} result from cache: {}", request, fromCache);
-            return fromCache;
-        }
-
-        InternalHttpResponse result = sendRequest(request);
-        if (cacheEnabled) {
-            log.info("Saving request {} result {} in cache", request, result);
-            cache.put(request, new CacheItem<>(result, LocalDateTime.now()));
-        }
-        return result;
-    }
-
     private InternalHttpResponse sendRequest(DeviceRequest request) {
         if (StringUtils.isBlank(request.getGatewayId()) || isSameGateway(request.getGatewayId())) {
             log.info("Executing local request");
@@ -108,6 +108,23 @@ public class DeviceApiService {
         }
         log.info("Sending request to gateway id={}", request.getGatewayId());
         return sendRemoteRequest(request);
+    }
+
+    public List<DeviceApiMethod> getApiMethods(DeviceInfo deviceInfo) {
+        Optional<DeviceInfo> foundDevice = deviceService.findDevice(deviceInfo.getName(), deviceInfo.getIp());
+        if (foundDevice.isEmpty()) {
+            throw new DeviceApiException("Unknown device!");
+        }
+        Optional<DeviceApi> optionalApi = apis.stream().filter((api) -> api.accept(foundDevice.get())).findFirst();
+        if (optionalApi.isEmpty()) {
+            throw new DeviceApiException("Api not found for this target");
+        }
+        Method[] methods = optionalApi.get().getClass().getMethods();
+        return Arrays.stream(methods)
+                .filter((method) -> Modifier.isPublic(method.getModifiers())
+                        && method.getReturnType().equals(InternalHttpResponse.class))
+                .map(DeviceApiMethod::fromMethod)
+                .toList();
     }
 
     private InternalHttpResponse sendLocalRequest(DeviceRequest request) {
@@ -120,7 +137,7 @@ public class DeviceApiService {
             throw new DeviceApiException("Api not found for this target");
         }
         DeviceApi api = optionalApi.get();
-        Method[] methods = api.getClass().getDeclaredMethods();
+        Method[] methods = api.getClass().getMethods();
         Method targetMethod = Arrays.stream(methods)
                 .filter((method) ->
                         method.getName().equals(request.getCommand()) &&
@@ -172,8 +189,8 @@ public class DeviceApiService {
         }
         return InternalHttpResponse.builder()
                 .data(response.getBody())
-                .status(response.getStatusCode().value())
-                .headers(response.getHeaders().toSingleValueMap())
+                .status(response.getStatusCode())
+                .headers(response.getHeaders())
                 .build();
     }
 
@@ -196,16 +213,5 @@ public class DeviceApiService {
             return true;
         }
         return StringUtils.equals(cloudIdentity.getGateway().getId(), gatewayId);
-    }
-
-    private String toCaps(String camel) {
-        StringBuilder res = new StringBuilder();
-        for (char value: camel.toCharArray()) {
-            if (Character.isUpperCase(value)) {
-                res.append("_");
-            }
-            res.append(Character.toUpperCase(value));
-        }
-        return res.toString();
     }
 }

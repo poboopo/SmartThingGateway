@@ -23,6 +23,7 @@ public class DeviceService {
     private final DevicesSearchService searchJob;
     private final DeviceRepository deviceRepository;
 
+    // todo add cache?
     public Optional<DeviceInfo> findDevice(String name, String ip) {
         Collection<DeviceInfo> devices = new ArrayList<>();
         devices.addAll(searchJob.getRecentFoundDevices());

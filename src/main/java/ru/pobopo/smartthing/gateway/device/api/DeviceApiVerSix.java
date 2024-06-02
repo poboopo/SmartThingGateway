@@ -3,9 +3,7 @@ package ru.pobopo.smartthing.gateway.device.api;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
@@ -19,8 +17,7 @@ import java.util.*;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DefaultDeviceApi extends DeviceApi {
-    public final static Collection<String> SUPPORTED_VERSIONS = List.of("0.5", "0.6");
+public class DeviceApiVerSix extends DeviceApi {
     public final static String HEALTH = "/health";
     public final static String SYSTEM_INFO = "/info/system";
     public final static String GET_ACTIONS = "/info/actions";
@@ -36,7 +33,6 @@ public class DefaultDeviceApi extends DeviceApi {
     public final static String HOOKS_BY_OBSERVABLE = HOOKS + "/by/observable";
     public final static String HOOKS_BY_ID = HOOKS + "/by/id";
     public final static String HOOKS_TEMPLATES = HOOKS + "/templates";
-    public final static String HOOK_TEST = HOOKS + "/test";
 
     public final static String FEATURES = "/features";
     public final static String METRICS = "/metrics";
@@ -50,7 +46,7 @@ public class DefaultDeviceApi extends DeviceApi {
         if (StringUtils.isBlank(deviceInfo.getIp())) {
             return false;
         }
-        return SUPPORTED_VERSIONS.contains(deviceInfo.getVersion());
+        return StringUtils.equals(deviceInfo.getVersion(), "0.6");
     }
 
     @Override
@@ -216,27 +212,7 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse testHook(DeviceInfo info, Observable observable, String id, String value) {
-        return sendRequest(
-                info,
-                String.format(
-                        "%s?type=%s&name=%s&id=%s&value=%s",
-                        HOOK_TEST,
-                        observable.getType(),
-                        observable.getName(),
-                        id,
-                        value == null ? "" : value
-                )
-        );
-    }
-
     public InternalHttpResponse getFeatures(DeviceInfo info) {
-        if (info.getVersion().equals("0.5")) {
-            return InternalHttpResponse.builder()
-                    .status(200)
-                    .data("{\"web\":true,\"actions\":true,\"sensors\":true,\"states\":true,\"hooks\":true,\"logger\":true}")
-                    .build();
-        }
         return sendRequest(info, FEATURES, HttpMethod.GET, null);
     }
 
@@ -274,11 +250,11 @@ public class DefaultDeviceApi extends DeviceApi {
         );
     }
 
-    private InternalHttpResponse sendRequest(DeviceInfo info, String path) {
+    protected InternalHttpResponse sendRequest(DeviceInfo info, String path) {
         return sendRequest(info, path, HttpMethod.GET, null);
     }
 
-    private InternalHttpResponse sendRequest(DeviceInfo info, String path, HttpMethod method, Object payload) {
+    protected InternalHttpResponse sendRequest(DeviceInfo info, String path, HttpMethod method, Object payload) {
         String url = buildUrl(info, path);
         log.info(
                 "Sending request [{}] {} - {}",
@@ -296,8 +272,8 @@ public class DefaultDeviceApi extends DeviceApi {
             );
             InternalHttpResponse deviceResponse = InternalHttpResponse.builder()
                     .data(response.getBody())
-                    .status(response.getStatusCode().value())
-                    .headers(response.getHeaders().toSingleValueMap())
+                    .status(response.getStatusCode())
+                    .headers(response.getHeaders())
                     .build();
             log.info("Request finished: {}", deviceResponse);
             return deviceResponse;
@@ -305,11 +281,11 @@ public class DefaultDeviceApi extends DeviceApi {
             log.error("Request failed: {}", exception.getMessage());
             return InternalHttpResponse.builder()
                     .data(exception.getMessage())
-                    .status(exception.getStatusCode().value())
+                    .status(exception.getStatusCode())
                     .build();
         } catch (Exception exception) {
             log.error("Failed to send request {}", exception.getMessage(), exception);
-            return new InternalHttpResponse(503, null, null);
+            return new InternalHttpResponse(HttpStatus.FORBIDDEN, null, null);
         }
     }
 

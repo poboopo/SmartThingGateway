@@ -11,9 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smartthing.gateway.device.api.DefaultDeviceApi;
+import ru.pobopo.smartthing.gateway.device.api.DeviceApiVerSix;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
-import ru.pobopo.smartthing.gateway.exception.DashboardFileException;
 import ru.pobopo.smartthing.model.DeviceInfo;
 
 import java.io.IOException;
@@ -143,7 +142,7 @@ public class DeviceRepository {
         log.info("Trying to load device info (ip={})", ip);
         try {
             DeviceInfo info = restTemplate.getForObject(
-                    String.format("http://%s/%s", ip, DefaultDeviceApi.SYSTEM_INFO),
+                    String.format("http://%s/%s", ip, DeviceApiVerSix.SYSTEM_INFO),
                     DeviceInfo.class
             );
             if (info == null) {
