@@ -274,7 +274,7 @@ public class DeviceApiVerSix extends DeviceApi {
             headers.setContentType(MediaType.APPLICATION_JSON);
             InternalHttpResponse deviceResponse = InternalHttpResponse.builder()
                     .data(response.getBody())
-                    .status(response.getStatusCode())
+                    .status(response.getStatusCode().value())
                     .headers(headers)
                     .build();
             log.info("Request finished: {}", deviceResponse);
@@ -283,11 +283,11 @@ public class DeviceApiVerSix extends DeviceApi {
             log.error("Request failed: {}", exception.getMessage());
             return InternalHttpResponse.builder()
                     .data(exception.getMessage())
-                    .status(exception.getStatusCode())
+                    .status(exception.getStatusCode().value())
                     .build();
         } catch (Exception exception) {
             log.error("Failed to send request {}", exception.getMessage(), exception);
-            return new InternalHttpResponse(HttpStatus.FORBIDDEN, null, null);
+            return new InternalHttpResponse(HttpStatus.FORBIDDEN.value(), null, null);
         }
     }
 

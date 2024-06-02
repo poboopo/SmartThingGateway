@@ -40,15 +40,17 @@ public class GatewayRequestProcessor implements MessageProcessor {
                     entity,
                     String.class
             );
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
             return new InternalHttpResponse(
-                    response.getStatusCode(),
+                    response.getStatusCode().value(),
                     response.getBody(),
-                    response.getHeaders()
+                    httpHeaders // todo this done bcs of "Multiple cross origin headers" error
             );
         } catch (HttpServerErrorException | HttpClientErrorException exception) {
             log.error("Request failed: {} {}", exception.getMessage(), exception.getStatusCode());
             return new InternalHttpResponse(
-                    exception.getStatusCode(),
+                    exception.getStatusCode().value(),
                     exception.getResponseBodyAs(String.class),
                     new HttpHeaders()
             );
