@@ -6,20 +6,16 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.IncompatibleConfigurationException;
-import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import ru.pobopo.smartthing.gateway.event.*;
-import ru.pobopo.smartthing.gateway.exception.StorageException;
 import ru.pobopo.smartthing.gateway.model.CloudConfig;
 import ru.pobopo.smartthing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smartthing.gateway.model.CloudConnectionStatusMessage;
 import ru.pobopo.smartthing.gateway.stomp.CustomStompSessionHandler;
 import ru.pobopo.smartthing.model.stomp.GatewayEventType;
-import ru.pobopo.smartthing.model.stomp.ProxyTopicMessage;
 
 import java.util.concurrent.ExecutionException;
 
