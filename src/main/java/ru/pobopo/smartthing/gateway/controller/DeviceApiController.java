@@ -38,11 +38,7 @@ public class DeviceApiController {
     @PostMapping
     public ResponseEntity<String> callApi(@RequestBody DeviceRequest request) {
         InternalHttpResponse result = deviceApiService.execute(request);
-        return new ResponseEntity<>(
-                result.getData(),
-                result.getHeaders(),
-                result.getStatus()
-        );
+        return result.toResponseEntity();
     }
     @GetMapping("/{target}")
     public ResponseEntity<String> callApiByTarget(
@@ -51,11 +47,7 @@ public class DeviceApiController {
             @RequestParam(required = false) String params
     ) throws BadRequestException {
         InternalHttpResponse result = deviceApiService.execute(target, command, params);
-        return new ResponseEntity<>(
-                result.getData(),
-                result.getHeaders(),
-                result.getStatus()
-        );
+        return result.toResponseEntity();
     }
 
     @GetMapping("/methods")

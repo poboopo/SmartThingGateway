@@ -270,10 +270,12 @@ public class DeviceApiVerSix extends DeviceApi {
                     new HttpEntity<>(payload == null ? "" : payload),
                     String.class
             );
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
             InternalHttpResponse deviceResponse = InternalHttpResponse.builder()
                     .data(response.getBody())
                     .status(response.getStatusCode())
-                    .headers(response.getHeaders())
+                    .headers(headers)
                     .build();
             log.info("Request finished: {}", deviceResponse);
             return deviceResponse;
