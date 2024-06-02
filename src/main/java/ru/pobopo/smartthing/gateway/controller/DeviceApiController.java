@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.model.DeviceApiMethod;
 import ru.pobopo.smartthing.gateway.service.DeviceApiService;
@@ -50,6 +51,7 @@ public class DeviceApiController {
         return result.toResponseEntity();
     }
 
+    @AcceptCloudRequest
     @GetMapping("/methods")
     public List<DeviceApiMethod> getApiMethods(
             @RequestParam(required = false) String name,

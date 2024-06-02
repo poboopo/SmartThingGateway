@@ -11,8 +11,6 @@ import ru.pobopo.smartthing.gateway.exception.MissingValueException;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.GatewayRequestMessage;
 
-import java.util.Map;
-
 @Slf4j
 @RequiredArgsConstructor
 public class GatewayRequestProcessor implements MessageProcessor {
