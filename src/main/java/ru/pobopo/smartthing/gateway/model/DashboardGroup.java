@@ -15,6 +15,6 @@ import java.util.*;
 public class DashboardGroup {
     private UUID id;
     private DeviceInfo device;
-    private List<DashboardObservable> observables = new ArrayList<>();
-    private DashboardGroupConfig config = new DashboardGroupConfig();
+    private List<DashboardObservable> observables;
+    private DashboardGroupConfig config;
 }
