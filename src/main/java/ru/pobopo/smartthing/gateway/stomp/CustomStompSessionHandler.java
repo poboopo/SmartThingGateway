@@ -56,6 +56,7 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
                 }
             }
         });
+//        session.send("/gateway/ping", "");
 
         statusConsumer.accept(CloudConnectionStatus.CONNECTED);
     }

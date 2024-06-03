@@ -23,7 +23,7 @@ import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.CONNECTIO
 
 @Component
 @Slf4j
-public class MessageBrokerService {
+public class CloudMessageBrokerService {
     private final WebSocketStompClient stompClient;
     private final CustomStompSessionHandler sessionHandler;
     private final SimpMessagingTemplate messagingTemplate;
@@ -39,7 +39,7 @@ public class MessageBrokerService {
     private Thread reconnectThread;
     private boolean reconnectFailed = false;
 
-    public MessageBrokerService(WebSocketStompClient stompClient, CloudService cloudService, CustomStompSessionHandler sessionHandler, SimpMessagingTemplate messagingTemplate) {
+    public CloudMessageBrokerService(WebSocketStompClient stompClient, CloudService cloudService, CustomStompSessionHandler sessionHandler, SimpMessagingTemplate messagingTemplate) {
         this.stompClient = stompClient;
         this.sessionHandler = sessionHandler;
         this.messagingTemplate = messagingTemplate;

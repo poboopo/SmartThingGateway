@@ -11,14 +11,14 @@ import ru.pobopo.smartthing.gateway.model.CloudIdentity;
 import ru.pobopo.smartthing.gateway.model.CloudConfig;
 import ru.pobopo.smartthing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smartthing.gateway.service.CloudService;
-import ru.pobopo.smartthing.gateway.service.MessageBrokerService;
+import ru.pobopo.smartthing.gateway.service.CloudMessageBrokerService;
 
 @RestController
 @RequestMapping("/cloud")
 @RequiredArgsConstructor
 @Tag(name = "Cloud connection controller", description = "Login/logout, connect/disconnect, get information")
 public class CloudController {
-    private final MessageBrokerService messageService;
+    private final CloudMessageBrokerService messageService;
     private final CloudService cloudService;
 
     @Operation(

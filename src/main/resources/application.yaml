@@ -30,3 +30,7 @@ device:
     cache:
       enabled: true
       ttl: 1500
+
+logging:
+  file:
+    name: /var/log/cloud.log

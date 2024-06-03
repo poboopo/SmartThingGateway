@@ -51,6 +51,7 @@ public class DeviceApiController {
         return result.toResponseEntity();
     }
 
+    // todo remove?
     @AcceptCloudRequest
     @GetMapping("/methods")
     public List<DeviceApiMethod> getApiMethods(
