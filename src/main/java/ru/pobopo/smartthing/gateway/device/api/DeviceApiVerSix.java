@@ -18,6 +18,8 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class DeviceApiVerSix extends DeviceApi {
+    private final static List<String> SUPPORTED_VERSIONS = List.of("0.5", "0.6");
+
     public final static String HEALTH = "/health";
     public final static String SYSTEM_INFO = "/info/system";
     public final static String GET_ACTIONS = "/info/actions";
@@ -46,7 +48,7 @@ public class DeviceApiVerSix extends DeviceApi {
         if (StringUtils.isBlank(deviceInfo.getIp())) {
             return false;
         }
-        return StringUtils.equals(deviceInfo.getVersion(), "0.6");
+        return SUPPORTED_VERSIONS.contains(deviceInfo.getVersion());
     }
 
     @Override
@@ -213,6 +215,12 @@ public class DeviceApiVerSix extends DeviceApi {
     }
 
     public InternalHttpResponse getFeatures(DeviceInfo info) {
+        if (info.getVersion().equals("0.5")) {
+            return InternalHttpResponse.builder()
+                    .status(200)
+                    .data("{\"web\":true,\"actions\":true,\"sensors\":true,\"states\":true,\"hooks\":true,\"logger\":true}")
+                    .build();
+        }
         return sendRequest(info, FEATURES, HttpMethod.GET, null);
     }
 
