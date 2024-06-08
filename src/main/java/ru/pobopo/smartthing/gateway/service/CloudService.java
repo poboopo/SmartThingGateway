@@ -22,6 +22,7 @@ public class CloudService {
     private final CloudDataRepository cloudDataRepository;
     private final RestTemplate restTemplate;
 
+    @Getter
     private CloudIdentity cloudIdentity;
     @Getter
     private CloudConfig cloudConfig;
@@ -39,14 +40,6 @@ public class CloudService {
         }
     }
 
-    public CloudIdentity getCloudIdentity() {
-        if (cloudIdentity == null) {
-            log.info("Cloud identity is null, trying to auth");
-            login();
-        }
-        return cloudIdentity;
-    }
-
     public CloudIdentity login(CloudConfig cloudConfig) throws StorageException {
         this.cloudConfig = cloudConfig;
         try {
@@ -59,9 +52,14 @@ public class CloudService {
         }
     }
 
-    public void login() {
+    public synchronized void login() {
         try {
-            cloudIdentity = basicRequest(HttpMethod.GET, "/auth", null, CloudIdentity.class).getBody();
+            ResponseEntity<CloudIdentity> response = basicRequest(HttpMethod.GET, "/auth", null, CloudIdentity.class);
+            if (response == null) {
+                log.error("Failed to fetch authentication from cloud");
+                return;
+            }
+            cloudIdentity = response.getBody();
             cloudDataRepository.saveCloudIdentity(cloudIdentity);
         } catch (StorageException exception) {
             log.error("Failed to save cloud identity: {}", exception.getMessage());

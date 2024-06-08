@@ -30,7 +30,7 @@ public class GatewayCommandProcessor implements MessageProcessor {
             }
             case LOGOUT -> {
                 log.info("Logout event! Removing token from config.");
-                cloudService.logout();
+                cloudService.removeCloudCache();
                 throw new LogoutException();
             }
             default -> throw new Exception("Unknown command");
