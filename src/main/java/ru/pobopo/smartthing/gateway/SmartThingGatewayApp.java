@@ -42,6 +42,10 @@ public class SmartThingGatewayApp {
             } catch (Throwable exception) {
                 log.error("Failed to login in cloud: {}", exception.getMessage());
             }
+            if (cloudService.getCloudIdentity() == null) {
+                log.warn("Skipping websocket connection, bcz we failed to auth in cloud");
+                return;
+            }
             try {
                 brokerService.connect(CloudConnectionStatus.NOT_CONNECTED);
             } catch (Throwable exception) {

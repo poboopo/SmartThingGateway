@@ -32,5 +32,5 @@ device:
       ttl: 1500
 
 logging:
-  file:
-    name: /var/log/cloud.log
+  path:
+    name: /var/log/cloud
