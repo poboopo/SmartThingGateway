@@ -32,5 +32,6 @@ device:
       ttl: 1500
 
 logging:
-  path:
-    name: /var/log/cloud
+  file:
+    name: /var/log/cloud.log
+  max-size: 20GB
