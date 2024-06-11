@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.IncompatibleConfigurationException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -34,7 +35,7 @@ public class CloudMessageBrokerService {
     @Value("${cloud.reconnect.pause}")
     private int reconnectPause;
 
-    private CloudConnectionStatus connectionStatus = CloudConnectionStatus.NOT_CONNECTED;
+    private volatile CloudConnectionStatus connectionStatus = CloudConnectionStatus.NOT_CONNECTED;
     private StompSession stompSession;
     private Thread reconnectThread;
     private boolean reconnectFailed = false;
@@ -53,7 +54,7 @@ public class CloudMessageBrokerService {
     }
 
     synchronized public void setStatus(CloudConnectionStatus status) {
-        if (connectionStatus.equals(status)) {
+        if (status == null || connectionStatus.equals(status)) {
             return;
         }
         log.info("New connection status: {}", status);
@@ -119,8 +120,8 @@ public class CloudMessageBrokerService {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
             log.info("Stop session disconnected");
-            setStatus(CloudConnectionStatus.DISCONNECTED);
         }
+        setStatus(CloudConnectionStatus.DISCONNECTED);
     }
 
     private void stopReconnectThread() {
@@ -169,5 +170,16 @@ public class CloudMessageBrokerService {
 
         log.info("Starting reconnect thread");
         reconnectThread.start();
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    public void checkStatus() {
+        if (!connectionStatus.equals(CloudConnectionStatus.CONNECTED)) {
+            return;
+        }
+        if (stompSession != null && !stompSession.isConnected()) {
+            log.error("Lost connection!!!");
+            setStatus(CloudConnectionStatus.CONNECTION_LOST);
+        }
     }
 }
