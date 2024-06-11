@@ -5,6 +5,9 @@ cloud:
   reconnect:
     attempts: 10
     pause: 10000
+  status:
+    check:
+      delay: 30000
   config:
     dir: ""
 

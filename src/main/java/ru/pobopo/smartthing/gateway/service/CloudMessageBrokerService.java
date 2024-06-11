@@ -172,7 +172,7 @@ public class CloudMessageBrokerService {
         reconnectThread.start();
     }
 
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(fixedDelayString = "${cloud.status.check.delay}")
     public void checkStatus() {
         if (!connectionStatus.equals(CloudConnectionStatus.CONNECTED)) {
             return;
