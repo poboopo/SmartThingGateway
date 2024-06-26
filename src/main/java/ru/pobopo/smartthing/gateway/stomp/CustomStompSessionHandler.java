@@ -63,7 +63,7 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
     @Override
     public void handleTransportError(StompSession session, Throwable exception) {
         log.error("Stomp transport error: {} ({})", exception.getMessage(), exception.getClass());
-        if (exception instanceof ConnectionLostException) {
+        if (exception instanceof ConnectionLostException || exception instanceof IllegalStateException) {
             statusConsumer.accept(CloudConnectionStatus.CONNECTION_LOST);
         }
     }

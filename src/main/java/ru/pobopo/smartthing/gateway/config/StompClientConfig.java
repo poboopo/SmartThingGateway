@@ -33,7 +33,6 @@ public class StompClientConfig {
 
     private ThreadPoolTaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(10);
         taskScheduler.initialize();
         return taskScheduler;
     }

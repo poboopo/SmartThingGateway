@@ -82,7 +82,10 @@ public class CloudMessageBrokerService {
         stopReconnectThread();
         disconnect();
         try {
-            if (connectionStatus == CloudConnectionStatus.CONNECTING || connectionStatus == CloudConnectionStatus.CONNECTED) {
+            if (connectionStatus == CloudConnectionStatus.CONNECTING
+                    || connectionStatus == CloudConnectionStatus.CONNECTED
+                    || connectionStatus == CloudConnectionStatus.RECONNECTING
+            ) {
                 return;
             }
             setStatus(CloudConnectionStatus.CONNECTING);
@@ -164,6 +167,8 @@ public class CloudMessageBrokerService {
             if (stompSession == null || !stompSession.isConnected()) {
                 setStatus(CloudConnectionStatus.FAILED_TO_CONNECT);
                 reconnectFailed = true;
+            } else {
+                log.info("Connection restored!");
             }
         });
         reconnectThread.setDaemon(true);
@@ -174,11 +179,11 @@ public class CloudMessageBrokerService {
 
     @Scheduled(fixedDelayString = "${cloud.status.check.delay}")
     public void checkStatus() {
-        if (!connectionStatus.equals(CloudConnectionStatus.CONNECTED)) {
+        if (CloudConnectionStatus.CONNECTED.equals(connectionStatus)) {
             return;
         }
         if (stompSession != null && !stompSession.isConnected()) {
-            log.error("Lost connection!!!");
+            log.info("Connection lost detected!");
             setStatus(CloudConnectionStatus.CONNECTION_LOST);
         }
     }
