@@ -14,8 +14,6 @@ import lombok.ToString;
 public class CloudConfig {
     @Schema(description = "Authentication token")
     private String token;
-    @Schema(description = "Cloud app ip")
-    private String cloudIp;
-    @Schema(description = "Cloud app port")
-    private int cloudPort;
+    @Schema(description = "Cloud app url")
+    private String cloudUrl;
 }

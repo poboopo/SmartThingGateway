@@ -4,6 +4,7 @@ import jakarta.annotation.PreDestroy;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.IncompatibleConfigurationException;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -98,16 +99,12 @@ public class CloudMessageBrokerService {
 
     private void connectWs() throws ExecutionException, InterruptedException {
         CloudConfig cloudConfig = cloudService.getCloudConfig();
-        if (cloudConfig == null) {
-            throw new IncompatibleConfigurationException("Can't find token in cloud config");
+        if (cloudConfig == null || StringUtils.isBlank(cloudConfig.getCloudUrl()) || StringUtils.isBlank(cloudConfig.getToken())) {
+            throw new IncompatibleConfigurationException("Can't find cloud url or auth token in cloud config!");
         }
 
-        String url = String.format(
-                "ws://%s:%d/smt-ws",
-                cloudConfig.getCloudIp(),
-                cloudConfig.getCloudPort()
-        );
-        log.info("Connecting to {}", url);
+        String wsUrl = cloudConfig.getCloudUrl().replace("http", "ws") + "/smt-ws";
+        log.info("Connecting to {}", wsUrl);
 
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
         headers.add(CloudService.AUTH_TOKEN_HEADER, cloudConfig.getToken());
@@ -115,7 +112,7 @@ public class CloudMessageBrokerService {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
         }
-        stompSession = stompClient.connectAsync(url, headers, sessionHandler).get();
+        stompSession = stompClient.connectAsync(wsUrl, headers, sessionHandler).get();
     }
 
     @PreDestroy

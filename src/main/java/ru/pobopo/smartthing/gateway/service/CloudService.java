@@ -14,6 +14,7 @@ import ru.pobopo.smartthing.gateway.model.CloudIdentity;
 import ru.pobopo.smartthing.gateway.model.CloudConfig;
 import ru.pobopo.smartthing.model.stomp.*;
 
+// todo need refactor
 @Component
 @Slf4j
 public class CloudService {
@@ -151,11 +152,6 @@ public class CloudService {
     }
 
     private String buildUrl(CloudConfig cloudInfo, String path) {
-        return String.format(
-                "http://%s:%s/%s",
-                cloudInfo.getCloudIp(),
-                cloudInfo.getCloudPort(),
-                !path.isEmpty() && path.charAt(0) == '/' ? path.substring(1) : path
-        );
+        return cloudInfo.getCloudUrl() + (!path.isEmpty() && path.charAt(0) != '/' ? '/' : "") + path;
     }
 }
