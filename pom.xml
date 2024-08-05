@@ -21,6 +21,14 @@
         <start-class>ru.pobopo.smartthing.gateway.SmartThingGatewayApp</start-class>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>smt-repo-releases</id>
+            <name>SmartThingApiRepository</name>
+            <url>https://pobopo.ru/repo/releases</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

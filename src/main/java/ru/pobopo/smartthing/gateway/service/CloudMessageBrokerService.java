@@ -100,7 +100,7 @@ public class CloudMessageBrokerService {
     private void connectWs() throws ExecutionException, InterruptedException {
         CloudConfig cloudConfig = cloudService.getCloudConfig();
         if (cloudConfig == null || StringUtils.isBlank(cloudConfig.getCloudUrl()) || StringUtils.isBlank(cloudConfig.getToken())) {
-            throw new IncompatibleConfigurationException("Can't find cloud url or auth token in cloud config!");
+            throw new IncompatibleConfigurationException("Can't find cloud ul or auth token in cloud config!");
         }
 
         String wsUrl = cloudConfig.getCloudUrl().replace("http", "ws") + "/smt-ws";
