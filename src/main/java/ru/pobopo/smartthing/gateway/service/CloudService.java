@@ -68,8 +68,15 @@ public class CloudService {
     }
 
     public void logout() {
+        if (cloudIdentity == null) {
+            return;
+        }
         try {
-            basicRequest(HttpMethod.POST,"/auth/gateway/logout", null, Void.class);
+            basicRequest(
+                    HttpMethod.POST,
+                    "/auth/gateway/logout/" + cloudIdentity.getGateway().getId(),
+                    null, Void.class
+            );
         } catch (Exception e) {
             log.error("Failed to logout in cloud: {}", e.getMessage());
         }
