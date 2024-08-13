@@ -31,9 +31,9 @@ public class CloudMessageBrokerService {
     private final SimpMessagingTemplate messagingTemplate;
     private final CloudService cloudService;
 
-    @Value("${cloud.reconnect.attempts}")
+    @Value("${cloud.reconnect.attempts:-1}")
     private int reconnectAttempts;
-    @Value("${cloud.reconnect.pause}")
+    @Value("${cloud.reconnect.pause:10000}")
     private int reconnectPause;
 
     private volatile CloudConnectionStatus connectionStatus = CloudConnectionStatus.NOT_CONNECTED;
@@ -147,7 +147,10 @@ public class CloudMessageBrokerService {
         }
         reconnectThread = new Thread(() -> {
             int attempt = 0;
-            while ((stompSession == null || !stompSession.isConnected()) && attempt < reconnectAttempts) {
+            while (
+                    (stompSession == null || !stompSession.isConnected())
+                    && (reconnectAttempts == -1 || attempt < reconnectAttempts)
+            ) {
                 try {
                     Thread.sleep(reconnectPause);
                     log.info("Reconnect attempt №{}", attempt);

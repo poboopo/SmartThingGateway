@@ -11,18 +11,13 @@ import ru.pobopo.smartthing.gateway.jobs.BackgroundJob;
 @Component
 @Slf4j
 public class BackgroundJobsService {
-    private ThreadPoolExecutor threadPoolExecutor;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
     @Autowired
     public BackgroundJobsService(List<BackgroundJob> jobList) {
-        if (jobList == null || jobList.isEmpty()) {
-            log.warn("No background jobs were configured!");
-            return;
-        }
-
+        this.threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(jobList.size());
         log.info("Total background jobs: {}", jobList.size());
 
-        this.threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(jobList.size());
         for (BackgroundJob job: jobList) {
             log.info("Starting job {}", job.getClass());
             threadPoolExecutor.submit(job);

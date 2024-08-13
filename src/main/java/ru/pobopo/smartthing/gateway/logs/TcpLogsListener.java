@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smartthing.gateway.jobs.BackgroundJob;
 import ru.pobopo.smartthing.gateway.service.DeviceLogsService;
 import ru.pobopo.smartthing.model.DeviceLogSource;
 import ru.pobopo.smartthing.model.DeviceLoggerMessage;
@@ -21,7 +22,7 @@ import java.util.HashMap;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class TcpLogsListener implements LogsListener {
+public class TcpLogsListener implements BackgroundJob {
     @Value("${device.logs.tcp.port}")
     private String port;
 
@@ -31,43 +32,38 @@ public class TcpLogsListener implements LogsListener {
     private final HashMap<String, LogClient> clients = new HashMap<>();
 
     @Override
-    public void listen() throws Exception {
-        if (StringUtils.isEmpty(port)) {
-            log.error("Tcp logs port missing! Leaving");
-            return;
-        }
-        serverSocket = new ServerSocket(Integer.parseInt(port));
-        log.info("TCP logs started, waiting for connections...");
-
-        while(!serverSocket.isClosed()) {
-            try {
-                Socket socketClient = serverSocket.accept();
-                String ip = socketClient.getInetAddress().getHostAddress();
-                if (clients.containsKey(ip)) {
-                    log.warn("Already have connection with {}, closing", ip);
-                    clients.remove(ip).stopClient();
-                }
-
-                LogClient client = new LogClient(logsProcessor, socketClient);
-                client.setDaemon(true);
-                client.start();
-                clients.put(ip, client);
-                log.info(
-                        "Got new log client: {}, total clients count: {}",
-                        ip,
-                        clients.size()
-                );
-            } catch (Exception exception) {
-                log.error("Tcp logger error: {}", exception.getMessage());
-            }
-        }
-        log.info("Tcp device logs listener stopped (socket closed)");
-    }
-
-    @Override
     public void run() {
         try {
-            listen();
+            if (StringUtils.isEmpty(port)) {
+                log.error("Tcp logs port missing! Leaving");
+                return;
+            }
+            serverSocket = new ServerSocket(Integer.parseInt(port));
+            log.info("TCP logs started, waiting for connections...");
+
+            while(!serverSocket.isClosed()) {
+                try {
+                    Socket socketClient = serverSocket.accept();
+                    String ip = socketClient.getInetAddress().getHostAddress();
+                    if (clients.containsKey(ip)) {
+                        log.warn("Already have connection with {}, closing", ip);
+                        clients.remove(ip).stopClient();
+                    }
+
+                    LogClient client = new LogClient(logsProcessor, socketClient);
+                    client.setDaemon(true);
+                    client.start();
+                    clients.put(ip, client);
+                    log.info(
+                            "Got new log client: {}, total clients count: {}",
+                            ip,
+                            clients.size()
+                    );
+                } catch (Exception exception) {
+                    log.error("Tcp logger error: {}", exception.getMessage());
+                }
+            }
+            log.info("Tcp device logs listener stopped (socket closed)");
         } catch (Exception e) {
             log.error("Tcp logs listen exception: {}", e.getMessage(), e);
         }

@@ -3,6 +3,7 @@ package ru.pobopo.smartthing.gateway;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -37,14 +38,14 @@ public class SmartThingGatewayApp {
             CloudMessageBrokerService brokerService
     )  {
         return args -> {
+            if (cloudService.getCloudConfig() == null || StringUtils.isBlank(cloudService.getCloudConfig().getCloudUrl())) {
+                log.info("No cloud config present");
+                return;
+            }
             try {
                 cloudService.login();
             } catch (Throwable exception) {
                 log.error("Failed to login in cloud: {}", exception.getMessage());
-            }
-            if (cloudService.getCloudIdentity() == null) {
-                log.warn("Skipping websocket connection, bcz we failed to auth in cloud");
-                return;
             }
             try {
                 brokerService.connect(CloudConnectionStatus.NOT_CONNECTED);
