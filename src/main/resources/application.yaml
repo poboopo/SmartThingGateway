@@ -3,7 +3,7 @@ server:
 
 cloud:
   reconnect:
-    attempts: 10
+    attempts: -1
     pause: 10000
   status:
     check:

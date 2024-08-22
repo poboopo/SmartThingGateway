@@ -150,6 +150,7 @@ public class CloudMessageBrokerService {
             while (
                     (stompSession == null || !stompSession.isConnected())
                     && (reconnectAttempts == -1 || attempt < reconnectAttempts)
+                    && !Thread.interrupted()
             ) {
                 try {
                     Thread.sleep(reconnectPause);
