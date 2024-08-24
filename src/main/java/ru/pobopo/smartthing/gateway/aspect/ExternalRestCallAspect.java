@@ -24,6 +24,9 @@ public class ExternalRestCallAspect {
 
     @Before("inPackage()")
     public void accessCheck(final JoinPoint joinPoint) {
+        if (RequestContextHolder.getRequestAttributes() == null) {
+            return;
+        }
         String cloudRequest = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getHeader("smt-cloud-request");
         if (StringUtils.equals(cloudRequest, "true")) {
             MethodSignature signature = (MethodSignature) joinPoint.getSignature();

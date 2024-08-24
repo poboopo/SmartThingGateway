@@ -24,6 +24,7 @@ public class MulticastLogsListener implements BackgroundJob {
     private String port;
 
     private final DeviceLogsService logsProcessor;
+    private final DeviceLoggerMessageParser messageParser;
 
     @Override
     public void run() {
@@ -50,9 +51,9 @@ public class MulticastLogsListener implements BackgroundJob {
                             packet.getLength(),
                             StandardCharsets.UTF_8
                     );
-                    DeviceLoggerMessage deviceLoggerMessage = DeviceLoggerMessage.parse("empty", message);
-                    deviceLoggerMessage.setSource(DeviceLogSource.MULTICAST);
-                    logsProcessor.addLog(deviceLoggerMessage);
+                    logsProcessor.addLog(
+                            messageParser.parse(DeviceLogSource.MULTICAST, message, null)
+                    );
                 }
             } finally {
                 multicastSocket.leaveGroup(address, multicastSocket.getNetworkInterface());

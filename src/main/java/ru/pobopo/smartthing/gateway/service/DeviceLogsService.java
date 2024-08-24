@@ -7,6 +7,7 @@ import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import ru.pobopo.smartthing.gateway.logs.DeviceLoggerMessageParser;
 import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 
 import java.util.List;
@@ -36,6 +37,9 @@ public class DeviceLogsService {
     }
 
     public void addLog(DeviceLoggerMessage message) {
+        if (message == null) {
+            return;
+        }
         executorService.submit(() -> processLog(message));
     }
 

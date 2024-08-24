@@ -27,6 +27,7 @@ public class TcpLogsListener implements BackgroundJob {
     private String port;
 
     private final DeviceLogsService logsProcessor;
+    private final DeviceLoggerMessageParser messageParser;
 
     private ServerSocket serverSocket;
     private final HashMap<String, LogClient> clients = new HashMap<>();
@@ -50,7 +51,7 @@ public class TcpLogsListener implements BackgroundJob {
                         clients.remove(ip).stopClient();
                     }
 
-                    LogClient client = new LogClient(logsProcessor, socketClient);
+                    LogClient client = new LogClient(messageParser, logsProcessor, socketClient);
                     client.setDaemon(true);
                     client.start();
                     clients.put(ip, client);
@@ -85,9 +86,11 @@ public class TcpLogsListener implements BackgroundJob {
 
     private static class LogClient extends Thread {
         private final Socket clientSocket;
+        private final DeviceLoggerMessageParser messageParser;
         private final DeviceLogsService logsProcessor;
 
-        public LogClient(DeviceLogsService logsProcessor, Socket clientSocket) {
+        public LogClient(DeviceLoggerMessageParser messageParser, DeviceLogsService logsProcessor, Socket clientSocket) {
+            this.messageParser = messageParser;
             this.clientSocket = clientSocket;
             this.logsProcessor = logsProcessor;
         }
@@ -100,9 +103,9 @@ public class TcpLogsListener implements BackgroundJob {
 
                 String message;
                 while ((message = in.readLine()) != null) {
-                    DeviceLoggerMessage deviceLoggerMessage = DeviceLoggerMessage.parse(address.getHostAddress(), message);
-                    deviceLoggerMessage.setSource(DeviceLogSource.TCP);
-                    logsProcessor.addLog(deviceLoggerMessage);
+                    logsProcessor.addLog(
+                            messageParser.parse(DeviceLogSource.TCP, message, address.getHostAddress())
+                    );
                 }
 
                 in.close();
