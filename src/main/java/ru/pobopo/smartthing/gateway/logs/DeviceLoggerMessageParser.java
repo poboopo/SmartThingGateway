@@ -48,7 +48,7 @@ public class DeviceLoggerMessageParser {
                         matcher.group(GROUP_NAME))
                 )
                 .level(Level.intToLevel(Integer.parseInt(matcher.group(GROUP_LEVEL))))
-                .tag(matcher.group(GROUP_LEVEL))
+                .tag(matcher.group(GROUP_TAG))
                 .message(matcher.group(GROUP_MESSAGE))
                 .source(source)
                 .dateTime(LocalDateTime.now())
