@@ -8,4 +8,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8081:8081
+      - 7779:7779
     network_mode: host
