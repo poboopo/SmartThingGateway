@@ -39,7 +39,6 @@ public class DeviceApiVerSix extends DeviceApi {
     public final static String FEATURES = "/features";
     public final static String METRICS = "/metrics";
     public final static String SETTINGS = "/settings";
-    public final static String RESTART = "/restart";
 
     private final RestTemplate restTemplate;
 
@@ -246,15 +245,6 @@ public class DeviceApiVerSix extends DeviceApi {
                 SETTINGS,
                 HttpMethod.POST,
                 settings
-        );
-    }
-
-    public InternalHttpResponse restart(DeviceInfo info) {
-        return sendRequest(
-                info,
-                RESTART,
-                HttpMethod.PUT,
-                null
         );
     }
 

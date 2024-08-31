@@ -2,6 +2,7 @@ package ru.pobopo.smartthing.gateway.device.api;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smartthing.gateway.device.api.model.Observable;
@@ -37,5 +38,13 @@ public class DeviceApiVerSeven extends DeviceApiVerSix {
                         value == null ? "" : value
                 )
         );
+    }
+
+    public InternalHttpResponse restart(DeviceInfo info) {
+        return this.sendRequest(info, "/danger/restart", HttpMethod.POST, null);
+    }
+
+    public InternalHttpResponse wipe(DeviceInfo info) {
+        return this.sendRequest(info, "/danger/wipe", HttpMethod.POST, null);
     }
 }
