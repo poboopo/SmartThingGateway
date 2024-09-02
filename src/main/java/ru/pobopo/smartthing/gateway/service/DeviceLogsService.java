@@ -44,24 +44,26 @@ public class DeviceLogsService implements BackgroundJob {
 
     @Override
     public void run() {
-        try {
-            DeviceLoggerMessage message = processQueue.take();
-            log.atLevel(message.getLevel()).log(message.toString());
-            if (logsQueue.size() > cacheSize) {
-                logsQueue.remove();
-            }
-            logsQueue.add(message);
-
+        while(!Thread.interrupted()) {
             try {
-                messagingTemplate.convertAndSend(
-                        DEVICES_LOGS_TOPIC,
-                        message
-                );
-            } catch (Exception exception) {
-                log.error("Failed to send log message in topics", exception);
+                DeviceLoggerMessage message = processQueue.take();
+                log.atLevel(message.getLevel()).log(message.toString());
+                if (logsQueue.size() > cacheSize) {
+                    logsQueue.remove();
+                }
+                logsQueue.add(message);
+
+                try {
+                    messagingTemplate.convertAndSend(
+                            DEVICES_LOGS_TOPIC,
+                            message
+                    );
+                } catch (Exception exception) {
+                    log.error("Failed to send log message in topics", exception);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 }
