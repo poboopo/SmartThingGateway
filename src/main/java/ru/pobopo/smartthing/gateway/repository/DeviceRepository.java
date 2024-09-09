@@ -136,8 +136,6 @@ public class DeviceRepository {
         return devices.stream().filter((deviceInfo -> StringUtils.equals(deviceInfo.getIp(), ip))).findFirst();
     }
 
-    // 2 requests when device name updated
-    // todo load from DeviceApi?
     private DeviceInfo loadDeviceInfo(String ip) {
         log.info("Trying to load device info (ip={})", ip);
         try {

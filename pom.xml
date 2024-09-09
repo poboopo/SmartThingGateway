@@ -87,13 +87,13 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.6.10</version>
+            <version>1.7.0</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.6.8</version>
+            <version>1.7.0</version>
             <scope>runtime</scope>
         </dependency>
         <!-- https://github.com/PavelProjects/SmartThingApiCommon-->

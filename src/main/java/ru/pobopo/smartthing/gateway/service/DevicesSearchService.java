@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.jobs;
+package ru.pobopo.smartthing.gateway.service;
 
 import java.io.IOException;
 import java.net.*;
@@ -9,6 +9,7 @@ import java.util.Set;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.gateway.cache.ConcurrentSetCache;
@@ -20,13 +21,16 @@ import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.DEVICES_T
 @Slf4j
 @RequiredArgsConstructor
 public class DevicesSearchService implements BackgroundJob {
-    // TODO MOVE ALL TO ENV
     public static final String DEVICES_SEARCH_TOPIC = DEVICES_TOPIC + "/search";
-    private final static String GROUP = "224.1.1.1";
-    private final static int PORT = 7778;
+
+    @Value("${device.search.group}")
+    private String searchGroup;
+    @Value("${device.search.port}")
+    private int searchPort;
+
+    private final SimpMessagingTemplate messagingTemplate;
 
     private final ConcurrentSetCache<DeviceInfo> cache = new ConcurrentSetCache<>(5, ChronoUnit.SECONDS);
-    private final SimpMessagingTemplate messagingTemplate;
 
     @Override
     public void run() {
@@ -40,7 +44,7 @@ public class DevicesSearchService implements BackgroundJob {
     }
 
     private void search() throws IOException {
-        SocketAddress address = new InetSocketAddress(InetAddress.getByName(GROUP), PORT);
+        SocketAddress address = new InetSocketAddress(InetAddress.getByName(searchGroup), searchPort);
         MulticastSocket multicastSocket = new MulticastSocket(address);
         byte[] buf = new byte[4096];
 

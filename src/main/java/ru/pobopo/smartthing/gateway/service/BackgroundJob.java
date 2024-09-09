@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.jobs;
+package ru.pobopo.smartthing.gateway.service;
 
 import org.springframework.stereotype.Component;
 

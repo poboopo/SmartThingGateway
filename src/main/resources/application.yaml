@@ -16,6 +16,9 @@ dashboard:
     file: ""
 
 device:
+  search:
+    group: 224.1.1.1
+    port: 7778
   logs:
     multicast:
       group: 224.1.1.1

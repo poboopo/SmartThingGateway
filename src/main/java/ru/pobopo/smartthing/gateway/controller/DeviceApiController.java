@@ -27,7 +27,6 @@ import java.util.List;
 public class DeviceApiController {
     private final DeviceApiService deviceApiService;
 
-    // TODO more info about how ApiSelector works?
     @Operation(
             summary = "Call device api method",
             description = "Api for target device will be selected from possible implementations." +
@@ -51,7 +50,6 @@ public class DeviceApiController {
         return result.toResponseEntity();
     }
 
-    // todo remove?
     @AcceptCloudRequest
     @GetMapping("/methods")
     public List<DeviceApiMethod> getApiMethods(

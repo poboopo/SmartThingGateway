@@ -8,5 +8,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - 8081:8081
-      - 7779:7779
+      - 7779:7779 # logs
+      - 7778:7778 # search
     network_mode: host
+    volumes:
+      - gateway-data:/app
+
+volumes:
+  gateway-data: {}

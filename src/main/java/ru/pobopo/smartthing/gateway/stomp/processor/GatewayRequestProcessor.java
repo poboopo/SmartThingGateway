@@ -43,7 +43,7 @@ public class GatewayRequestProcessor implements MessageProcessor {
             return new InternalHttpResponse(
                     response.getStatusCode().value(),
                     response.getBody(),
-                    httpHeaders // todo this done bcs of "Multiple cross origin headers" error
+                    httpHeaders // this done bcs of "Multiple cross-origin headers" error
             );
         } catch (HttpServerErrorException | HttpClientErrorException exception) {
             log.error("Request failed: {} {}", exception.getMessage(), exception.getStatusCode());
