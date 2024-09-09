@@ -22,12 +22,11 @@ public class DeviceApiVerSix extends DeviceApi {
 
     public final static String HEALTH = "/health";
     public final static String SYSTEM_INFO = "/info/system";
-    public final static String GET_ACTIONS = "/info/actions";
-    public final static String GET_CONFIG = "/info/config";
+    public final static String GET_ACTIONS = "/actions/info";
     public final static String CALL_ACTION = "/actions";
-    public final static String CONFIG_VALUES = "/config";
-    public final static String SAVE_CONFIG_VALUES = CONFIG_VALUES + "/save";
-    public final static String DELETE_ALL_CONFIG_VALUES = CONFIG_VALUES + "/delete/all";
+    public final static String GET_CONFIG = "/config/info";
+    public final static String CONFIG_VALUES = "/config/values";
+    public final static String DELETE_ALL_CONFIG_VALUES = "/config/delete/all";
     public final static String SENSORS = "/sensors";
     public final static String STATES = "/states";
 
@@ -111,7 +110,7 @@ public class DeviceApiVerSix extends DeviceApi {
     public InternalHttpResponse saveConfigValues(DeviceInfo info, Map<String, Object> values) {
         return sendRequest(
                 info,
-                SAVE_CONFIG_VALUES,
+                CONFIG_VALUES,
                 HttpMethod.POST,
                 values
         );
