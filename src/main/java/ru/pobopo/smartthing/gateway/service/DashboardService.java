@@ -6,17 +6,17 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.validation.ValidationException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import ru.pobopo.smartthing.gateway.dashboard.DashboardGroupWorkerFactory;
+import ru.pobopo.smartthing.gateway.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.gateway.exception.DashboardFileException;
-import ru.pobopo.smartthing.gateway.model.DashboardGroup;
-import ru.pobopo.smartthing.gateway.model.DashboardGroupValues;
-import ru.pobopo.smartthing.gateway.model.DashboardValues;
-import ru.pobopo.smartthing.gateway.runnable.DashboardGroupWorker;
+import ru.pobopo.smartthing.model.gateway.dashboard.*;
+import ru.pobopo.smartthing.gateway.dashboard.DashboardGroupWorker;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,10 +35,9 @@ public class DashboardService {
     private static final Path DASHBOARD_FILE_DEFAULT_PATH =
             Paths.get(DEFAULT_APP_DIR.toString(), ".smartthing/dashboard/settings.json");
 
-    private final ObjectMapper objectMapper;
     private final File settingsFile;
-    private final DeviceApiService apiService;
-    private final SimpMessagingTemplate template;
+    private final ObjectMapper objectMapper;
+    private final DashboardGroupWorkerFactory workerFactory;
 
     @Getter
     private final List<DashboardGroup> groups;
@@ -47,10 +46,8 @@ public class DashboardService {
     public DashboardService(
             @Value("${dashboard.settings.file:}") String file,
             ObjectMapper objectMapper,
-            DeviceApiService apiService,
-            SimpMessagingTemplate template
+            DashboardGroupWorkerFactory workerFactory
     ) throws IOException, DashboardFileException {
-        this.apiService = apiService;
         if (StringUtils.isNotBlank(file) && !StringUtils.endsWith(file, ".json")) {
             throw new IllegalStateException("Wrong dashboard groups settings file name (.json suffix is missing)");
         }
@@ -69,7 +66,7 @@ public class DashboardService {
 
         this.settingsFile = filePath.toFile();
         this.objectMapper = objectMapper;
-        this.template = template;
+        this.workerFactory = workerFactory;
 
         try {
             groups = objectMapper.readValue(settingsFile, new TypeReference<>() {});
@@ -109,18 +106,19 @@ public class DashboardService {
     }
 
     public void updateGroup(DashboardGroup group) throws IOException, ValidationException {
-        int index = findGroupIndexById(groups, group.getId());
-        if (index == -1) {
+        Optional<DashboardGroup> optionalGroup = groups.stream().filter(g -> g.getId().equals(group.getId())).findFirst();
+        if (optionalGroup.isEmpty()) {
             throw new ValidationException("Can't find group by id " + group.getId());
         }
 
-        groups.get(index).setDevice(group.getDevice());
-        groups.get(index).setObservables(
+        DashboardGroup foundGroup = optionalGroup.get();
+        foundGroup.setDevice(group.getDevice());
+        foundGroup.setObservables(
                 group.getObservables().stream()
-                        .filter((o) -> StringUtils.isNotBlank(o.getName()) && StringUtils.isNotBlank(o.getType()))
+                        .filter((o) -> StringUtils.isNotBlank(o.getName()) && o.getType() != null)
                         .toList()
         );
-        groups.get(index).setConfig(group.getConfig());
+        foundGroup.setConfig(group.getConfig());
 
         writeGroupsToFile();
         log.info("Group {} was updated", group.getId());
@@ -134,10 +132,11 @@ public class DashboardService {
     public void deleteGroup(UUID id) throws IOException, ValidationException {
         Objects.requireNonNull(id);
 
-        int index = findGroupIndexById(groups, id);
-        if (index == -1) {
+        Optional<DashboardGroup> foundGroup = groups.stream().filter(group -> group.getId().equals(id)).findFirst();
+        if (foundGroup.isEmpty()) {
             throw new ValidationException("Can't find group by id " + id);
         }
+
         DashboardGroupWorker worker = workers.get(id);
         if (worker != null) {
             log.info("Trying to stop group worker");
@@ -145,37 +144,64 @@ public class DashboardService {
             workers.remove(id);
             log.info("Worker stopped and removed");
         }
-        groups.remove(index);
+        groups.remove(foundGroup.get());
 
         writeGroupsToFile();
         log.info("Group {} was deleted", id);
     }
 
     public List<DashboardGroupValues> getValues() {
-        return workers.values().stream().map((w) -> new DashboardGroupValues(w.getGroup(), w.getValues())).toList();
+        if (workers.isEmpty()) {
+            return List.of();
+        }
+        return workers.values().stream().map((w) -> new DashboardGroupValues(w.getGroup(), observablesMapToList(w.getValues()))).toList();
     }
 
-    public DashboardValues getGroupValues(UUID id) {
+    public List<DashboardObservableValues> getGroupValues(UUID id) {
         Objects.requireNonNull(id);
 
         if (!workers.containsKey(id)) {
-            log.info("Worker for group {} not found", id); // todo throw exception?
-            return null;
+            throw new ValidationException("Group with id=" + id + " not found");
         }
 
-        return workers.get(id).getValues();
+        return observablesMapToList(workers.get(id).getValues());
     }
 
-    public DashboardValues updateGroupValues(UUID id) {
+    public void updateValues(UUID id) {
         Objects.requireNonNull(id);
 
         if (!workers.containsKey(id)) {
-            log.info("Worker for group {} not found", id); // todo throw exception?
-            return null;
+            return;
         }
-
         workers.get(id).update();
-        return workers.get(id).getValues();
+    }
+
+    private List<DashboardObservableValues> observablesMapToList(Map<DashboardObservable, Deque<DashboardObservableValue>> values) {
+        List<DashboardObservableValues> result = new ArrayList<>();
+
+        for(Map.Entry<DashboardObservable, Deque<DashboardObservableValue>> entry: values.entrySet()) {
+            result.add(new DashboardObservableValues(
+                    entry.getKey(),
+                    entry.getValue())
+            );
+        }
+
+        return result;
+    }
+
+    private void startGroupWorker(DashboardGroup group) {
+        if (workers.containsKey(group.getId())) {
+            throw new IllegalStateException("Worker for group " + group.getDevice().getName() + " already exists");
+        }
+
+        DashboardGroupWorker worker = workerFactory.create(group);
+        try {
+            log.info("Starting new dashboard worker for group {}", group);
+            worker.start();
+            workers.put(group.getId(), worker);
+        } catch (Exception e) {
+            log.error("Failed to start group worker", e);
+        }
     }
 
     @EventListener
@@ -190,31 +216,8 @@ public class DashboardService {
         }
     }
 
-    private void startGroupWorker(DashboardGroup group) {
-        if (workers.containsKey(group.getId())) {
-            throw new IllegalStateException("Worker for group " + group.getDevice().getName() + " already exists");
-        }
-        log.info("Creating new dashboard worker for group {}", group);
-        DashboardGroupWorker worker = new DashboardGroupWorker(group, apiService, objectMapper, template);
-        try {
-            worker.start();
-            workers.put(group.getId(), worker);
-        } catch (Exception e) {
-            log.error("Failed to start group worker", e);
-        }
-    }
-
     private void writeGroupsToFile() throws IOException {
         log.info("Writing groups in file {}", settingsFile);
         objectMapper.writeValue(settingsFile, groups);
-    }
-
-    private int findGroupIndexById(List<DashboardGroup> groups, UUID id) {
-        for (int i = 0; i < groups.size(); i++) {
-            if (groups.get(i).getId().equals(id)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }

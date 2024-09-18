@@ -8,17 +8,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smartthing.gateway.device.api.model.Observable;
+import ru.pobopo.smartthing.model.gateway.Observable;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DeviceApiVerSix extends DeviceApi {
-    private final static List<String> SUPPORTED_VERSIONS = List.of("0.5", "0.6");
+public class RestDeviceApi extends DeviceApi {
+    private final static List<String> SUPPORTED_VERSIONS = List.of("0.5", "0.6", "0.7");
 
     public final static String HEALTH = "/health";
     public final static String SYSTEM_INFO = "/info/system";
@@ -28,12 +29,14 @@ public class DeviceApiVerSix extends DeviceApi {
     public final static String CONFIG_VALUES = "/config/values";
     public final static String DELETE_ALL_CONFIG_VALUES = "/config/delete/all";
     public final static String SENSORS = "/sensors";
+    public final static String SENSORS_TYPES = "/sensors/types";
     public final static String STATES = "/states";
 
     public final static String HOOKS = "/hooks";
     public final static String HOOKS_BY_OBSERVABLE = HOOKS + "/by/observable";
     public final static String HOOKS_BY_ID = HOOKS + "/by/id";
     public final static String HOOKS_TEMPLATES = HOOKS + "/templates";
+    public final static String HOOK_TEST = HOOKS + "/test";
 
     public final static String FEATURES = "/features";
     public final static String METRICS = "/metrics";
@@ -88,6 +91,13 @@ public class DeviceApiVerSix extends DeviceApi {
         return sendRequest(
                 info,
                 SENSORS
+        );
+    }
+
+    public InternalHttpResponse getSensorsTypes(DeviceInfo info) {
+        return sendRequest(
+                info,
+                SENSORS_TYPES
         );
     }
 
@@ -247,13 +257,35 @@ public class DeviceApiVerSix extends DeviceApi {
         );
     }
 
+    public InternalHttpResponse testHook(DeviceInfo info, Observable observable, String id, String value) {
+        return this.sendRequest(
+                info,
+                String.format(
+                        "%s?type=%s&name=%s&id=%s&value=%s",
+                        HOOK_TEST,
+                        observable.getType(),
+                        observable.getName(),
+                        id,
+                        value == null ? "" : value
+                )
+        );
+    }
+
+    public InternalHttpResponse restart(DeviceInfo info) {
+        return this.sendRequest(info, "/danger/restart", HttpMethod.POST, null);
+    }
+
+    public InternalHttpResponse wipe(DeviceInfo info) {
+        return this.sendRequest(info, "/danger/wipe", HttpMethod.POST, null);
+    }
+
     protected InternalHttpResponse sendRequest(DeviceInfo info, String path) {
         return sendRequest(info, path, HttpMethod.GET, null);
     }
 
     protected InternalHttpResponse sendRequest(DeviceInfo info, String path, HttpMethod method, Object payload) {
         String url = buildUrl(info, path);
-        log.info(
+        log.debug(
                 "Sending request [{}] {} - {}",
                 method.name(),
                 url,
@@ -274,7 +306,7 @@ public class DeviceApiVerSix extends DeviceApi {
                     .status(response.getStatusCode().value())
                     .headers(headers)
                     .build();
-            log.info("Request finished: {}", deviceResponse);
+            log.debug("Request finished: {}", deviceResponse);
             return deviceResponse;
         } catch (HttpClientErrorException | HttpServerErrorException exception) {
             log.error("Request failed: {}", exception.getMessage());

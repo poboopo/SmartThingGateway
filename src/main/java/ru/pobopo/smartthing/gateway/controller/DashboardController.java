@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
-import ru.pobopo.smartthing.gateway.exception.DashboardFileException;
-import ru.pobopo.smartthing.gateway.model.DashboardGroup;
-import ru.pobopo.smartthing.gateway.model.DashboardGroupValues;
-import ru.pobopo.smartthing.gateway.model.DashboardValues;
+import ru.pobopo.smartthing.model.gateway.dashboard.*;
 import ru.pobopo.smartthing.gateway.service.DashboardService;
 
 import java.io.IOException;
@@ -49,12 +46,15 @@ public class DashboardController {
     }
 
     @GetMapping("/values/{id}")
-    public DashboardValues groupValues(@PathVariable UUID id) {
+    public List<DashboardObservableValues> groupValues(
+            @PathVariable UUID id,
+            @RequestParam(required = false) Boolean force
+    ) {
         return dashboardService.getGroupValues(id);
     }
 
-    @PutMapping("/values/{id}")
-    public DashboardValues groupValuesUpdate(@PathVariable UUID id) {
-        return dashboardService.updateGroupValues(id);
+    @PutMapping("/values/{id}/update")
+    public void updateValues(@PathVariable UUID id) {
+        dashboardService.updateValues(id);
     }
 }
