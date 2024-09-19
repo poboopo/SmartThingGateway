@@ -3,6 +3,7 @@ package ru.pobopo.smartthing.gateway.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -27,48 +28,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static ru.pobopo.smartthing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
-
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DeviceRepository {
     private static final Pattern IP_PATTERN = Pattern.compile("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
 
     private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
-    private final Path repoFile;
-
-    private final Set<DeviceInfo> devices = ConcurrentHashMap.newKeySet();
-
-    @Autowired
-    public DeviceRepository(@Value("${device.saved.file}") String repoFilePath,
-                            RestTemplate restTemplate, ObjectMapper objectMapper) throws IOException {
-        this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
-
-        if (StringUtils.isBlank(repoFilePath)) {
-            repoFile = Paths.get(DEFAULT_APP_DIR.toString(), "/saved_devices.json");
-        } else {
-            repoFile = Paths.get(repoFilePath);
-        }
-        log.info("Using saved device file: {}", repoFile);
-
-        if (!Files.exists(repoFile)) {
-            log.info("No saved devices file found, creating...");
-            Files.createDirectories(repoFile.getParent());
-            Files.writeString(repoFile, "[]");
-        } else {
-            try {
-                this.devices.addAll(objectMapper.readValue(repoFile.toFile(), new TypeReference<>() {}));
-                log.info("Loaded devices: {}", devices);
-            } catch (MismatchedInputException exception) {
-                throw new RuntimeException("Failed to load saved devices", exception);
-            }
-        }
-    }
+    private final FileRepository<DeviceInfo> fileRepository;
 
     public Collection<DeviceInfo> getDevices() {
-        return Collections.unmodifiableCollection(devices);
+        return fileRepository.getAll();
     }
 
     public DeviceInfo addDevice(String ip) throws BadRequestException {
@@ -85,9 +55,9 @@ public class DeviceRepository {
         if (newDeviceInfo == null) {
             throw new BadRequestException("Can't find device with ip=" + ip);
         }
-        devices.add(newDeviceInfo);
+        fileRepository.add(newDeviceInfo);
+        fileRepository.commit();
         log.info("Added new device {}", newDeviceInfo);
-        saveToFile();
         return newDeviceInfo;
     }
 
@@ -100,9 +70,9 @@ public class DeviceRepository {
         if (device.isEmpty()) {
             throw new BadRequestException("There is no saved device with ip=" + ip);
         }
-        devices.remove(device.get());
+        fileRepository.remove(device.get());
+        fileRepository.commit();
         log.info("Device {} deleted", device.get());
-        saveToFile();
     }
 
     public DeviceInfo updateDeviceInfo(String ip) throws BadRequestException {
@@ -122,10 +92,10 @@ public class DeviceRepository {
             log.info("New device info are equals to old one");
             return newInfo;
         }
-        devices.remove(device.get());
-        devices.add(newInfo);
+        fileRepository.remove(device.get());
+        fileRepository.add(newInfo);
+        fileRepository.commit();
         log.info("Updated device info {}", newInfo);
-        saveToFile();
         return newInfo;
     }
 
@@ -133,7 +103,7 @@ public class DeviceRepository {
         if (StringUtils.isBlank(ip)) {
             return Optional.empty();
         }
-        return devices.stream().filter((deviceInfo -> StringUtils.equals(deviceInfo.getIp(), ip))).findFirst();
+        return fileRepository.find(deviceInfo -> StringUtils.equals(deviceInfo.getIp(), ip));
     }
 
     private DeviceInfo loadDeviceInfo(String ip) {
@@ -152,12 +122,6 @@ public class DeviceRepository {
             log.error("Failed to get device info: {}", exception.getMessage(), exception);
             return null;
         }
-    }
-
-    @SneakyThrows
-    private void saveToFile() {
-        log.info("Writing saved devices to file");
-        objectMapper.writeValue(repoFile.toFile(), devices);
     }
 
     private boolean isValidIp(String ip) {

@@ -6,14 +6,12 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.validation.ValidationException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import ru.pobopo.smartthing.gateway.dashboard.DashboardGroupWorkerFactory;
-import ru.pobopo.smartthing.gateway.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.gateway.exception.DashboardFileException;
 import ru.pobopo.smartthing.model.gateway.dashboard.*;
 import ru.pobopo.smartthing.gateway.dashboard.DashboardGroupWorker;
@@ -33,7 +31,7 @@ import static ru.pobopo.smartthing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
 @Service
 public class DashboardService {
     private static final Path DASHBOARD_FILE_DEFAULT_PATH =
-            Paths.get(DEFAULT_APP_DIR.toString(), ".smartthing/dashboard/settings.json");
+            Paths.get(DEFAULT_APP_DIR.toString(), ".smartthing/dashboard.json");
 
     private final File settingsFile;
     private final ObjectMapper objectMapper;

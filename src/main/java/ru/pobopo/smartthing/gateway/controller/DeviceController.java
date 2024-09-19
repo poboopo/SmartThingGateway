@@ -21,6 +21,7 @@ import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -66,7 +67,7 @@ public class DeviceController {
                     "directory $HOME/.smartthing/device/settings/"
     )
     @PostMapping("/settings")
-    public void createSettings(@RequestBody DeviceSettings settings) throws BadRequestException, DeviceSettingsException {
+    public void createSettings(@RequestBody DeviceSettings settings) {
         settingsService.createSettings(settings);
     }
 
@@ -76,22 +77,20 @@ public class DeviceController {
                     "device.settings.dir or uses default path $HOME/.smartthing/device/settings/"
     )
     @GetMapping("/settings")
-    public List<DeviceSettings> getSettings() throws DeviceSettingsException {
+    public Collection<DeviceSettings> getSettings() {
         return settingsService.getSettings();
     }
 
     @Operation(summary = "Update existing settings")
     @PutMapping("/settings")
-    public void updateSettings(@RequestBody UpdateDeviceSettings settings) throws BadRequestException, DeviceSettingsException {
+    public void updateSettings(@RequestBody UpdateDeviceSettings settings) throws DeviceSettingsException {
         settingsService.updateSettings(settings);
     }
 
     @Operation(summary = "Delete saved settings")
-    @DeleteMapping("/settings/{name}")
-    public void deleteSettings(
-            @PathVariable("name") @Parameter(description = "Settings name") String name
-    ) throws DeviceSettingsException, BadRequestException {
-        settingsService.deleteSettings(name);
+    @DeleteMapping("/settings/{id}")
+    public void deleteSettings(@PathVariable("id") @Parameter(description = "Settings id") UUID id) {
+        settingsService.deleteSettings(id);
     }
 
     @Operation(summary = "Get last 100 devices logs messages")
