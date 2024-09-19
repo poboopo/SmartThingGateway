@@ -2,7 +2,6 @@ package ru.pobopo.smartthing.gateway.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +39,7 @@ public class FileRepository<T> {
     }
 
     public Optional<T> find(Predicate<T> predicate) {
-        return data.stream().filter(predicate).findFirst();
+        return data.stream().filter(predicate).findFirst(); // todo not working
     }
 
     @SneakyThrows
@@ -58,11 +57,12 @@ public class FileRepository<T> {
             Files.createDirectories(repoFile.getParent());
             Files.writeString(repoFile, "[]");
         } else {
-            try {
-                this.data.addAll(objectMapper.readValue(repoFile.toFile(), new TypeReference<>() {}));
-            } catch (MismatchedInputException exception) {
-                throw new RuntimeException("Failed to load saved devices", exception);
-            }
+            List<T> loaded = objectMapper.readValue(
+                    repoFile.toFile(),
+                    new TypeReference<>() {}
+            );
+            this.data.clear();
+            this.data.addAll(loaded);
         }
     }
 }

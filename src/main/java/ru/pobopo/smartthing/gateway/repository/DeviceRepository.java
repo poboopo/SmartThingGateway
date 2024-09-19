@@ -16,15 +16,8 @@ import ru.pobopo.smartthing.gateway.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.model.DeviceInfo;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,7 +100,6 @@ public class DeviceRepository {
     }
 
     private DeviceInfo loadDeviceInfo(String ip) {
-        log.info("Trying to load device info (ip={})", ip);
         try {
             DeviceInfo info = restTemplate.getForObject(
                     String.format("http://%s/%s", ip, RestDeviceApi.SYSTEM_INFO),
