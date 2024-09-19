@@ -27,6 +27,7 @@ public class RepositoriesConfig {
     @Bean
     public FileRepository<DeviceSettings> deviceSettingsFileRepository(ObjectMapper objectMapper) {
         return new FileRepository<>(
+                DeviceSettings.class,
                 StringUtils.isEmpty(deviceSettingsPath) ? SETTINGS_FILE_DEFAULT : Paths.get(deviceSettingsPath),
                 objectMapper
         );
@@ -35,6 +36,7 @@ public class RepositoriesConfig {
     @Bean
     public FileRepository<DeviceInfo> savedDevicesRepository(ObjectMapper objectMapper) {
         return new FileRepository<>(
+                DeviceInfo.class,
                 StringUtils.isEmpty(savedDevicesPath) ? SAVED_DEVICES_DEFAULT : Paths.get(savedDevicesPath),
                 objectMapper
         );

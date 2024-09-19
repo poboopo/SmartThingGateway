@@ -36,7 +36,7 @@ public class DeviceSettingsService {
         }
         validateSettings(deviceSettings);
 
-        Optional<DeviceSettings> settingsOptional = fileRepository.find(s -> s.getId() == deviceSettings.getId());
+        Optional<DeviceSettings> settingsOptional = fileRepository.find(s -> deviceSettings.getId().equals(s.getId()));
         if (settingsOptional.isEmpty()) {
             throw new ValidationException("Device settings with id=" + deviceSettings.getId() + " not found");
         }
@@ -48,7 +48,7 @@ public class DeviceSettingsService {
                 builder.name(deviceSettings.getName());
             }
             if (StringUtils.isNotBlank(deviceSettings.getValue())) {
-                builder.name(deviceSettings.getValue());
+                builder.value(deviceSettings.getValue());
             }
             fileRepository.add(builder.build());
             fileRepository.commit();
@@ -63,7 +63,7 @@ public class DeviceSettingsService {
             throw new ValidationException("Settings id can't be blank!");
         }
 
-        Optional<DeviceSettings> settingsOptional = fileRepository.find(s -> s.getId() == id);
+        Optional<DeviceSettings> settingsOptional = fileRepository.find(s -> id.equals(s.getId()));
         if (settingsOptional.isEmpty()) {
             throw new ValidationException("Device settings with id=" + id + " not found");
         }

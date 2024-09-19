@@ -13,12 +13,14 @@ import java.util.function.Predicate;
 
 @Slf4j
 public class FileRepository<T> {
+    private final Class<T> clazz;
     private final ObjectMapper objectMapper;
     private final Path repoFile;
 
     private final Set<T> data = ConcurrentHashMap.newKeySet();
 
-    public FileRepository(Path repoFile, ObjectMapper objectMapper) {
+    public FileRepository(Class<T> clazz, Path repoFile, ObjectMapper objectMapper) {
+        this.clazz = clazz;
         this.objectMapper = objectMapper;
         this.repoFile = repoFile;
 
@@ -59,7 +61,7 @@ public class FileRepository<T> {
         } else {
             List<T> loaded = objectMapper.readValue(
                     repoFile.toFile(),
-                    new TypeReference<>() {}
+                    objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz)
             );
             this.data.clear();
             this.data.addAll(loaded);
