@@ -189,7 +189,7 @@ public class DeviceApiService {
         }
         return InternalHttpResponse.builder()
                 .data(response.getBody())
-                .status(response.getStatusCode().value())
+                .status(response.getStatusCode())
                 .headers(response.getHeaders())
                 .build();
     }

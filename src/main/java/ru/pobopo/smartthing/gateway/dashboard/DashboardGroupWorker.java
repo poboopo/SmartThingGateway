@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import ru.pobopo.smartthing.gateway.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.model.gateway.ObservableType;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
@@ -36,7 +38,7 @@ public class DashboardGroupWorker extends Thread {
             ObjectMapper objectMapper,
             Consumer<List<DashboardObservableValueUpdate>> updatesConsumer
     ) {
-        super("Dashboard-Group-Worker-" + group.getId());
+        super("Dashboard-Group-Worker-" + group.getDevice().getName());
         this.group = group;
         this.objectMapper = objectMapper;
         this.deviceApi = deviceApi;
@@ -121,7 +123,7 @@ public class DashboardGroupWorker extends Thread {
                 throw new IllegalArgumentException("Type " + type + " not supported!");
             }
         }
-        if (response.getStatus() != 200) {
+        if (response.getStatus() != HttpStatus.OK) {
             log.error("Failed to fetch sensors values");
             return Map.of();
         }

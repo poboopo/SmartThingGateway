@@ -225,7 +225,7 @@ public class RestDeviceApi extends DeviceApi {
     public InternalHttpResponse getFeatures(DeviceInfo info) {
         if (info.getVersion().equals("0.5")) {
             return InternalHttpResponse.builder()
-                    .status(200)
+                    .status(HttpStatus.OK)
                     .data("{\"web\":true,\"actions\":true,\"sensors\":true,\"states\":true,\"hooks\":true,\"logger\":true}")
                     .build();
         }
@@ -303,7 +303,7 @@ public class RestDeviceApi extends DeviceApi {
             headers.setContentType(MediaType.APPLICATION_JSON);
             InternalHttpResponse deviceResponse = InternalHttpResponse.builder()
                     .data(response.getBody())
-                    .status(response.getStatusCode().value())
+                    .status(response.getStatusCode())
                     .headers(headers)
                     .build();
             log.debug("Request finished: {}", deviceResponse);
@@ -312,11 +312,11 @@ public class RestDeviceApi extends DeviceApi {
             log.error("Request failed: {}", exception.getMessage());
             return InternalHttpResponse.builder()
                     .data(exception.getMessage())
-                    .status(exception.getStatusCode().value())
+                    .status(exception.getStatusCode())
                     .build();
         } catch (Exception exception) {
             log.error("Failed to send request {}", exception.getMessage(), exception);
-            return new InternalHttpResponse(HttpStatus.FORBIDDEN.value(), null, null);
+            return new InternalHttpResponse(HttpStatus.FORBIDDEN, null, null);
         }
     }
 
