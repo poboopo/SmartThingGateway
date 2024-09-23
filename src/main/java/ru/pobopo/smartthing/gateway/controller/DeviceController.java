@@ -62,16 +62,6 @@ public class DeviceController {
     }
 
     @Operation(
-            summary = "Save device settings",
-            description = "Saves settings in .json file directory from env variable device.settings.dir or in default " +
-                    "directory $HOME/.smartthing/device/settings/"
-    )
-    @PostMapping("/settings")
-    public void createSettings(@RequestBody DeviceSettings settings) {
-        settingsService.createSettings(settings);
-    }
-
-    @Operation(
             summary = "Get saved devices settings",
             description = "Loads saved settings from .json files from directory. Directory path loads from env variable " +
                     "device.settings.dir or uses default path $HOME/.smartthing/device/settings/"
@@ -81,10 +71,20 @@ public class DeviceController {
         return settingsService.getSettings();
     }
 
+    @Operation(
+            summary = "Save device settings",
+            description = "Saves settings in .json file directory from env variable device.settings.dir or in default " +
+                    "directory $HOME/.smartthing/device/settings/"
+    )
+    @PostMapping("/settings")
+    public DeviceSettings createSettings(@RequestBody DeviceSettings settings) {
+        return settingsService.createSettings(settings);
+    }
+
     @Operation(summary = "Update existing settings")
     @PutMapping("/settings")
-    public void updateSettings(@RequestBody UpdateDeviceSettings settings) throws DeviceSettingsException {
-        settingsService.updateSettings(settings);
+    public DeviceSettings updateSettings(@RequestBody UpdateDeviceSettings settings) throws DeviceSettingsException {
+        return settingsService.updateSettings(settings);
     }
 
     @Operation(summary = "Delete saved settings")

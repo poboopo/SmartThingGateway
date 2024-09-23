@@ -21,16 +21,17 @@ public class DeviceSettingsService {
         return fileRepository.getAll();
     }
 
-    public void createSettings(DeviceSettings deviceSettings) {
+    public DeviceSettings createSettings(DeviceSettings deviceSettings) {
         Objects.requireNonNull(deviceSettings);
         validateSettings(deviceSettings);
 
         deviceSettings.setId(UUID.randomUUID());
         fileRepository.add(deviceSettings);
         fileRepository.commit();
+        return deviceSettings;
     }
 
-    public void updateSettings(DeviceSettings deviceSettings) throws DeviceSettingsException {
+    public DeviceSettings updateSettings(DeviceSettings deviceSettings) throws DeviceSettingsException {
         if (deviceSettings.getId() == null) {
             throw new ValidationException("Settings id can't be blank!");
         }
@@ -50,8 +51,10 @@ public class DeviceSettingsService {
             if (StringUtils.isNotBlank(deviceSettings.getValue())) {
                 builder.value(deviceSettings.getValue());
             }
-            fileRepository.add(builder.build());
+            DeviceSettings updatedSettings = builder.build();
+            fileRepository.add(updatedSettings);
             fileRepository.commit();
+            return updatedSettings;
         } catch (Exception e) {
             fileRepository.rollback();
             throw new DeviceSettingsException("Failed to update settings");

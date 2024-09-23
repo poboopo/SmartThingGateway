@@ -65,21 +65,22 @@ public class DashboardService {
         }
     }
 
-    public void updateGroup(DashboardGroup group) throws ValidationException {
+    public DashboardGroup updateGroup(DashboardGroup group) throws ValidationException {
         Optional<DashboardGroup> optionalGroup = repository.find(g -> g.getId().equals(group.getId()));
         if (optionalGroup.isEmpty()) {
             throw new ValidationException("Can't find group by id " + group.getId());
         }
 
-        DashboardGroup.DashboardGroupBuilder builder = optionalGroup.get().toBuilder();
-        builder.device(group.getDevice())
+        DashboardGroup updatedGroup = optionalGroup.get().toBuilder()
+                .device(group.getDevice())
                 .config(group.getConfig())
                 .observables(group.getObservables().stream()
                         .filter((o) -> StringUtils.isNotBlank(o.getName()) && o.getType() != null)
-                        .toList());
+                        .toList())
+                .build();
         try {
             repository.remove(optionalGroup.get());
-            repository.add(builder.build());
+            repository.add(updatedGroup);
 
             log.info("Group {} was updated", group.getId());
             repository.commit();
@@ -92,6 +93,7 @@ public class DashboardService {
             log.info("Fetching group values");
             workers.get(group.getId()).update();
         }
+        return updatedGroup;
     }
 
     public void deleteGroup(UUID id) throws ValidationException {

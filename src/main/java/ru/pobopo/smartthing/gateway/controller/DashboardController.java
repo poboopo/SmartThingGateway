@@ -31,8 +31,8 @@ public class DashboardController {
     }
 
     @PutMapping
-    public void updateGroup(@RequestBody DashboardGroup group) throws ValidationException {
-        dashboardService.updateGroup(group);
+    public DashboardGroup updateGroup(@RequestBody DashboardGroup group) throws ValidationException {
+        return dashboardService.updateGroup(group);
     }
 
     @DeleteMapping("/{id}")
