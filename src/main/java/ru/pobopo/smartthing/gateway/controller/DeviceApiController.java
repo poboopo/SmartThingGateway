@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
@@ -14,7 +13,6 @@ import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.model.DeviceApiMethod;
 import ru.pobopo.smartthing.gateway.service.DeviceApiService;
 import ru.pobopo.smartthing.model.DeviceInfo;
-import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.util.List;
@@ -37,17 +35,16 @@ public class DeviceApiController {
     )
     @PostMapping
     public ResponseEntity<String> callApi(@RequestBody DeviceRequest request) {
-        InternalHttpResponse result = deviceApiService.execute(request);
-        return result.toResponseEntity();
+        return deviceApiService.execute(request);
     }
+
     @GetMapping("/{target}")
     public ResponseEntity<String> callApiByTarget(
             @PathVariable String target,
             @RequestParam String command,
             @RequestParam(required = false) String params
     ) throws BadRequestException {
-        InternalHttpResponse result = deviceApiService.execute(target, command, params);
-        return result.toResponseEntity();
+        return deviceApiService.execute(target, command, params);
     }
 
     @AcceptCloudRequest

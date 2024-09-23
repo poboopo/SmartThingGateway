@@ -8,17 +8,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.gateway.event.CloudLogoutEvent;
-import ru.pobopo.smartthing.gateway.exception.ForbiddenCloudEndpointException;
 import ru.pobopo.smartthing.gateway.exception.LogoutException;
 import ru.pobopo.smartthing.gateway.model.CloudConnectionStatus;
 import ru.pobopo.smartthing.gateway.service.CloudService;
 import ru.pobopo.smartthing.gateway.stomp.processor.MessageProcessor;
-import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.BaseMessage;
 import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.function.Consumer;
 
 @Component

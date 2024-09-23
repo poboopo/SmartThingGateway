@@ -16,7 +16,6 @@ import ru.pobopo.smartthing.gateway.exception.DeviceApiException;
 import ru.pobopo.smartthing.gateway.model.CloudIdentity;
 import ru.pobopo.smartthing.gateway.model.DeviceApiMethod;
 import ru.pobopo.smartthing.model.DeviceInfo;
-import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 import java.lang.reflect.Method;
@@ -44,18 +43,18 @@ public class DeviceApiService {
     @Value("${device.api.cache.ttl:1500}")
     private int cacheTtl;
 
-    private final Map<DeviceRequest, CacheItem<InternalHttpResponse>> cache = new ConcurrentHashMap<>();
+    private final Map<DeviceRequest, CacheItem<ResponseEntity<String>>> cache = new ConcurrentHashMap<>();
 
-    public InternalHttpResponse execute(DeviceRequest request) {
+    public ResponseEntity<String> execute(DeviceRequest request) {
         Objects.requireNonNull(request, "Incoming request can't be null!");
         log.info("Executing device request: {}", request);
-        InternalHttpResponse fromCache = getFromCache(request);
+        ResponseEntity<String> fromCache = getFromCache(request);
         if (fromCache != null) {
             log.info("Got request {} result from cache: {}", request, fromCache);
             return fromCache;
         }
 
-        InternalHttpResponse result = sendRequest(request);
+        ResponseEntity<String> result = sendRequest(request);
         if (cacheEnabled) {
             log.info("Saving request {} result {} in cache", request, result);
             cache.put(request, new CacheItem<>(result, LocalDateTime.now()));
@@ -63,7 +62,7 @@ public class DeviceApiService {
         return result;
     }
 
-    public InternalHttpResponse execute(String target, String command, String params) throws BadRequestException {
+    public ResponseEntity<String> execute(String target, String command, String params) throws BadRequestException {
         if (StringUtils.isBlank(target)) {
             throw new BadRequestException("Target can't be blank");
         }
@@ -101,7 +100,7 @@ public class DeviceApiService {
         return execute(requestBuilder.build());
     }
 
-    private InternalHttpResponse sendRequest(DeviceRequest request) {
+    private ResponseEntity<String> sendRequest(DeviceRequest request) {
         if (StringUtils.isBlank(request.getGatewayId()) || isSameGateway(request.getGatewayId())) {
             log.info("Executing local request");
             return sendLocalRequest(request);
@@ -122,12 +121,12 @@ public class DeviceApiService {
         Method[] methods = optionalApi.get().getClass().getMethods();
         return Arrays.stream(methods)
                 .filter((method) -> Modifier.isPublic(method.getModifiers())
-                        && method.getReturnType().equals(InternalHttpResponse.class))
+                        && method.getReturnType().equals(ResponseEntity.class))
                 .map(DeviceApiMethod::fromMethod)
                 .toList();
     }
 
-    private InternalHttpResponse sendLocalRequest(DeviceRequest request) {
+    private ResponseEntity<String> sendLocalRequest(DeviceRequest request) {
         Optional<DeviceInfo> deviceInfo = deviceService.findDevice(request.getDevice().getName(), request.getDevice().getIp());
         if (deviceInfo.isEmpty()) {
             throw new DeviceApiException("Unknown device!");
@@ -141,7 +140,7 @@ public class DeviceApiService {
         Method targetMethod = Arrays.stream(methods)
                 .filter((method) ->
                         method.getName().equals(request.getCommand()) &&
-                                method.getReturnType().equals(InternalHttpResponse.class)
+                                method.getReturnType().equals(ResponseEntity.class)
                 )
                 .findFirst()
                 .orElseThrow(() -> new DeviceApiException(String.format(
@@ -171,7 +170,7 @@ public class DeviceApiService {
                     args.add(objectMapper.convertValue(value, parameter.getType()));
                 }
             }
-            return (InternalHttpResponse) targetMethod.invoke(api, args.toArray());
+            return (ResponseEntity<String>) targetMethod.invoke(api, args.toArray());
         } catch (Exception e) {
             log.error("Failed to call device api", e);
             throw new DeviceApiException(e.getMessage());
@@ -179,7 +178,7 @@ public class DeviceApiService {
     }
 
     @SneakyThrows
-    private InternalHttpResponse sendRemoteRequest(DeviceRequest request) {
+    private ResponseEntity<String> sendRemoteRequest(DeviceRequest request) {
         //todo handle gateway not found exception
         // add internal exception codes?
         ResponseEntity<String> response = cloudService.sendDeviceRequest(request);
@@ -187,19 +186,15 @@ public class DeviceApiService {
         if (response.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
             throw new BadRequestException("Gateway with id=" + request.getGatewayId() + " not found!");
         }
-        return InternalHttpResponse.builder()
-                .data(response.getBody())
-                .status(response.getStatusCode())
-                .headers(response.getHeaders())
-                .build();
+        return response;
     }
 
-    private InternalHttpResponse getFromCache(DeviceRequest request) {
+    private ResponseEntity<String> getFromCache(DeviceRequest request) {
         if (!cacheEnabled) {
             return null;
         }
 
-        CacheItem<InternalHttpResponse> cacheItem = cache.get(request);
+        CacheItem<ResponseEntity<String>> cacheItem = cache.get(request);
         if (cacheItem == null || cacheItem.getAddedTime().until(LocalDateTime.now(), ChronoUnit.MILLIS) > cacheTtl) {
             cache.remove(request);
             return null;

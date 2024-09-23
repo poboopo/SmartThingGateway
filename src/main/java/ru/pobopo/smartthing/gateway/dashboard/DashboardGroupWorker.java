@@ -8,13 +8,13 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import ru.pobopo.smartthing.gateway.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.model.gateway.ObservableType;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardObservable;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardObservableValueUpdate;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardObservableValue;
-import ru.pobopo.smartthing.model.InternalHttpResponse;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -115,7 +115,7 @@ public class DashboardGroupWorker extends Thread {
             log.debug("No {}S, skipping update", type);
             return Map.of();
         }
-        InternalHttpResponse response;
+        ResponseEntity<String> response;
         switch (type) {
             case SENSOR -> response = deviceApi.getSensors(group.getDevice());
             case STATE -> response = deviceApi.getStates(group.getDevice());
@@ -123,10 +123,10 @@ public class DashboardGroupWorker extends Thread {
                 throw new IllegalArgumentException("Type " + type + " not supported!");
             }
         }
-        if (response.getStatus() != HttpStatus.OK) {
+        if (response.getStatusCode() != HttpStatus.OK) {
             log.error("Failed to fetch sensors values");
             return Map.of();
         }
-        return objectMapper.readValue(response.getData(), new TypeReference<>() {});
+        return objectMapper.readValue(response.getBody(), new TypeReference<>() {});
     }
 }
