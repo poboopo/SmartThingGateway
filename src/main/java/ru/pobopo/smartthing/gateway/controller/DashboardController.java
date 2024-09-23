@@ -8,7 +8,7 @@ import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
 import ru.pobopo.smartthing.model.gateway.dashboard.*;
 import ru.pobopo.smartthing.gateway.service.DashboardService;
 
-import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,23 +20,23 @@ public class DashboardController {
     private final DashboardService dashboardService;
 
     @GetMapping
-    public List<DashboardGroup> getGroups() {
+    public Collection<DashboardGroup> getGroups() {
         return dashboardService.getGroups();
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public DashboardGroup createGroup(@RequestBody DashboardGroup group) throws ValidationException, IOException {
+    public DashboardGroup createGroup(@RequestBody DashboardGroup group) throws ValidationException {
         return dashboardService.createGroup(group);
     }
 
     @PutMapping
-    public void updateGroup(@RequestBody DashboardGroup group) throws ValidationException, IOException {
+    public void updateGroup(@RequestBody DashboardGroup group) throws ValidationException {
         dashboardService.updateGroup(group);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteGroup(@PathVariable UUID id) throws ValidationException, IOException {
+    public void deleteGroup(@PathVariable UUID id) throws ValidationException {
         dashboardService.deleteGroup(id);
     }
 

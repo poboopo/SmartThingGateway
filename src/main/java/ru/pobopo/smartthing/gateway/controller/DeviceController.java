@@ -13,7 +13,7 @@ import ru.pobopo.smartthing.gateway.exception.DeviceSettingsException;
 import ru.pobopo.smartthing.gateway.service.DevicesSearchService;
 import ru.pobopo.smartthing.gateway.model.*;
 import ru.pobopo.smartthing.gateway.service.DeviceLogsService;
-import ru.pobopo.smartthing.gateway.repository.DeviceRepository;
+import ru.pobopo.smartthing.gateway.service.SavedDevicesService;
 import ru.pobopo.smartthing.gateway.service.DeviceSettingsService;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.DeviceLoggerMessage;
@@ -33,7 +33,7 @@ public class DeviceController {
     private final DeviceSettingsService settingsService;
     private final DeviceLogsService deviceLogsService;
     private final DevicesSearchService searchJob;
-    private final DeviceRepository deviceRepository;
+    private final SavedDevicesService savedDevicesService;
 
     @Operation(summary = "Get recent found devices in local network")
     @GetMapping("/found")
@@ -43,22 +43,22 @@ public class DeviceController {
 
     @GetMapping("/saved")
     public Collection<DeviceInfo> getSavedDevices() {
-        return deviceRepository.getDevices();
+        return savedDevicesService.getDevices();
     }
 
     @PostMapping("/saved")
     public DeviceInfo addDevice(@RequestParam String ip) throws BadRequestException {
-        return deviceRepository.addDevice(ip);
+        return savedDevicesService.addDevice(ip);
     }
 
     @PutMapping("/saved")
     public DeviceInfo updateDeviceInfo(@RequestParam String ip) throws BadRequestException {
-        return deviceRepository.updateDeviceInfo(ip);
+        return savedDevicesService.updateDeviceInfo(ip);
     }
 
     @DeleteMapping("/saved")
     public void deleteDevice(@RequestParam String ip) throws BadRequestException {
-        deviceRepository.deleteDevice(ip);
+        savedDevicesService.deleteDevice(ip);
     }
 
     @Operation(

@@ -41,11 +41,11 @@ public class FileRepository<T> {
     }
 
     public Optional<T> find(Predicate<T> predicate) {
-        return data.stream().filter(predicate).findFirst(); // todo not working
+        return data.stream().filter(predicate).findFirst();
     }
 
     @SneakyThrows
-    public void commit() {
+    public synchronized void commit() {
         objectMapper.writeValue(repoFile.toFile(), data);
     }
 

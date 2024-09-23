@@ -1,19 +1,14 @@
-package ru.pobopo.smartthing.gateway.repository;
+package ru.pobopo.smartthing.gateway.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smartthing.gateway.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
+import ru.pobopo.smartthing.gateway.repository.FileRepository;
 import ru.pobopo.smartthing.model.DeviceInfo;
 
 import java.util.Collection;
@@ -24,7 +19,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DeviceRepository {
+public class SavedDevicesService {
     private static final Pattern IP_PATTERN = Pattern.compile("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
 
     private final RestTemplate restTemplate;
