@@ -18,7 +18,7 @@ public class GatewayRequestProcessor implements MessageProcessor {
     private final String gatewayPort;
 
     @Override
-    public Object process(Object payload) throws Exception {
+    public InternalHttpResponse process(Object payload) throws Exception {
         GatewayRequestMessage requestMessage = (GatewayRequestMessage) payload;
         log.info("Processing gateway request {}", requestMessage);
         if (StringUtils.isEmpty(requestMessage.getUrl())) {

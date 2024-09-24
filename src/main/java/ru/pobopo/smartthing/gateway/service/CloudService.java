@@ -149,12 +149,9 @@ public class CloudService {
             String url = buildUrl(cloudConfig, path);
             log.info("Sending request: url={}, method={}, entity={}", url, method.name(), entity);
             return restTemplate.exchange(url, method, entity, tClass);
-        } catch (ResourceAccessException exception) {
-            log.error("Request failed: {}", exception.getMessage());
-            throw exception;
         } catch (Exception exception) {
             log.error("Request failed: {}", exception.getMessage());
-            throw new RuntimeException();
+            throw exception;
         }
     }
 

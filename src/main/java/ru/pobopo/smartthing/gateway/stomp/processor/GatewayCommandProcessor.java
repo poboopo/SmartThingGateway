@@ -1,11 +1,13 @@
 package ru.pobopo.smartthing.gateway.stomp.processor;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import ru.pobopo.smartthing.gateway.exception.LogoutException;
 import ru.pobopo.smartthing.gateway.service.CloudService;
+import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.GatewayCommandMessage;
-import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -13,20 +15,16 @@ public class GatewayCommandProcessor implements MessageProcessor {
     private final CloudService cloudService;
 
     @Override
-    public Object process(Object payload) throws Exception {
+    public InternalHttpResponse process(Object payload) throws Exception {
         GatewayCommandMessage gatewayCommand = (GatewayCommandMessage) payload;
 
-        ResponseMessage response = new ResponseMessage();
-
         if (gatewayCommand.getCommand() == null) {
-            response.setSuccess(false);
-            response.setError("Command is missing!");
-            return response;
+            return new InternalHttpResponse(HttpStatus.BAD_REQUEST, "Command is missing!", null);
         }
 
         switch (gatewayCommand.getCommand()) {
             case PING -> {
-                return "pong";
+                return new InternalHttpResponse(HttpStatus.OK, "ping", null);
             }
             case LOGOUT -> {
                 log.info("Logout event! Removing token from config.");

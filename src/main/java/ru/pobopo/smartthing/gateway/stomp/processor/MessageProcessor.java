@@ -1,5 +1,7 @@
 package ru.pobopo.smartthing.gateway.stomp.processor;
 
+import ru.pobopo.smartthing.model.InternalHttpResponse;
+
 public interface MessageProcessor {
-    Object process(Object payload) throws Exception;
+    InternalHttpResponse process(Object payload) throws Exception;
 }

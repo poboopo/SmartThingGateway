@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.pobopo.smartthing.gateway.exception.MissingValueException;
 import ru.pobopo.smartthing.gateway.service.DeviceApiService;
+import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequestMessage;
 import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 
@@ -18,7 +19,7 @@ public class DeviceRequestMessageProcessor implements MessageProcessor {
     }
 
     @Override
-    public Object process(Object payload) throws Exception {
+    public InternalHttpResponse process(Object payload) throws Exception {
         DeviceRequestMessage request = (DeviceRequestMessage) payload;
         return apiService.execute(request.getRequest());
     }
