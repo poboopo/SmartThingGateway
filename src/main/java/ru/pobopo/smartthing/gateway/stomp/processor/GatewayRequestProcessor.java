@@ -8,6 +8,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smartthing.gateway.exception.MissingValueException;
+import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.GatewayRequestMessage;
 
 @Slf4j
@@ -31,17 +32,25 @@ public class GatewayRequestProcessor implements MessageProcessor {
         HttpEntity<?> entity = new HttpEntity<>(requestMessage.getData(), headers);
 
         try {
-            return restTemplate.exchange(
+            ResponseEntity<String> response = restTemplate.exchange(
                     "http://localhost:" + gatewayPort + requestMessage.getUrl(),
                     HttpMethod.valueOf(requestMessage.getMethod()),
                     entity,
                     String.class
             );
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            return new InternalHttpResponse(
+                    response.getStatusCode(),
+                    response.getBody(),
+                    httpHeaders // this done bcs of "Multiple cross-origin headers" error
+            );
         } catch (HttpServerErrorException | HttpClientErrorException exception) {
             log.error("Request failed: {} {}", exception.getMessage(), exception.getStatusCode());
-            return new ResponseEntity<>(
+            return new InternalHttpResponse(
+                    exception.getStatusCode(),
                     exception.getResponseBodyAs(String.class),
-                    exception.getStatusCode()
+                    new HttpHeaders()
             );
         }
     }

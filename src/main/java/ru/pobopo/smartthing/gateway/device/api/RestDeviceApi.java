@@ -10,6 +10,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smartthing.model.gateway.Observable;
 import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.InternalHttpResponse;
 
 import java.util.List;
 import java.util.Map;
@@ -52,16 +53,16 @@ public class RestDeviceApi extends DeviceApi {
     }
 
     @Override
-    public ResponseEntity<String> health(DeviceInfo info) {
+    public InternalHttpResponse health(DeviceInfo info) {
         return sendRequest(info, HEALTH);
     }
 
     @Override
-    public ResponseEntity<String> getInfo(DeviceInfo info) {
+    public InternalHttpResponse getInfo(DeviceInfo info) {
         return sendRequest(info, SYSTEM_INFO);
     }
 
-    public ResponseEntity<String> saveName(DeviceInfo info, String name) {
+    public InternalHttpResponse saveName(DeviceInfo info, String name) {
         return sendRequest(
                 info,
                 SYSTEM_INFO,
@@ -71,29 +72,29 @@ public class RestDeviceApi extends DeviceApi {
     }
 
     @Override
-    public ResponseEntity<String> getActions(DeviceInfo info) {
+    public InternalHttpResponse getActions(DeviceInfo info) {
         return sendRequest(info, GET_ACTIONS);
     }
 
     @Override
-    public ResponseEntity<String> callAction(DeviceInfo info, String action) {
+    public InternalHttpResponse callAction(DeviceInfo info, String action) {
         return sendRequest(
                 info,
-                CALL_ACTION + "Stringaction=" + action,
+                CALL_ACTION + "?action=" + action,
                 HttpMethod.PUT,
                 null
         );
     }
 
     @Override
-    public ResponseEntity<String> getSensors(DeviceInfo info) {
+    public InternalHttpResponse getSensors(DeviceInfo info) {
         return sendRequest(
                 info,
                 SENSORS
         );
     }
 
-    public ResponseEntity<String> getSensorsTypes(DeviceInfo info) {
+    public InternalHttpResponse getSensorsTypes(DeviceInfo info) {
         return sendRequest(
                 info,
                 SENSORS_TYPES
@@ -101,22 +102,22 @@ public class RestDeviceApi extends DeviceApi {
     }
 
     @Override
-    public ResponseEntity<String> getStates(DeviceInfo info) {
+    public InternalHttpResponse getStates(DeviceInfo info) {
         return sendRequest(
                 info,
                 STATES
         );
     }
 
-    public ResponseEntity<String> getConfigInfo(DeviceInfo info) {
+    public InternalHttpResponse getConfigInfo(DeviceInfo info) {
         return sendRequest(info, GET_CONFIG);
     }
 
-    public ResponseEntity<String> getConfigValues(DeviceInfo info) {
+    public InternalHttpResponse getConfigValues(DeviceInfo info) {
         return sendRequest(info, CONFIG_VALUES);
     }
 
-    public ResponseEntity<String> saveConfigValues(DeviceInfo info, Map<String, Object> values) {
+    public InternalHttpResponse saveConfigValues(DeviceInfo info, Map<String, Object> values) {
         return sendRequest(
                 info,
                 CONFIG_VALUES,
@@ -125,7 +126,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> deleteConfigValue(DeviceInfo info, String name) {
+    public InternalHttpResponse deleteConfigValue(DeviceInfo info, String name) {
         return sendRequest(
                 info,
                 CONFIG_VALUES,
@@ -134,7 +135,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> deleteAllConfigValues(DeviceInfo info) {
+    public InternalHttpResponse deleteAllConfigValues(DeviceInfo info) {
         return sendRequest(
                 info,
                 DELETE_ALL_CONFIG_VALUES,
@@ -143,18 +144,18 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> getAllHooks(DeviceInfo info) {
+    public InternalHttpResponse getAllHooks(DeviceInfo info) {
         return sendRequest(
                 info,
                 HOOKS
         );
     }
 
-    public ResponseEntity<String> getHooks(DeviceInfo info, Observable observable) {
+    public InternalHttpResponse getHooks(DeviceInfo info, Observable observable) {
         return sendRequest(
                 info,
                 String.format(
-                        "%sStringtype=%s&name=%s",
+                        "%s?type=%s&name=%s",
                         HOOKS_BY_OBSERVABLE,
                         observable.getType(),
                         observable.getName()
@@ -162,11 +163,11 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> getHookById(DeviceInfo info, Observable observable, String id) {
+    public InternalHttpResponse getHookById(DeviceInfo info, Observable observable, String id) {
         return sendRequest(
                 info,
                 String.format(
-                        "%sStringtype=%s&name=%s&id=%s",
+                        "%s?type=%s&name=%s&id=%s",
                         HOOKS_BY_ID,
                         observable.getType(),
                         observable.getName(),
@@ -175,14 +176,14 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> getHooksTemplates(DeviceInfo info, String type) {
+    public InternalHttpResponse getHooksTemplates(DeviceInfo info, String type) {
         return sendRequest(
                 info,
-                HOOKS_TEMPLATES + "Stringtype=" + type
+                HOOKS_TEMPLATES + "?type=" + type
         );
     }
 
-    public ResponseEntity<String> createHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
+    public InternalHttpResponse createHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
         return sendRequest(
                 info,
                 HOOKS,
@@ -194,7 +195,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> updateHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
+    public InternalHttpResponse updateHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
         return sendRequest(
                 info,
                 HOOKS,
@@ -206,11 +207,11 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> deleteHook(DeviceInfo info, Observable observable, String id) {
+    public InternalHttpResponse deleteHook(DeviceInfo info, Observable observable, String id) {
         return sendRequest(
                 info,
                 String.format(
-                        "%sStringtype=%s&name=%s&id=%s",
+                        "%s?type=%s&name=%s&id=%s",
                         HOOKS_BY_ID,
                         observable.getType(),
                         observable.getName(),
@@ -221,18 +222,24 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> getFeatures(DeviceInfo info) {
+    public InternalHttpResponse getFeatures(DeviceInfo info) {
+        if (info.getVersion().equals("0.5")) {
+            return InternalHttpResponse.builder()
+                    .status(HttpStatus.OK)
+                    .data("{\"web\":true,\"actions\":true,\"sensors\":true,\"states\":true,\"hooks\":true,\"logger\":true}")
+                    .build();
+        }
         return sendRequest(info, FEATURES, HttpMethod.GET, null);
     }
 
-    public ResponseEntity<String> getMetrics(DeviceInfo info) {
+    public InternalHttpResponse getMetrics(DeviceInfo info) {
         return sendRequest(
                 info,
                 METRICS
         );
     }
 
-    public ResponseEntity<String> exportSettings(DeviceInfo info) {
+    public InternalHttpResponse exportSettings(DeviceInfo info) {
         return sendRequest(
                 info,
                 SETTINGS,
@@ -241,7 +248,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> importSettings(DeviceInfo info, Map<String, Object> settings) {
+    public InternalHttpResponse importSettings(DeviceInfo info, Map<String, Object> settings) {
         return sendRequest(
                 info,
                 SETTINGS,
@@ -250,11 +257,11 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> testHook(DeviceInfo info, Observable observable, String id, String value) {
+    public InternalHttpResponse testHook(DeviceInfo info, Observable observable, String id, String value) {
         return this.sendRequest(
                 info,
                 String.format(
-                        "%sStringtype=%s&name=%s&id=%s&value=%s",
+                        "%s?type=%s&name=%s&id=%s&value=%s",
                         HOOK_TEST,
                         observable.getType(),
                         observable.getName(),
@@ -264,19 +271,19 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public ResponseEntity<String> restart(DeviceInfo info) {
+    public InternalHttpResponse restart(DeviceInfo info) {
         return this.sendRequest(info, "/danger/restart", HttpMethod.POST, null);
     }
 
-    public ResponseEntity<String> wipe(DeviceInfo info) {
+    public InternalHttpResponse wipe(DeviceInfo info) {
         return this.sendRequest(info, "/danger/wipe", HttpMethod.POST, null);
     }
 
-    protected ResponseEntity<String> sendRequest(DeviceInfo info, String path) {
+    protected InternalHttpResponse sendRequest(DeviceInfo info, String path) {
         return sendRequest(info, path, HttpMethod.GET, null);
     }
 
-    protected ResponseEntity<String> sendRequest(DeviceInfo info, String path, HttpMethod method, Object payload) {
+    protected InternalHttpResponse sendRequest(DeviceInfo info, String path, HttpMethod method, Object payload) {
         String url = buildUrl(info, path);
         log.debug(
                 "Sending request [{}] {} - {}",
@@ -292,14 +299,24 @@ public class RestDeviceApi extends DeviceApi {
                     new HttpEntity<>(payload == null ? "" : payload),
                     String.class
             );
-            log.debug("Request finished: {}", response);
-            return response;
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            InternalHttpResponse deviceResponse = InternalHttpResponse.builder()
+                    .data(response.getBody())
+                    .status(response.getStatusCode())
+                    .headers(headers)
+                    .build();
+            log.debug("Request finished: {}", deviceResponse);
+            return deviceResponse;
         } catch (HttpClientErrorException | HttpServerErrorException exception) {
             log.error("Request failed: {}", exception.getMessage());
-            return new ResponseEntity<>(exception.getMessage(), exception.getStatusCode());
+            return InternalHttpResponse.builder()
+                    .data(exception.getMessage())
+                    .status(exception.getStatusCode())
+                    .build();
         } catch (Exception exception) {
             log.error("Failed to send request {}", exception.getMessage(), exception);
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            return new InternalHttpResponse(HttpStatus.FORBIDDEN, null, null);
         }
     }
 
