@@ -1,0 +1,13 @@
+package ru.pobopo.smartthing.gateway.service.ota;
+
+public enum OtaFirmwareTaskStatus {
+    STARTED,
+    INVITATION,
+    INVITATION_FAILED,
+    INVITATION_ACCEPTED,
+    FIRMWARE_TRANSFER,
+    FIRMWARE_TRANSFER_FAILED,
+    FIRMWARE_TRANSFER_CONFIRMATION,
+    FIRMWARE_TRANSFER_FINISHED,
+    FINISHED
+}

@@ -10,11 +10,11 @@ import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.controller.model.UpdateDeviceSettings;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.exception.DeviceSettingsException;
-import ru.pobopo.smartthing.gateway.service.DevicesSearchService;
-import ru.pobopo.smartthing.gateway.model.*;
-import ru.pobopo.smartthing.gateway.service.DeviceLogsService;
-import ru.pobopo.smartthing.gateway.service.SavedDevicesService;
-import ru.pobopo.smartthing.gateway.service.DeviceSettingsService;
+import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
+import ru.pobopo.smartthing.gateway.service.device.DevicesSearchService;
+import ru.pobopo.smartthing.gateway.service.device.DeviceLogsService;
+import ru.pobopo.smartthing.gateway.service.device.SavedDevicesService;
+import ru.pobopo.smartthing.gateway.service.device.DeviceSettingsService;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 

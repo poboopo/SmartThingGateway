@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.device;
 
 import java.util.ArrayList;
 import java.util.Collection;

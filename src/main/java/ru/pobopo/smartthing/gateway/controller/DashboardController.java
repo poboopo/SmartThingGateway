@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
 import ru.pobopo.smartthing.model.gateway.dashboard.*;
-import ru.pobopo.smartthing.gateway.service.DashboardService;
+import ru.pobopo.smartthing.gateway.service.device.DashboardService;
 
 import java.util.Collection;
 import java.util.List;

@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.device;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +13,9 @@ import ru.pobopo.smartthing.gateway.cache.CacheItem;
 import ru.pobopo.smartthing.gateway.device.api.DeviceApi;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.exception.DeviceApiException;
-import ru.pobopo.smartthing.gateway.model.CloudIdentity;
-import ru.pobopo.smartthing.gateway.model.DeviceApiMethod;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
+import ru.pobopo.smartthing.gateway.model.device.DeviceApiMethod;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;

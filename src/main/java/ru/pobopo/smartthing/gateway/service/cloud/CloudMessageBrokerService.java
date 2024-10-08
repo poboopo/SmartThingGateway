@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.cloud;
 
 import jakarta.annotation.PreDestroy;
 
@@ -13,9 +13,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
-import ru.pobopo.smartthing.gateway.model.CloudConfig;
-import ru.pobopo.smartthing.gateway.model.CloudConnectionStatus;
-import ru.pobopo.smartthing.gateway.model.CloudConnectionStatusMessage;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudConfig;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudConnectionStatus;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudConnectionStatusMessage;
 import ru.pobopo.smartthing.gateway.stomp.CustomStompSessionHandler;
 import ru.pobopo.smartthing.model.stomp.GatewayEventType;
 

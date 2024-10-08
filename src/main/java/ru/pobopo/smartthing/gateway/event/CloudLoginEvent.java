@@ -2,7 +2,7 @@ package ru.pobopo.smartthing.gateway.event;
 
 import lombok.NonNull;
 import org.springframework.context.ApplicationEvent;
-import ru.pobopo.smartthing.gateway.model.CloudIdentity;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
 
 import java.util.Objects;
 

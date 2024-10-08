@@ -1,6 +1,5 @@
 package ru.pobopo.smartthing.gateway.repository;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +35,7 @@ public class FileRepository<T> {
         data.add(value);
     }
 
-    public void remove(T value) {
+    public void delete(T value) {
         data.remove(value);
     }
 
@@ -46,6 +45,7 @@ public class FileRepository<T> {
 
     @SneakyThrows
     public synchronized void commit() {
+        // todo add lock
         objectMapper.writeValue(repoFile.toFile(), data);
     }
 

@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.model;
+package ru.pobopo.smartthing.gateway.model.cloud;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.cloud;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,8 +14,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.gateway.exception.StorageException;
-import ru.pobopo.smartthing.gateway.model.CloudConfig;
-import ru.pobopo.smartthing.gateway.model.CloudIdentity;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudConfig;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
 
 import static ru.pobopo.smartthing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
 

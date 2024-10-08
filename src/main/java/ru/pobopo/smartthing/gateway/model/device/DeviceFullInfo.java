@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.model;
+package ru.pobopo.smartthing.gateway.model.device;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.job;
 
 import java.util.List;
 import java.util.concurrent.Executors;

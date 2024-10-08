@@ -66,8 +66,8 @@ public class DashboardGroupWorker extends Thread {
         }
 
         try {
-            Map<String, Object> sensors = fetchValues(ObservableType.SENSOR);
-            Map<String, Object> states = fetchValues(ObservableType.STATE);
+            Map<String, Object> sensors = fetchValues(ObservableType.sensor);
+            Map<String, Object> states = fetchValues(ObservableType.state);
 
             if (sensors.isEmpty() && states.isEmpty()) {
                 return;
@@ -77,8 +77,8 @@ public class DashboardGroupWorker extends Thread {
             for (DashboardObservable observable: group.getObservables()) {
                 Object value;
                 switch (observable.getType()) {
-                    case STATE -> value = states.get(observable.getName());
-                    case SENSOR -> value = sensors.get(observable.getName());
+                    case state -> value = states.get(observable.getName());
+                    case sensor -> value = sensors.get(observable.getName());
                     default -> throw new IllegalArgumentException("Type " + observable.getType() + " not supported!");
                 }
 
@@ -117,8 +117,8 @@ public class DashboardGroupWorker extends Thread {
         }
         InternalHttpResponse response;
         switch (type) {
-            case SENSOR -> response = deviceApi.getSensors(group.getDevice());
-            case STATE -> response = deviceApi.getStates(group.getDevice());
+            case sensor -> response = deviceApi.getSensors(group.getDevice());
+            case state -> response = deviceApi.getStates(group.getDevice());
             default -> {
                 throw new IllegalArgumentException("Type " + type + " not supported!");
             }

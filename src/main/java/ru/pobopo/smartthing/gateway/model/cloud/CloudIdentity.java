@@ -1,9 +1,10 @@
-package ru.pobopo.smartthing.gateway.model;
+package ru.pobopo.smartthing.gateway.model.cloud;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import ru.pobopo.smartthing.gateway.model.UserInfo;
 import ru.pobopo.smartthing.model.GatewayInfo;
 
 @Data

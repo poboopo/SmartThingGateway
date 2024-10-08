@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.device;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +58,7 @@ public class SavedDevicesService {
         if (device.isEmpty()) {
             throw new BadRequestException("There is no saved device with ip=" + ip);
         }
-        fileRepository.remove(device.get());
+        fileRepository.delete(device.get());
         fileRepository.commit();
         log.info("Device {} deleted", device.get());
     }
@@ -80,7 +80,7 @@ public class SavedDevicesService {
             log.info("New device info are equals to old one");
             return newInfo;
         }
-        fileRepository.remove(device.get());
+        fileRepository.delete(device.get());
         fileRepository.add(newInfo);
         fileRepository.commit();
         log.info("Updated device info {}", newInfo);

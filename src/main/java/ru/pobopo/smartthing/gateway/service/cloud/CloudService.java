@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.cloud;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -7,11 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smartthing.gateway.exception.StorageException;
-import ru.pobopo.smartthing.gateway.model.CloudIdentity;
-import ru.pobopo.smartthing.gateway.model.CloudConfig;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudConfig;
 import ru.pobopo.smartthing.model.stomp.*;
 
 // todo need refactor

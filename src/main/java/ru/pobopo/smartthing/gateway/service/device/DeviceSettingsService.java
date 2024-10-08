@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.device;
 
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import ru.pobopo.smartthing.gateway.exception.DeviceSettingsException;
-import ru.pobopo.smartthing.gateway.model.DeviceSettings;
+import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
 
 import java.util.*;
@@ -43,7 +43,7 @@ public class DeviceSettingsService {
         }
         DeviceSettings oldSettings = settingsOptional.get();
         try {
-            fileRepository.remove(oldSettings);
+            fileRepository.delete(oldSettings);
             DeviceSettings.DeviceSettingsBuilder builder = oldSettings.toBuilder();
             if (StringUtils.isNotBlank(deviceSettings.getName())) {
                 builder.name(deviceSettings.getName());
@@ -70,7 +70,7 @@ public class DeviceSettingsService {
         if (settingsOptional.isEmpty()) {
             throw new ValidationException("Device settings with id=" + id + " not found");
         }
-        fileRepository.remove(settingsOptional.get());
+        fileRepository.delete(settingsOptional.get());
         fileRepository.commit();
     }
 

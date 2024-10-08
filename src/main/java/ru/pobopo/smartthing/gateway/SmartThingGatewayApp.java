@@ -8,9 +8,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import ru.pobopo.smartthing.gateway.model.CloudConnectionStatus;
-import ru.pobopo.smartthing.gateway.service.CloudService;
-import ru.pobopo.smartthing.gateway.service.CloudMessageBrokerService;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudConnectionStatus;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudMessageBrokerService;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

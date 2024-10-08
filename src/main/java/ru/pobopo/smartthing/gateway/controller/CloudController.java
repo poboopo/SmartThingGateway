@@ -7,11 +7,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smartthing.gateway.event.CloudLogoutEvent;
 import ru.pobopo.smartthing.gateway.exception.StorageException;
-import ru.pobopo.smartthing.gateway.model.CloudIdentity;
-import ru.pobopo.smartthing.gateway.model.CloudConfig;
-import ru.pobopo.smartthing.gateway.model.CloudConnectionStatus;
-import ru.pobopo.smartthing.gateway.service.CloudService;
-import ru.pobopo.smartthing.gateway.service.CloudMessageBrokerService;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudConfig;
+import ru.pobopo.smartthing.gateway.model.cloud.CloudConnectionStatus;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudMessageBrokerService;
 
 @RestController
 @RequestMapping("/cloud")

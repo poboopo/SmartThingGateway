@@ -1,3 +1,8 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
 server:
   port: 8081
 
@@ -39,5 +44,15 @@ device:
 
 logging:
   file:
-    name: /var/log/cloud.log
+    name: /var/log/smt_gateway.log
   max-size: 20GB
+
+ota:
+  tasks:
+    cleanup:
+      delay: 10000
+  firmware:
+    storage:
+      dir: ""
+    info:
+      file: ""

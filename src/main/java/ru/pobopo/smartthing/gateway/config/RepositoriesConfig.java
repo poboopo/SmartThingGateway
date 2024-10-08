@@ -5,7 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.pobopo.smartthing.gateway.model.DeviceSettings;
+import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
+import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareInfo;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
@@ -20,13 +21,16 @@ public class RepositoriesConfig {
     private static final Path SETTINGS_FILE_DEFAULT = Paths.get(DEFAULT_APP_DIR.toString(), "device_settings.json");
     private static final Path SAVED_DEVICES_DEFAULT = Paths.get(DEFAULT_APP_DIR.toString(), "saved_devices.json");
     private static final Path DASHBOARD_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "dashboard_config.json");
+    private static final Path FIRMWARE_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "firmware_info.json");
 
     @Value("${device.settings.dir:}")
     private String deviceSettingsPath;
-    @Value("${device.saved.file}")
+    @Value("${device.saved.file:}")
     private String savedDevicesPath;
     @Value("${dashboard.settings.file:}")
     private String dashboardConfigPath;
+    @Value("${ota.firmware.info.file:}")
+    private String firmwareInfoPath;
 
     @Bean
     public FileRepository<DeviceSettings> deviceSettingsFileRepository(ObjectMapper objectMapper) {
@@ -51,6 +55,15 @@ public class RepositoriesConfig {
         return new FileRepository<>(
                 DashboardGroup.class,
                 StringUtils.isEmpty(dashboardConfigPath) ? DASHBOARD_DEFAULT_PATH : Paths.get(dashboardConfigPath),
+                objectMapper
+        );
+    }
+
+    @Bean
+    public FileRepository<OtaFirmwareInfo> firmwareRepository(ObjectMapper objectMapper) {
+        return new FileRepository<>(
+                OtaFirmwareInfo.class,
+                StringUtils.isEmpty(firmwareInfoPath) ? FIRMWARE_DEFAULT_PATH : Paths.get(firmwareInfoPath),
                 objectMapper
         );
     }

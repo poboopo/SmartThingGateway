@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smartthing.gateway.service.DeviceApiService;
+import ru.pobopo.smartthing.gateway.service.device.DeviceApiService;
 import ru.pobopo.smartthing.gateway.stomp.MessageProcessorFactory;
 import ru.pobopo.smartthing.gateway.stomp.processor.DeviceRequestMessageProcessor;
 import ru.pobopo.smartthing.gateway.stomp.processor.GatewayCommandProcessor;
-import ru.pobopo.smartthing.gateway.service.CloudService;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
 import ru.pobopo.smartthing.gateway.stomp.processor.GatewayRequestProcessor;
 import ru.pobopo.smartthing.model.stomp.MessageType;
 

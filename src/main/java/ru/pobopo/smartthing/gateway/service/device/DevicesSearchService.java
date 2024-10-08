@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.device;
 
 import java.io.IOException;
 import java.net.*;
@@ -10,9 +10,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.gateway.cache.ConcurrentSetCache;
+import ru.pobopo.smartthing.gateway.service.job.BackgroundJob;
 import ru.pobopo.smartthing.model.DeviceInfo;
 
 import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.DEVICES_TOPIC;
@@ -27,8 +27,6 @@ public class DevicesSearchService implements BackgroundJob {
     private String searchGroup;
     @Value("${device.search.port}")
     private int searchPort;
-
-    private final SimpMessagingTemplate messagingTemplate;
 
     private final ConcurrentSetCache<DeviceInfo> cache = new ConcurrentSetCache<>(5, ChronoUnit.SECONDS);
 
@@ -64,10 +62,6 @@ public class DevicesSearchService implements BackgroundJob {
                 DeviceInfo deviceInfo = DeviceInfo.fromMulticastMessage(message);
 
                 if (deviceInfo != null) {
-                    messagingTemplate.convertAndSend(
-                            DEVICES_SEARCH_TOPIC,
-                            deviceInfo
-                    );
                     cache.put(deviceInfo);
                 } else {
                     log.error("Can't build device info from {}", message);
