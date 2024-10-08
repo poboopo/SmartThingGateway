@@ -34,7 +34,7 @@ public class OtaFirmwareUploadTask implements Runnable {
     private final String topic;
 
     @Getter
-    private OtaFirmwareTaskStatus status;
+    private volatile OtaFirmwareTaskStatus status;
     @Getter
     private final AtomicInteger transferProgress = new AtomicInteger(0);
 
