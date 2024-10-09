@@ -21,7 +21,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 @RestController
-@RequestMapping("/ota/firmware")
+@RequestMapping("/api/ota/firmware")
 @RequiredArgsConstructor
 public class OtaUpdatesController {
     private final OtaFirmwareService otaFirmwareService;

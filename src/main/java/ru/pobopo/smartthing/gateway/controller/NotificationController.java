@@ -14,7 +14,7 @@ import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.stomp.GatewayNotification;
 
 @RestController
-@RequestMapping("/notification")
+@RequestMapping("/api/notification")
 @Tag(name = "Notification controller")
 public class NotificationController {
     private final NotificationService notificationService;

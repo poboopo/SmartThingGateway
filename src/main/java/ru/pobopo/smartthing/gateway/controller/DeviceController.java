@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/devices")
+@RequestMapping("/api/devices")
 @AcceptCloudRequest
 @RequiredArgsConstructor
 @Tag(name = "Devices controller", description = "Find and save devices, export and import device settings, get devices logs")

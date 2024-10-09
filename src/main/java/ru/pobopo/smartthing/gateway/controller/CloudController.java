@@ -14,7 +14,7 @@ import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudMessageBrokerService;
 
 @RestController
-@RequestMapping("/cloud")
+@RequestMapping("/api/cloud")
 @RequiredArgsConstructor
 @Tag(name = "Cloud connection controller", description = "Login/logout, connect/disconnect, get information")
 public class CloudController {

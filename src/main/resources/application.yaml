@@ -4,7 +4,7 @@ spring:
       max-file-size: 10MB
 
 server:
-  port: 8081
+  port: ${port:8080}
 
 cloud:
   reconnect:
