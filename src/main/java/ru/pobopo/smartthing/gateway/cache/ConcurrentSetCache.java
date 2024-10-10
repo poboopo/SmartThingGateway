@@ -19,7 +19,6 @@ public class ConcurrentSetCache<T> {
     }
 
     public void put(T value) {
-        evictItems();
         if (value == null) {
             return;
         }
@@ -31,17 +30,15 @@ public class ConcurrentSetCache<T> {
 
     @NonNull
     public Set<T> getValues() {
-        evictItems();
         Set<CacheItem<T>> it = new HashSet<>(items);
         return it.stream().map(CacheItem::getItem).collect(Collectors.toUnmodifiableSet());
     }
 
     public int size() {
-        evictItems();
         return items.size();
     }
 
-    private void evictItems() {
+    public void evictItems() {
         items.removeIf(this::shouldEvict);
     }
 
