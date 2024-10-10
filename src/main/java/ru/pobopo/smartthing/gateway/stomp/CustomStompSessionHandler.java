@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.gateway.event.CloudLogoutEvent;
 import ru.pobopo.smartthing.gateway.exception.LogoutException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConnectionStatus;
-import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
 import ru.pobopo.smartthing.gateway.stomp.processor.MessageProcessor;
 import ru.pobopo.smartthing.model.stomp.BaseMessage;
 import ru.pobopo.smartthing.model.stomp.ResponseMessage;
@@ -28,7 +28,7 @@ public class CustomStompSessionHandler extends StompSessionHandlerAdapter {
     private Consumer<CloudConnectionStatus> statusConsumer;
 
     private final MessageProcessorFactory processorFactory;
-    private final CloudService cloudService;
+    private final CloudApiService cloudService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Override

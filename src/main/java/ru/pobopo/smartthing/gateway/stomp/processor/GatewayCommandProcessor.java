@@ -4,14 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import ru.pobopo.smartthing.gateway.exception.LogoutException;
-import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.GatewayCommandMessage;
 
 @Slf4j
 @RequiredArgsConstructor
 public class GatewayCommandProcessor implements MessageProcessor {
-    private final CloudService cloudService;
+    private final CloudApiService cloudService;
 
     @Override
     public InternalHttpResponse process(Object payload) throws Exception {

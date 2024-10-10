@@ -29,7 +29,7 @@ public class CloudMessageBrokerService {
     private final WebSocketStompClient stompClient;
     private final CustomStompSessionHandler sessionHandler;
     private final SimpMessagingTemplate messagingTemplate;
-    private final CloudService cloudService;
+    private final CloudApiService cloudService;
 
     @Value("${cloud.reconnect.attempts:-1}")
     private int reconnectAttempts;
@@ -41,7 +41,7 @@ public class CloudMessageBrokerService {
     private Thread reconnectThread;
     private boolean reconnectFailed = false;
 
-    public CloudMessageBrokerService(WebSocketStompClient stompClient, CloudService cloudService, CustomStompSessionHandler sessionHandler, SimpMessagingTemplate messagingTemplate) {
+    public CloudMessageBrokerService(WebSocketStompClient stompClient, CloudApiService cloudService, CustomStompSessionHandler sessionHandler, SimpMessagingTemplate messagingTemplate) {
         this.stompClient = stompClient;
         this.sessionHandler = sessionHandler;
         this.messagingTemplate = messagingTemplate;
@@ -58,9 +58,6 @@ public class CloudMessageBrokerService {
         if (status == null || connectionStatus.equals(status)) {
             return;
         }
-        log.info("New connection status: {}", status);
-        this.connectionStatus = status;
-        this.messagingTemplate.convertAndSend(CONNECTION_STATUS_TOPIC, new CloudConnectionStatusMessage(status));
 
         switch (status) {
             case CONNECTED -> {
@@ -69,8 +66,16 @@ public class CloudMessageBrokerService {
                 cloudService.event(GatewayEventType.CONNECTED);
             }
             case CONNECTION_LOST -> startReconnectThread();
-            case DISCONNECTED -> cloudService.event(GatewayEventType.DISCONNECTED);
+            case DISCONNECTED -> {
+                if (!connectionStatus.equals(CloudConnectionStatus.DISCONNECTED)) {
+                    cloudService.event(GatewayEventType.DISCONNECTED);
+                }
+            }
         }
+
+        log.info("New connection status: {}", status);
+        this.connectionStatus = status;
+        this.messagingTemplate.convertAndSend(CONNECTION_STATUS_TOPIC, new CloudConnectionStatusMessage(status));
     }
 
     public void logout() {
@@ -103,11 +108,11 @@ public class CloudMessageBrokerService {
             throw new IncompatibleConfigurationException("Can't find cloud ul or auth token in cloud config!");
         }
 
-        String wsUrl = cloudConfig.getCloudUrl().replace("http", "ws") + "/smt-ws";
+        String wsUrl = cloudConfig.getCloudUrl().replace("http", "ws") + "/api/smt-ws";
         log.info("Connecting to {}", wsUrl);
 
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-        headers.add(CloudService.AUTH_TOKEN_HEADER, cloudConfig.getToken());
+        headers.add(CloudApiService.AUTH_TOKEN_HEADER, cloudConfig.getToken());
 
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();

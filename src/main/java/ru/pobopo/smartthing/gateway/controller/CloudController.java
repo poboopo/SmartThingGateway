@@ -10,7 +10,7 @@ import ru.pobopo.smartthing.gateway.exception.StorageException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConfig;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConnectionStatus;
-import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudMessageBrokerService;
 
 @RestController
@@ -19,7 +19,7 @@ import ru.pobopo.smartthing.gateway.service.cloud.CloudMessageBrokerService;
 @Tag(name = "Cloud connection controller", description = "Login/logout, connect/disconnect, get information")
 public class CloudController {
     private final CloudMessageBrokerService messageService;
-    private final CloudService cloudService;
+    private final CloudApiService cloudService;
 
     @Operation(
             summary = "Login in cloud",

@@ -9,7 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConnectionStatus;
-import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudMessageBrokerService;
 
 import java.nio.file.Path;
@@ -34,7 +34,7 @@ public class SmartThingGatewayApp {
 
     @Bean
     CommandLineRunner run(
-            CloudService cloudService,
+            CloudApiService cloudService,
             CloudMessageBrokerService brokerService
     )  {
         return args -> {

@@ -35,7 +35,7 @@ public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/smt-ws").setAllowedOrigins("*");
+        registry.addEndpoint("/api/smt-ws").setAllowedOrigins("*");
     }
 
     @Override

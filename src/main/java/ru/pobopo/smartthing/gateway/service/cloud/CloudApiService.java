@@ -16,7 +16,7 @@ import ru.pobopo.smartthing.model.stomp.*;
 // todo need refactor
 @Component
 @Slf4j
-public class CloudService {
+public class CloudApiService {
     public static final String AUTH_TOKEN_HEADER = "SmartThing-Token-Gateway";
 
     private final CloudDataRepository cloudDataRepository;
@@ -28,7 +28,7 @@ public class CloudService {
     private CloudConfig cloudConfig;
 
     @Autowired
-    public CloudService(CloudDataRepository cloudDataRepository, RestTemplate restTemplate) {
+    public CloudApiService(CloudDataRepository cloudDataRepository, RestTemplate restTemplate) {
         this.cloudDataRepository = cloudDataRepository;
         this.restTemplate = restTemplate;
 
@@ -54,7 +54,7 @@ public class CloudService {
 
     public synchronized void login() {
         try {
-            ResponseEntity<CloudIdentity> response = basicRequest(HttpMethod.GET, "/auth", null, CloudIdentity.class);
+            ResponseEntity<CloudIdentity> response = basicRequest(HttpMethod.GET, "/api/auth", null, CloudIdentity.class);
             if (response == null) {
                 log.error("Failed to fetch authentication from cloud");
                 return;
@@ -73,7 +73,7 @@ public class CloudService {
         try {
             basicRequest(
                     HttpMethod.POST,
-                    "/auth/gateway/logout/" + cloudIdentity.getGateway().getId(),
+                    "/api/auth/gateway/logout/" + cloudIdentity.getGateway().getId(),
                     null, Void.class
             );
         } catch (Exception e) {
@@ -96,7 +96,7 @@ public class CloudService {
     public void sendResponse(ResponseMessage response) {
         basicRequest(
                 HttpMethod.POST,
-                "/gateway/requests/response",
+                "/api/gateway/requests/response",
                 response,
                 Void.class
         );
@@ -105,7 +105,7 @@ public class CloudService {
     public ResponseEntity<String> sendDeviceRequest(DeviceRequest request) {
         return basicRequest(
                 HttpMethod.POST,
-                "/gateway/requests/device",
+                "/api/gateway/requests/device",
                 request,
                 String.class
         );
@@ -114,7 +114,7 @@ public class CloudService {
     public void notification(GatewayNotification notification) {
         basicRequest(
                 HttpMethod.POST,
-                "/gateway/requests/notification",
+                "/api/gateway/requests/notification",
                 notification,
                 Void.class
         );
@@ -123,7 +123,7 @@ public class CloudService {
     public void event(GatewayEventType event) {
         basicRequest(
                 HttpMethod.POST,
-                "/gateway/requests/event?event=" + event.name(),
+                "/api/gateway/requests/event?event=" + event.name(),
                 null,
                 Void.class
         );

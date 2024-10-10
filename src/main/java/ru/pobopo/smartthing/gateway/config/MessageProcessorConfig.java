@@ -8,7 +8,7 @@ import ru.pobopo.smartthing.gateway.service.device.DeviceApiService;
 import ru.pobopo.smartthing.gateway.stomp.MessageProcessorFactory;
 import ru.pobopo.smartthing.gateway.stomp.processor.DeviceRequestMessageProcessor;
 import ru.pobopo.smartthing.gateway.stomp.processor.GatewayCommandProcessor;
-import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
 import ru.pobopo.smartthing.gateway.stomp.processor.GatewayRequestProcessor;
 import ru.pobopo.smartthing.model.stomp.MessageType;
 
@@ -17,7 +17,7 @@ public class MessageProcessorConfig {
 
     @Bean
     public MessageProcessorFactory messageProcessorFactory(
-            CloudService cloudService,
+            CloudApiService cloudService,
             DeviceApiService deviceApiService,
             RestTemplate restTemplate,
             @Value("${server.port}") String serverPort

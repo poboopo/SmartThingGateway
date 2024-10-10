@@ -15,7 +15,7 @@ import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.exception.DeviceApiException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
 import ru.pobopo.smartthing.gateway.model.device.DeviceApiMethod;
-import ru.pobopo.smartthing.gateway.service.cloud.CloudService;
+import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
 import ru.pobopo.smartthing.model.stomp.DeviceRequest;
@@ -37,7 +37,7 @@ public class DeviceApiService {
 
     private final List<DeviceApi> apis;
     private final ObjectMapper objectMapper;
-    private final CloudService cloudService;
+    private final CloudApiService cloudService;
     private final DeviceService deviceService;
 
     @Value("${device.api.cache.enabled:true}")
