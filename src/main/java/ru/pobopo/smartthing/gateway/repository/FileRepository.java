@@ -28,25 +28,34 @@ public class FileRepository<T> {
     }
 
     public Collection<T> getAll() {
-        return Collections.unmodifiableCollection(data);
+        synchronized (data) {
+            return Collections.unmodifiableCollection(data);
+        }
     }
 
     public void add(T value) {
-        data.add(value);
+        synchronized (data) {
+            data.add(value);
+        }
     }
 
     public void delete(T value) {
-        data.remove(value);
+        synchronized (data) {
+            data.remove(value);
+        }
     }
 
     public Optional<T> find(Predicate<T> predicate) {
-        return data.stream().filter(predicate).findFirst();
+        synchronized (data) {
+            return data.stream().filter(predicate).findFirst();
+        }
     }
 
     @SneakyThrows
-    public synchronized void commit() {
-        // todo add lock
-        objectMapper.writeValue(repoFile.toFile(), data);
+    public void commit() {
+        synchronized (data) {
+            objectMapper.writeValue(repoFile.toFile(), data);
+        }
     }
 
     public void rollback() {
@@ -55,16 +64,18 @@ public class FileRepository<T> {
 
     @SneakyThrows
     private void loadFromFile() {
-        if (!Files.exists(repoFile)) {
-            Files.createDirectories(repoFile.getParent());
-            Files.writeString(repoFile, "[]");
-        } else {
-            List<T> loaded = objectMapper.readValue(
-                    repoFile.toFile(),
-                    objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz)
-            );
-            this.data.clear();
-            this.data.addAll(loaded);
+        synchronized (data) {
+            data.clear();
+            if (!Files.exists(repoFile)) {
+                Files.createDirectories(repoFile.getParent());
+                Files.writeString(repoFile, "[]");
+            } else {
+                List<T> loaded = objectMapper.readValue(
+                        repoFile.toFile(),
+                        objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz)
+                );
+                this.data.addAll(loaded);
+            }
         }
     }
 }
