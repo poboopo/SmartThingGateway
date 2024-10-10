@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
+import ru.pobopo.smartthing.gateway.aspect.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.controller.model.UpdateDeviceSettings;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.exception.DeviceSettingsException;

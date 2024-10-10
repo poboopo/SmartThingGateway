@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
+import ru.pobopo.smartthing.gateway.aspect.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.model.device.DeviceApiMethod;
 import ru.pobopo.smartthing.gateway.service.device.DeviceApiService;

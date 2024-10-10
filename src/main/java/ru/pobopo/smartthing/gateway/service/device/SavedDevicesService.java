@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smartthing.gateway.device.api.RestDeviceApi;
+import ru.pobopo.smartthing.gateway.service.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
 import ru.pobopo.smartthing.model.DeviceInfo;

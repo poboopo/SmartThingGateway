@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareInfo;
+import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareTaskStatus;
 import ru.pobopo.smartthing.gateway.model.ota.OtaUploadProgressShort;
 import ru.pobopo.smartthing.model.DeviceInfo;
 

@@ -7,10 +7,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import ru.pobopo.smartthing.gateway.dashboard.DashboardGroupWorkerFactory;
+import ru.pobopo.smartthing.gateway.service.dashboard.DashboardGroupWorkerFactory;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
 import ru.pobopo.smartthing.model.gateway.dashboard.*;
-import ru.pobopo.smartthing.gateway.dashboard.DashboardGroupWorker;
+import ru.pobopo.smartthing.gateway.service.dashboard.DashboardGroupWorker;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;

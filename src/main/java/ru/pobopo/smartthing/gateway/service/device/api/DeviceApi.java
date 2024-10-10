@@ -1,10 +1,9 @@
-package ru.pobopo.smartthing.gateway.device.api;
+package ru.pobopo.smartthing.gateway.service.device.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
-import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 
 @Slf4j
 public abstract class DeviceApi {

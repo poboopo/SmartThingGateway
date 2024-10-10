@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.pobopo.smartthing.gateway.service.ota.OtaFirmwareTaskStatus;
 
 @Data
 @Builder

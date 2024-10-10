@@ -10,7 +10,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.exception.ForbiddenCloudEndpointException;
 
 import java.lang.reflect.Method;

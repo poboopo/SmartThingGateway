@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.dashboard;
+package ru.pobopo.smartthing.gateway.service.dashboard;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

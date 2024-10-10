@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.dashboard;
+package ru.pobopo.smartthing.gateway.service.dashboard;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -7,8 +7,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import ru.pobopo.smartthing.gateway.device.api.RestDeviceApi;
+import ru.pobopo.smartthing.gateway.service.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.model.gateway.ObservableType;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardObservable;

@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service.ota;
+package ru.pobopo.smartthing.gateway.model.ota;
 
 public enum OtaFirmwareTaskStatus {
     STARTED,

@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.logs;
+package ru.pobopo.smartthing.gateway.service.job.logs;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

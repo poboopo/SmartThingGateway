@@ -1,9 +1,9 @@
-package ru.pobopo.smartthing.gateway.dashboard;
+package ru.pobopo.smartthing.gateway.service.dashboard;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smartthing.gateway.device.api.RestDeviceApi;
+import ru.pobopo.smartthing.gateway.service.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardUpdatesConsumer;
 

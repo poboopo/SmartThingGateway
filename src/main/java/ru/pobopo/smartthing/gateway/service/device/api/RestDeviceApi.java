@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.device.api;
+package ru.pobopo.smartthing.gateway.service.device.api;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

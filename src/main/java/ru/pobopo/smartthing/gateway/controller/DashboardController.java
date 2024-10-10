@@ -4,7 +4,7 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.pobopo.smartthing.gateway.annotation.AcceptCloudRequest;
+import ru.pobopo.smartthing.gateway.aspect.AcceptCloudRequest;
 import ru.pobopo.smartthing.model.gateway.dashboard.*;
 import ru.pobopo.smartthing.gateway.service.device.DashboardService;
 

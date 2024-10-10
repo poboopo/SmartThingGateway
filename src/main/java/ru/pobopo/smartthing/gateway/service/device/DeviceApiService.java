@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.pobopo.smartthing.gateway.cache.CacheItem;
-import ru.pobopo.smartthing.gateway.device.api.DeviceApi;
+import ru.pobopo.smartthing.gateway.service.device.api.DeviceApi;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.exception.DeviceApiException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
