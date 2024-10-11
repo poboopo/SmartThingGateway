@@ -1,0 +1,11 @@
+# systemd example config
+[Unit]
+Description=SmartThingGateway app
+
+[Service]
+User=root
+WorkingDirectory=/home/pobopo
+ExecStart=java -Dport=80 -jar gateway.jar
+
+[Install]
+WantedBy=multi-user.target
