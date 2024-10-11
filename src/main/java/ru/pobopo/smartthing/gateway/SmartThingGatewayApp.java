@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConnectionStatus;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudMessageBrokerService;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Slf4j
+@EnableScheduling
 @SpringBootApplication
 public class SmartThingGatewayApp {
     public static final Path DEFAULT_APP_DIR = Paths.get(System.getProperty("user.home"), ".smartthing");
