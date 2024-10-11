@@ -5,6 +5,7 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,8 @@ public class DevicesSearchService implements BackgroundJob {
     private String searchGroup;
     @Value("${device.search.port}")
     private int searchPort;
+
+    private final AtomicBoolean socketConnected = new AtomicBoolean(false);
 
     private final ConcurrentSetCache<DeviceInfo> cache = new ConcurrentSetCache<>(5, ChronoUnit.SECONDS);
 
@@ -45,6 +48,7 @@ public class DevicesSearchService implements BackgroundJob {
 
         try {
             multicastSocket.joinGroup(address, multicastSocket.getNetworkInterface());
+            this.socketConnected.lazySet(true);
             while(!Thread.interrupted()) {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 multicastSocket.receive(packet);
@@ -66,11 +70,16 @@ public class DevicesSearchService implements BackgroundJob {
             }
         } catch (Exception exception) {
             log.error("Search job failed", exception);
+            this.socketConnected.lazySet(false);
             throw new RuntimeException(exception);
         } finally {
             multicastSocket.leaveGroup(address, multicastSocket.getNetworkInterface());
             multicastSocket.close();
         }
+    }
+
+    public boolean isSearchEnabled() {
+        return socketConnected.get();
     }
 
     @NonNull

@@ -35,6 +35,11 @@ public class DeviceController {
     private final DevicesSearchService searchJob;
     private final SavedDevicesService savedDevicesService;
 
+    @GetMapping("/search/enabled")
+    public boolean searchEnabled() {
+        return searchJob.isSearchEnabled();
+    }
+
     @Operation(summary = "Get recent found devices in local network")
     @GetMapping("/found")
     public Set<DeviceInfo> getDevices() {
