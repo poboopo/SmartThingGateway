@@ -51,10 +51,13 @@ public class OtaFirmwareService {
     public OtaFirmwareInfo addFirmware(OtaFirmwareInfo info, MultipartFile file) throws IOException {
         if (
                 StringUtils.isBlank(info.getType()) ||
-                StringUtils.isBlank(info.getBoard()) ||
-                StringUtils.isBlank(info.getVersion())
+                        StringUtils.isBlank(info.getBoard()) ||
+                        StringUtils.isBlank(info.getVersion())
         ) {
             throw new ValidationException("Type, board and version params are required!");
+        }
+        if (findDuplicates(info).isPresent()) {
+            throw new ValidationException("Duplicate firmware detected");
         }
 
         byte[] firmwareData = file.getBytes();
@@ -83,6 +86,9 @@ public class OtaFirmwareService {
     public OtaFirmwareInfo updateFirmwareInfo(OtaFirmwareInfo otaFirmwareInfo) {
         if (otaFirmwareInfo.getId() == null) {
             throw new ValidationException("Id is missing");
+        }
+        if (findDuplicates(otaFirmwareInfo).isPresent()) {
+            throw new ValidationException("Duplicate firmware info detected");
         }
         Optional<OtaFirmwareInfo> info = repository.find(i -> i.getId().equals(otaFirmwareInfo.getId()));
         if (info.isEmpty()) {
@@ -121,14 +127,14 @@ public class OtaFirmwareService {
         if (info.isEmpty()) {
             throw new ValidationException("Can't find firmware info with given id");
         }
-         try {
-             repository.delete(info.get());
-             storageService.deleteFirmwareFile(info.get());
-             repository.commit();
-         } catch (Exception e) {
-             repository.rollback();
-             throw e;
-         }
+        try {
+            repository.delete(info.get());
+            storageService.deleteFirmwareFile(info.get());
+            repository.commit();
+        } catch (Exception e) {
+            repository.rollback();
+            throw e;
+        }
     }
 
     public Path getFirmwareFile(UUID id) {
@@ -214,6 +220,13 @@ public class OtaFirmwareService {
 
     public Collection<String> supportedBoards() {
         return BOARD_INVITATION_PORT.keySet();
+    }
+
+    private Optional<OtaFirmwareInfo> findDuplicates(OtaFirmwareInfo info) {
+        return repository.find(firm -> StringUtils.equals(firm.getType(), info.getType())
+                && StringUtils.equals(firm.getVersion(), info.getVersion())
+                && StringUtils.equals(firm.getBoard(), info.getBoard())
+        );
     }
 
     @SneakyThrows
