@@ -67,6 +67,13 @@ public class OtaUpdatesController {
         return otaFirmwareService.uploadFirmware(id, deviceInfo);
     }
 
+    @DeleteMapping("/upload")
+    public void abortUpload(
+            @RequestParam("id") UUID id
+    ) {
+        otaFirmwareService.abortFirmwareUpload(id);
+    }
+
     @GetMapping("/boards")
     public Collection<String> getSupportedBoards() {
         return otaFirmwareService.supportedBoards();

@@ -199,6 +199,18 @@ public class OtaFirmwareService {
         return uploadTask.getId();
     }
 
+    public void abortFirmwareUpload(UUID taskId) {
+        Optional<Pair<Future<?>, OtaFirmwareUploadTask>> task = uploadTasks.values().stream()
+                .filter(p -> p.getRight().getId().equals(taskId))
+                .findFirst();
+
+        if (task.isEmpty()) {
+            throw new ValidationException("Upload task not found");
+        }
+
+        task.get().getLeft().cancel(true);
+    }
+
     public List<OtaFirmwareUploadProgress> getRunningUploads() {
         List<OtaFirmwareUploadProgress> result = new ArrayList<>();
         for (Map.Entry<DeviceInfo, Pair<Future<?>, OtaFirmwareUploadTask>> entry : uploadTasks.entrySet()) {

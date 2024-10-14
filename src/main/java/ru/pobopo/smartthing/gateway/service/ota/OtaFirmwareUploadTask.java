@@ -55,19 +55,26 @@ public class OtaFirmwareUploadTask implements Runnable {
             int port = socket.getLocalPort();
             log.info("Upload port for device {}: {}", device, port);
 
+            checkInterrupted();
+
             if (!sendInvitationMessage(port)) {
                 log.error("Device {} not accepted invitation", device);
                 return;
             }
 
+            checkInterrupted();
+
             sendFirmware(socket);
             setStatus(OtaFirmwareTaskStatus.FINISHED);
+        } catch (InterruptedException e) {
+            setStatus(OtaFirmwareTaskStatus.ABORTED);
+            log.warn("Upload task for {} was aborted", device);
         } catch (Exception e) {
             log.error("Failed to upload firmware to device {}", device, e);
         }
     }
 
-    private void sendFirmware(ServerSocket socket) throws IOException {
+    private void sendFirmware(ServerSocket socket) throws IOException, InterruptedException {
         try (Socket client = socket.accept();) {
             setStatus(OtaFirmwareTaskStatus.FIRMWARE_TRANSFER);
             OutputStream outputStream = client.getOutputStream();
@@ -77,6 +84,7 @@ public class OtaFirmwareUploadTask implements Runnable {
             String response = "";
             int total = 0, step = 1, sendLength, respLen;
             while (total < data.length) {
+                checkInterrupted();
                 sendLength = Math.min(data.length - total, STEP_SIZE);
                 outputStream.write(data, total, sendLength);
 
@@ -89,15 +97,22 @@ public class OtaFirmwareUploadTask implements Runnable {
                 }
                 step++;
             }
+
+            checkInterrupted();
+
             transferProgress.lazySet(100);
             setStatus(OtaFirmwareTaskStatus.FIRMWARE_TRANSFER_CONFIRMATION);
             log.info("Firmware transmission to {} finished, waiting for confirmation from device", device);
 
             long start = System.currentTimeMillis();
-            while (!StringUtils.equals(response, "OK") || System.currentTimeMillis() - start > CONFIRMATION_TIMEOUT) {
+            while (!StringUtils.equals(response, "OK") && System.currentTimeMillis() - start < CONFIRMATION_TIMEOUT) {
+                checkInterrupted();
                 respLen = inputStream.read(buff);
                 response = new String(buff, 0, respLen);
             }
+
+            checkInterrupted();
+
             if (!StringUtils.equals(response, "OK")) {
                 log.error("Confirmation from {} is missing!", device);
                 setStatus(OtaFirmwareTaskStatus.FIRMWARE_TRANSFER_FAILED);
@@ -107,6 +122,13 @@ public class OtaFirmwareUploadTask implements Runnable {
         } catch (Exception e) {
             setStatus(OtaFirmwareTaskStatus.FIRMWARE_TRANSFER_FAILED);
             throw e;
+        }
+    }
+
+    // looks bad, but it works
+    private void checkInterrupted() throws InterruptedException {
+        if (Thread.interrupted()) {
+            throw new InterruptedException();
         }
     }
 
