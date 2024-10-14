@@ -27,38 +27,30 @@ public class DeviceSettingsService {
 
         deviceSettings.setId(UUID.randomUUID());
         fileRepository.add(deviceSettings);
-        fileRepository.commit();
         return deviceSettings;
     }
 
-    public DeviceSettings updateSettings(DeviceSettings deviceSettings) throws DeviceSettingsException {
+    public DeviceSettings updateSettings(DeviceSettings deviceSettings) {
         if (deviceSettings.getId() == null) {
             throw new ValidationException("Settings id can't be blank!");
         }
         validateSettings(deviceSettings);
 
-        Optional<DeviceSettings> settingsOptional = fileRepository.find(s -> deviceSettings.getId().equals(s.getId()));
+        Optional<DeviceSettings> settingsOptional = fileRepository.findById(deviceSettings.getId());
         if (settingsOptional.isEmpty()) {
             throw new ValidationException("Device settings with id=" + deviceSettings.getId() + " not found");
         }
         DeviceSettings oldSettings = settingsOptional.get();
-        try {
-            fileRepository.delete(oldSettings);
-            DeviceSettings.DeviceSettingsBuilder builder = oldSettings.toBuilder();
-            if (StringUtils.isNotBlank(deviceSettings.getName())) {
-                builder.name(deviceSettings.getName());
-            }
-            if (StringUtils.isNotBlank(deviceSettings.getValue())) {
-                builder.value(deviceSettings.getValue());
-            }
-            DeviceSettings updatedSettings = builder.build();
-            fileRepository.add(updatedSettings);
-            fileRepository.commit();
-            return updatedSettings;
-        } catch (Exception e) {
-            fileRepository.rollback();
-            throw new DeviceSettingsException("Failed to update settings");
+        DeviceSettings.DeviceSettingsBuilder builder = oldSettings.toBuilder();
+        if (StringUtils.isNotBlank(deviceSettings.getName())) {
+            builder.name(deviceSettings.getName());
         }
+        if (StringUtils.isNotBlank(deviceSettings.getValue())) {
+            builder.value(deviceSettings.getValue());
+        }
+        DeviceSettings updatedSettings = builder.build();
+        fileRepository.update(updatedSettings);
+        return updatedSettings;
     }
 
     public void deleteSettings(UUID id) {
@@ -66,12 +58,11 @@ public class DeviceSettingsService {
             throw new ValidationException("Settings id can't be blank!");
         }
 
-        Optional<DeviceSettings> settingsOptional = fileRepository.find(s -> id.equals(s.getId()));
+        Optional<DeviceSettings> settingsOptional = fileRepository.findById(id);
         if (settingsOptional.isEmpty()) {
             throw new ValidationException("Device settings with id=" + id + " not found");
         }
-        fileRepository.delete(settingsOptional.get());
-        fileRepository.commit();
+        fileRepository.delete(id);
     }
 
     private void validateSettings(DeviceSettings deviceSettings) {

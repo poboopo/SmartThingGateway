@@ -3,79 +3,125 @@ package ru.pobopo.smartthing.gateway.repository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import ru.pobopo.smartthing.annotation.FileRepoId;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 @Slf4j
 public class FileRepository<T> {
     private final Class<T> clazz;
     private final ObjectMapper objectMapper;
-    private final Path repoFile;
+    private final String repoDirectory;
+    private final Method getIdMethod;
 
-    private final Set<T> data = ConcurrentHashMap.newKeySet();
-
-    public FileRepository(Class<T> clazz, Path repoFile, ObjectMapper objectMapper) {
+    public FileRepository(Class<T> clazz, Path repoDirectory, ObjectMapper objectMapper) throws IOException {
         this.clazz = clazz;
         this.objectMapper = objectMapper;
-        this.repoFile = repoFile;
+        this.repoDirectory = repoDirectory.toString();
 
-        log.info("Using file repo: {}", repoFile);
-        loadFromFile();
+        Optional<Field> idField = Arrays.stream(clazz.getDeclaredFields())
+                .filter(f -> f.isAnnotationPresent(FileRepoId.class) && f.getType().equals(UUID.class)).findAny();
+        if (idField.isEmpty()) {
+            throw new IllegalArgumentException("Class " + clazz + " is missing id field of UUID type! (FileRepoId annotated field not found)");
+        }
+
+        String fieldName = idField.get().getName();
+        String getterName = String.format("get%s%s", fieldName.substring(0, 1).toUpperCase(), fieldName.substring(1));
+
+        Optional<Method> method = Arrays.stream(clazz.getDeclaredMethods())
+                .filter(m -> m.getName().equals(getterName) && m.getReturnType().equals(UUID.class))
+                .findFirst();
+        if (method.isEmpty()) {
+            throw new IllegalArgumentException("Can't find getter for id field in class " + clazz + " (searched name = " + getterName + ")");
+        }
+        getIdMethod = method.get();
+
+        log.info("Using file repository directory {} (for {})", repoDirectory, clazz);
+        if (!Files.exists(repoDirectory)) {
+            Files.createDirectories(repoDirectory);
+        }
     }
 
     public Collection<T> getAll() {
-        synchronized (data) {
-            return Collections.unmodifiableCollection(data);
-        }
+        return readAllFiles();
     }
 
+    @SneakyThrows
+    public Optional<T> findById(UUID id) {
+        Path file = objectPath(id);
+        if (!Files.exists(file)) {
+            return Optional.empty();
+        }
+        return Optional.of(objectMapper.readValue(file.toFile(), clazz));
+    }
+
+    @SneakyThrows
     public void add(T value) {
-        synchronized (data) {
-            data.add(value);
+        Path file = objectPath(getId(value));
+        if (Files.exists(file)) {
+            throw new IllegalStateException("Passed id already in use!");
         }
-    }
-
-    public void delete(T value) {
-        synchronized (data) {
-            data.remove(value);
-        }
-    }
-
-    public Optional<T> find(Predicate<T> predicate) {
-        synchronized (data) {
-            return data.stream().filter(predicate).findFirst();
-        }
+        objectMapper.writeValue(file.toFile(), value);
     }
 
     @SneakyThrows
-    public void commit() {
-        synchronized (data) {
-            objectMapper.writeValue(repoFile.toFile(), data);
+    public void update(T value) {
+        Path file = objectPath(getId(value));
+        if (!Files.exists(file)) {
+            throw new IllegalStateException("Can't find given object file");
         }
-    }
-
-    public void rollback() {
-        loadFromFile();
+        objectMapper.writeValue(file.toFile(), value);
     }
 
     @SneakyThrows
-    private void loadFromFile() {
-        synchronized (data) {
-            data.clear();
-            if (!Files.exists(repoFile)) {
-                Files.createDirectories(repoFile.getParent());
-                Files.writeString(repoFile, "[]");
-            } else {
-                List<T> loaded = objectMapper.readValue(
-                        repoFile.toFile(),
-                        objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz)
-                );
-                this.data.addAll(loaded);
+    public void delete(UUID id) {
+        Path file = objectPath(id);
+        if (!Files.exists(file)) {
+            throw new IllegalStateException("Can't find given object file");
+        }
+        Files.delete(file);
+    }
+
+    private Path objectPath(UUID id) {
+        return Path.of(repoDirectory, id.toString() + ".json");
+    }
+
+    private UUID getId(T value) {
+        try {
+            Object id = getIdMethod.invoke(value);
+            if (id == null) {
+                throw new IllegalStateException("Id field can't be null!");
             }
+            if (id instanceof UUID) {
+                return (UUID) id;
+            }
+            throw new IllegalStateException("Id getter returned wrong value type (expected UUID)");
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            log.error("Failed to call {} method", getIdMethod.getName(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @SneakyThrows
+    private List<T> readAllFiles() {
+        try (Stream<Path> stream = Files.list(Path.of(repoDirectory))) {
+            return stream
+                    .filter(file -> !Files.isDirectory(file))
+                    .map(file -> {
+                        try {
+                            return objectMapper.readValue(file.toFile(), clazz);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
         }
     }
 }

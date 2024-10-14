@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
-import ru.pobopo.smartthing.model.gateway.GatewayNotificationConsumer;
+import ru.pobopo.smartthing.model.GatewayNotificationConsumer;
 import ru.pobopo.smartthing.model.stomp.GatewayNotification;
 
 @Slf4j

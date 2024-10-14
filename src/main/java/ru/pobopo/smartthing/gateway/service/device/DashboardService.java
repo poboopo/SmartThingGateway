@@ -34,7 +34,7 @@ public class DashboardService {
             throw new ValidationException("Device can't be null!");
         }
 
-        Optional<DashboardGroup> existingGroup = repository.find(g -> g.getDevice().equals(group.getDevice()));
+        Optional<DashboardGroup> existingGroup = repository.getAll().stream().filter(g -> g.getDevice().equals(group.getDevice())).findFirst();
         if (existingGroup.isPresent()) {
             throw new ValidationException("Group for this device already exists, id=" + existingGroup.get().getId());
         }
@@ -49,18 +49,16 @@ public class DashboardService {
 
         try {
             startGroupWorker(group);
-            repository.commit();
-
             log.info("Created new group {}", group);
             return group;
         } catch (Exception e) {
-            repository.rollback();
+            repository.delete(group.getId());
             throw e;
         }
     }
 
     public DashboardGroup updateGroup(DashboardGroup group) throws ValidationException {
-        Optional<DashboardGroup> optionalGroup = repository.find(g -> g.getId().equals(group.getId()));
+        Optional<DashboardGroup> optionalGroup = repository.findById(group.getId());
         if (optionalGroup.isEmpty()) {
             throw new ValidationException("Can't find group by id " + group.getId());
         }
@@ -72,16 +70,8 @@ public class DashboardService {
                         .filter((o) -> StringUtils.isNotBlank(o.getName()) && o.getType() != null)
                         .toList())
                 .build();
-        try {
-            repository.delete(optionalGroup.get());
-            repository.add(updatedGroup);
-
-            log.info("Group {} was updated", group.getId());
-            repository.commit();
-        } catch (Exception e) {
-            repository.rollback();
-            throw e;
-        }
+        repository.update(updatedGroup);
+        log.info("Group {} was updated", group.getId());
 
         if (workers.containsKey(group.getId())) {
             log.info("Fetching group values");
@@ -95,7 +85,7 @@ public class DashboardService {
             throw new ValidationException("Group's id is missing!");
         }
 
-        Optional<DashboardGroup> foundGroup = repository.find(g -> g.getId().equals(id));
+        Optional<DashboardGroup> foundGroup = repository.findById(id);
         if (foundGroup.isEmpty()) {
             throw new ValidationException("Can't find group by id " + id);
         }
@@ -108,9 +98,7 @@ public class DashboardService {
             log.info("Worker stopped and removed");
         }
 
-        repository.delete(foundGroup.get());
-        repository.commit();
-
+        repository.delete(id);
         log.info("Group {} was deleted", id);
     }
 

@@ -74,7 +74,6 @@ public class OtaFirmwareService {
                     .build();
 
             repository.add(newFirmwareInfo);
-            repository.commit();
 
             return newFirmwareInfo;
         } catch (Exception e) {
@@ -90,58 +89,45 @@ public class OtaFirmwareService {
         if (findDuplicates(otaFirmwareInfo).isPresent()) {
             throw new ValidationException("Duplicate firmware info detected");
         }
-        Optional<OtaFirmwareInfo> info = repository.find(i -> i.getId().equals(otaFirmwareInfo.getId()));
+        Optional<OtaFirmwareInfo> info = repository.findById(otaFirmwareInfo.getId());
         if (info.isEmpty()) {
             throw new ValidationException("Can't find firmware info with given id");
         }
 
         OtaFirmwareInfo oldInfo = info.get();
-        try {
-            repository.delete(oldInfo);
-            OtaFirmwareInfo.OtaFirmwareInfoBuilder builder = oldInfo.toBuilder();
-            if (StringUtils.isNotBlank(otaFirmwareInfo.getType())) {
-                builder.type(otaFirmwareInfo.getType());
-            }
-            if (StringUtils.isNotBlank(otaFirmwareInfo.getBoard())) {
-                builder.board(otaFirmwareInfo.getBoard());
-            }
-            if (StringUtils.isNotBlank(otaFirmwareInfo.getVersion())) {
-                builder.version(otaFirmwareInfo.getVersion());
-            }
-            OtaFirmwareInfo newInfo = builder.build();
-            repository.add(newInfo);
-            repository.commit();
-            log.info("Firmware info were updated: {}", newInfo);
-            return newInfo;
-        } catch (Exception e) {
-            repository.rollback();
-            throw e;
+        OtaFirmwareInfo.OtaFirmwareInfoBuilder builder = oldInfo.toBuilder();
+        if (StringUtils.isNotBlank(otaFirmwareInfo.getType())) {
+            builder.type(otaFirmwareInfo.getType());
         }
+        if (StringUtils.isNotBlank(otaFirmwareInfo.getBoard())) {
+            builder.board(otaFirmwareInfo.getBoard());
+        }
+        if (StringUtils.isNotBlank(otaFirmwareInfo.getVersion())) {
+            builder.version(otaFirmwareInfo.getVersion());
+        }
+        OtaFirmwareInfo newInfo = builder.build();
+        repository.update(newInfo);
+        log.info("Firmware info were updated: {}", newInfo);
+        return newInfo;
     }
 
     public void deleteFirmware(UUID id) throws IOException {
         if (id == null) {
             throw new ValidationException("Id is missing");
         }
-        Optional<OtaFirmwareInfo> info = repository.find(i -> i.getId().equals(id));
+        Optional<OtaFirmwareInfo> info = repository.findById(id);
         if (info.isEmpty()) {
             throw new ValidationException("Can't find firmware info with given id");
         }
-        try {
-            repository.delete(info.get());
-            storageService.deleteFirmwareFile(info.get());
-            repository.commit();
-        } catch (Exception e) {
-            repository.rollback();
-            throw e;
-        }
+        repository.delete(info.get().getId());
+        storageService.deleteFirmwareFile(info.get());
     }
 
     public Path getFirmwareFile(UUID id) {
         if (id == null) {
             return null;
         }
-        Optional<OtaFirmwareInfo> info = repository.find(i -> i.getId().equals(id));
+        Optional<OtaFirmwareInfo> info = repository.findById(id);
         return info.map(storageService::getFirmwareFile).orElse(null);
     }
 
@@ -170,7 +156,7 @@ public class OtaFirmwareService {
         if (id == null) {
             throw new ValidationException("Id is missing");
         }
-        Optional<OtaFirmwareInfo> info = repository.find(i -> i.getId().equals(id));
+        Optional<OtaFirmwareInfo> info = repository.findById(id);
         if (info.isEmpty()) {
             throw new ValidationException("Can't find firmware info with given id");
         }
@@ -235,10 +221,10 @@ public class OtaFirmwareService {
     }
 
     private Optional<OtaFirmwareInfo> findDuplicates(OtaFirmwareInfo info) {
-        return repository.find(firm -> StringUtils.equals(firm.getType(), info.getType())
+        return repository.getAll().stream().filter(firm -> StringUtils.equals(firm.getType(), info.getType())
                 && StringUtils.equals(firm.getVersion(), info.getVersion())
                 && StringUtils.equals(firm.getBoard(), info.getBoard())
-        );
+        ).findFirst();
     }
 
     @SneakyThrows

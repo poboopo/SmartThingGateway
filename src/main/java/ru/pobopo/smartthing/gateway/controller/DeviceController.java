@@ -88,7 +88,7 @@ public class DeviceController {
 
     @Operation(summary = "Update existing settings")
     @PutMapping("/settings")
-    public DeviceSettings updateSettings(@RequestBody UpdateDeviceSettings settings) throws DeviceSettingsException {
+    public DeviceSettings updateSettings(@RequestBody UpdateDeviceSettings settings) {
         return settingsService.updateSettings(settings);
     }
 

@@ -11,6 +11,7 @@ import ru.pobopo.smartthing.gateway.repository.FileRepository;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -18,10 +19,10 @@ import static ru.pobopo.smartthing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
 
 @Configuration
 public class RepositoriesConfig {
-    private static final Path SETTINGS_FILE_DEFAULT = Paths.get(DEFAULT_APP_DIR.toString(), "device_settings.json");
-    private static final Path SAVED_DEVICES_DEFAULT = Paths.get(DEFAULT_APP_DIR.toString(), "saved_devices.json");
-    private static final Path DASHBOARD_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "dashboard_config.json");
-    private static final Path FIRMWARE_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "firmware_info.json");
+    private static final Path SETTINGS_FILE_DEFAULT = Paths.get(DEFAULT_APP_DIR.toString(), "device_settings");
+    private static final Path SAVED_DEVICES_DEFAULT = Paths.get(DEFAULT_APP_DIR.toString(), "saved_devices");
+    private static final Path DASHBOARD_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "dashboard_config");
+    private static final Path FIRMWARE_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "firmware_info");
 
     @Value("${device.settings.dir:}")
     private String deviceSettingsPath;
@@ -33,7 +34,7 @@ public class RepositoriesConfig {
     private String firmwareInfoPath;
 
     @Bean
-    public FileRepository<DeviceSettings> deviceSettingsFileRepository(ObjectMapper objectMapper) {
+    public FileRepository<DeviceSettings> deviceSettingsFileRepository(ObjectMapper objectMapper) throws IOException {
         return new FileRepository<>(
                 DeviceSettings.class,
                 StringUtils.isEmpty(deviceSettingsPath) ? SETTINGS_FILE_DEFAULT : Paths.get(deviceSettingsPath),
@@ -42,7 +43,7 @@ public class RepositoriesConfig {
     }
 
     @Bean
-    public FileRepository<DeviceInfo> savedDevicesRepository(ObjectMapper objectMapper) {
+    public FileRepository<DeviceInfo> savedDevicesRepository(ObjectMapper objectMapper) throws IOException {
         return new FileRepository<>(
                 DeviceInfo.class,
                 StringUtils.isEmpty(savedDevicesPath) ? SAVED_DEVICES_DEFAULT : Paths.get(savedDevicesPath),
@@ -51,7 +52,7 @@ public class RepositoriesConfig {
     }
 
     @Bean
-    public FileRepository<DashboardGroup> dashboardRepository(ObjectMapper objectMapper) {
+    public FileRepository<DashboardGroup> dashboardRepository(ObjectMapper objectMapper) throws IOException {
         return new FileRepository<>(
                 DashboardGroup.class,
                 StringUtils.isEmpty(dashboardConfigPath) ? DASHBOARD_DEFAULT_PATH : Paths.get(dashboardConfigPath),
@@ -60,7 +61,7 @@ public class RepositoriesConfig {
     }
 
     @Bean
-    public FileRepository<OtaFirmwareInfo> firmwareRepository(ObjectMapper objectMapper) {
+    public FileRepository<OtaFirmwareInfo> firmwareRepository(ObjectMapper objectMapper) throws IOException {
         return new FileRepository<>(
                 OtaFirmwareInfo.class,
                 StringUtils.isEmpty(firmwareInfoPath) ? FIRMWARE_DEFAULT_PATH : Paths.get(firmwareInfoPath),

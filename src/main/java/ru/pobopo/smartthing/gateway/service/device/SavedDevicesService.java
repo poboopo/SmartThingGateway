@@ -13,6 +13,7 @@ import ru.pobopo.smartthing.model.DeviceInfo;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,8 +44,8 @@ public class SavedDevicesService {
         if (newDeviceInfo == null) {
             throw new BadRequestException("Can't find device with ip=" + ip);
         }
+        newDeviceInfo.setId(UUID.randomUUID());
         fileRepository.add(newDeviceInfo);
-        fileRepository.commit();
         log.info("Added new device {}", newDeviceInfo);
         return newDeviceInfo;
     }
@@ -58,8 +59,7 @@ public class SavedDevicesService {
         if (device.isEmpty()) {
             throw new BadRequestException("There is no saved device with ip=" + ip);
         }
-        fileRepository.delete(device.get());
-        fileRepository.commit();
+        fileRepository.delete(device.get().getId());
         log.info("Device {} deleted", device.get());
     }
 
@@ -80,9 +80,7 @@ public class SavedDevicesService {
             log.info("New device info are equals to old one");
             return newInfo;
         }
-        fileRepository.delete(device.get());
-        fileRepository.add(newInfo);
-        fileRepository.commit();
+        fileRepository.update(device.get());
         log.info("Updated device info {}", newInfo);
         return newInfo;
     }
@@ -91,7 +89,7 @@ public class SavedDevicesService {
         if (StringUtils.isBlank(ip)) {
             return Optional.empty();
         }
-        return fileRepository.find(deviceInfo -> StringUtils.equals(deviceInfo.getIp(), ip));
+        return fileRepository.getAll().stream().filter(deviceInfo -> StringUtils.equals(deviceInfo.getIp(), ip)).findFirst();
     }
 
     private DeviceInfo loadDeviceInfo(String ip) {
