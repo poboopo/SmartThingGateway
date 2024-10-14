@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
-import ru.pobopo.smartthing.gateway.service.NotificationService;
+import ru.pobopo.smartthing.gateway.service.notification.NotificationService;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.stomp.GatewayNotification;
 
