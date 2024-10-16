@@ -5,11 +5,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.event.Level;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smartthing.gateway.aspect.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.controller.model.UpdateDeviceSettings;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
+import ru.pobopo.smartthing.gateway.model.logs.DeviceLogsFilter;
 import ru.pobopo.smartthing.gateway.service.device.DevicesSearchService;
 import ru.pobopo.smartthing.gateway.service.device.DeviceLogsService;
 import ru.pobopo.smartthing.gateway.service.device.SavedDevicesService;
@@ -100,7 +103,17 @@ public class DeviceController {
 
     @Operation(summary = "Get last 100 devices logs messages")
     @GetMapping("/logs")
-    public List<DeviceLoggerMessage> getLogs() {
-        return deviceLogsService.getLogs();
+    public List<DeviceLoggerMessage> getLogs(
+            @RequestParam(required = false) String device,
+            @RequestParam(required = false) String tag,
+            @RequestParam(required = false) String message,
+            @RequestParam(required = false) Level level
+    ) {
+        return deviceLogsService.getLogs(DeviceLogsFilter.builder()
+                .device(device != null ? device.toLowerCase() : null)
+                .tag(tag != null ? tag.toLowerCase() : null)
+                .message(message != null ? message.toLowerCase() : null)
+                .level(level)
+                .build());
     }
 }

@@ -37,7 +37,7 @@ public class SavedDevicesService {
         }
         Optional<SavedDeviceInfo> existing = getDevice(ip);
         if (existing.isPresent()) {
-            log.info("Device with ip {} already exists", ip);
+            log.warn("Device with ip {} already exists", ip);
             return existing.get();
         }
         SavedDeviceInfo newDeviceInfo = loadDeviceInfo(ip);
