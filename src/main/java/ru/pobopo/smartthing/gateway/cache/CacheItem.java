@@ -2,19 +2,13 @@ package ru.pobopo.smartthing.gateway.cache;
 
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
 @AllArgsConstructor
 public class CacheItem<T> {
     private final T item;
     private final LocalDateTime addedTime;
-
-    public T getItem() {
-        return item;
-    }
-
-    public LocalDateTime getAddedTime() {
-        return addedTime;
-    }
 
     @Override
     public boolean equals(Object obj) {

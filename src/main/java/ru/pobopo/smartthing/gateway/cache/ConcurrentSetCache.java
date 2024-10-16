@@ -5,18 +5,21 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 public class ConcurrentSetCache<T> {
     private final Set<CacheItem<T>> items = ConcurrentHashMap.newKeySet();
+
     private final long evictionTime;
     private final ChronoUnit timeUnits;
-
-    public ConcurrentSetCache(long evictionTime, ChronoUnit timeUnits) {
-        this.evictionTime = evictionTime;
-        this.timeUnits = timeUnits;
-    }
+    // Called, when added item is not already in cache
+    private final Consumer<T> onPut;
+    // Called, when item evicted from cache
+    private final Consumer<T> onEvict;
 
     public void put(T value) {
         if (value == null) {
@@ -24,7 +27,9 @@ public class ConcurrentSetCache<T> {
         }
 
         CacheItem<T> item = new CacheItem<>(value, LocalDateTime.now());
-        items.remove(item);
+        if (!items.remove(item)) {
+            onPut.accept(value);
+        }
         items.add(item);
     }
 
@@ -43,6 +48,10 @@ public class ConcurrentSetCache<T> {
     }
 
     private boolean shouldEvict(CacheItem<T> item) {
-        return item.getAddedTime().until(LocalDateTime.now(), timeUnits) >= evictionTime;
+        boolean result = item.getAddedTime().until(LocalDateTime.now(), timeUnits) >= evictionTime;
+        if (result) {
+            onEvict.accept(item.getItem());
+        }
+        return result;
     }
 }
