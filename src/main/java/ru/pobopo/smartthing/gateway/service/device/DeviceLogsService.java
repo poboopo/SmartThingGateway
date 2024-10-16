@@ -29,7 +29,7 @@ public class DeviceLogsService implements BackgroundJob {
 
     private final SimpMessagingTemplate messagingTemplate;
 
-    @Value("${device.logs.cache.size:100}")
+    @Value("${device.logs.cache.size:200}")
     private int cacheSize;
     @Value("${device.logs.level:INFO}")
     private Level logLevel;

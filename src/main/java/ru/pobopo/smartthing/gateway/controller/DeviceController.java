@@ -101,7 +101,7 @@ public class DeviceController {
         settingsService.deleteSettings(id);
     }
 
-    @Operation(summary = "Get last 100 devices logs messages")
+    @Operation(summary = "Get last N logs messages from devices")
     @GetMapping("/logs")
     public List<DeviceLoggerMessage> getLogs(
             @RequestParam(required = false) String device,
