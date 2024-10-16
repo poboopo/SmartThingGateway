@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
 import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareInfo;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
-import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.SavedDeviceInfo;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
 
 import java.io.IOException;
@@ -43,9 +43,9 @@ public class RepositoriesConfig {
     }
 
     @Bean
-    public FileRepository<DeviceInfo> savedDevicesRepository(ObjectMapper objectMapper) throws IOException {
+    public FileRepository<SavedDeviceInfo> savedDevicesRepository(ObjectMapper objectMapper) throws IOException {
         return new FileRepository<>(
-                DeviceInfo.class,
+                SavedDeviceInfo.class,
                 StringUtils.isEmpty(savedDevicesPath) ? SAVED_DEVICES_DEFAULT : Paths.get(savedDevicesPath),
                 objectMapper
         );

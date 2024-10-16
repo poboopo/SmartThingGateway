@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smartthing.gateway.aspect.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.controller.model.UpdateDeviceSettings;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
-import ru.pobopo.smartthing.gateway.exception.DeviceSettingsException;
 import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
 import ru.pobopo.smartthing.gateway.service.device.DevicesSearchService;
 import ru.pobopo.smartthing.gateway.service.device.DeviceLogsService;
 import ru.pobopo.smartthing.gateway.service.device.SavedDevicesService;
 import ru.pobopo.smartthing.gateway.service.device.DeviceSettingsService;
 import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.SavedDeviceInfo;
 import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 
 import java.util.Collection;
@@ -47,17 +47,17 @@ public class DeviceController {
     }
 
     @GetMapping("/saved")
-    public Collection<DeviceInfo> getSavedDevices() {
+    public Collection<SavedDeviceInfo> getSavedDevices() {
         return savedDevicesService.getDevices();
     }
 
     @PostMapping("/saved")
-    public DeviceInfo addDevice(@RequestParam String ip) throws BadRequestException {
+    public SavedDeviceInfo addDevice(@RequestParam String ip) throws BadRequestException {
         return savedDevicesService.addDevice(ip);
     }
 
     @PutMapping("/saved")
-    public DeviceInfo updateDeviceInfo(@RequestParam String ip) throws BadRequestException {
+    public SavedDeviceInfo updateDeviceInfo(@RequestParam String ip) throws BadRequestException {
         return savedDevicesService.updateDeviceInfo(ip);
     }
 

@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smartthing.gateway.service.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
-import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.SavedDeviceInfo;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -24,23 +24,23 @@ public class SavedDevicesService {
     private static final Pattern IP_PATTERN = Pattern.compile("^((25[0-5]|(2[0-4]|1\\d|[1-9]|)\\d)\\.?\\b){4}$");
 
     private final RestTemplate restTemplate;
-    private final FileRepository<DeviceInfo> fileRepository;
+    private final FileRepository<SavedDeviceInfo> fileRepository;
 
-    public Collection<DeviceInfo> getDevices() {
+    public Collection<SavedDeviceInfo> getDevices() {
         return fileRepository.getAll();
     }
 
-    public DeviceInfo addDevice(String ip) throws BadRequestException {
+    public SavedDeviceInfo addDevice(String ip) throws BadRequestException {
         log.info("Trying to add new device by ip={}", ip);
         if (!isValidIp(ip)) {
             throw new BadRequestException("Not valid ip");
         }
-        Optional<DeviceInfo> existing = getDevice(ip);
+        Optional<SavedDeviceInfo> existing = getDevice(ip);
         if (existing.isPresent()) {
             log.info("Device with ip {} already exists", ip);
             return existing.get();
         }
-        DeviceInfo newDeviceInfo = loadDeviceInfo(ip);
+        SavedDeviceInfo newDeviceInfo = loadDeviceInfo(ip);
         if (newDeviceInfo == null) {
             throw new BadRequestException("Can't find device with ip=" + ip);
         }
@@ -55,7 +55,7 @@ public class SavedDevicesService {
         if (!isValidIp(ip)) {
             throw new BadRequestException("Not valid ip");
         }
-        Optional<DeviceInfo> device = getDevice(ip);
+        Optional<SavedDeviceInfo> device = getDevice(ip);
         if (device.isEmpty()) {
             throw new BadRequestException("There is no saved device with ip=" + ip);
         }
@@ -63,16 +63,16 @@ public class SavedDevicesService {
         log.info("Device {} deleted", device.get());
     }
 
-    public DeviceInfo updateDeviceInfo(String ip) throws BadRequestException {
+    public SavedDeviceInfo updateDeviceInfo(String ip) throws BadRequestException {
         log.info("Trying to update device with ip={}", ip);
         if (!isValidIp(ip)) {
             throw new BadRequestException("Not valid ip");
         }
-        Optional<DeviceInfo> device = getDevice(ip);
+        Optional<SavedDeviceInfo> device = getDevice(ip);
         if (device.isEmpty()) {
             throw new BadRequestException("There is no saved device with ip=" + ip);
         }
-        DeviceInfo newInfo = loadDeviceInfo(ip);
+        SavedDeviceInfo newInfo = loadDeviceInfo(ip);
         if (newInfo == null) {
             throw new BadRequestException("Can't find active device with ip=" + ip);
         }
@@ -85,18 +85,18 @@ public class SavedDevicesService {
         return newInfo;
     }
 
-    public Optional<DeviceInfo> getDevice(String ip) {
+    public Optional<SavedDeviceInfo> getDevice(String ip) {
         if (StringUtils.isBlank(ip)) {
             return Optional.empty();
         }
         return fileRepository.getAll().stream().filter(deviceInfo -> StringUtils.equals(deviceInfo.getIp(), ip)).findFirst();
     }
 
-    private DeviceInfo loadDeviceInfo(String ip) {
+    private SavedDeviceInfo loadDeviceInfo(String ip) {
         try {
-            DeviceInfo info = restTemplate.getForObject(
+            SavedDeviceInfo info = restTemplate.getForObject(
                     String.format("http://%s/%s", ip, RestDeviceApi.SYSTEM_INFO),
-                    DeviceInfo.class
+                    SavedDeviceInfo.class
             );
             if (info == null) {
                 return null;
