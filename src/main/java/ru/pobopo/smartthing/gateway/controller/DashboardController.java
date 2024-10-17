@@ -36,7 +36,7 @@ public class DashboardController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteGroup(@PathVariable UUID id) throws ValidationException {
+    public void deleteGroup(@PathVariable UUID id) throws ValidationException, InterruptedException {
         dashboardService.deleteGroup(id);
     }
 

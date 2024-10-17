@@ -62,6 +62,7 @@ public class DashboardService {
         if (optionalGroup.isEmpty()) {
             throw new ValidationException("Can't find group by id " + group.getId());
         }
+        log.info("Updating group {}", group);
 
         DashboardGroup updatedGroup = optionalGroup.get().toBuilder()
                 .device(group.getDevice())
@@ -71,16 +72,20 @@ public class DashboardService {
                         .toList())
                 .build();
         repository.update(updatedGroup);
-        log.info("Group {} was updated", group.getId());
 
         if (workers.containsKey(group.getId())) {
-            log.info("Fetching group values");
-            workers.get(group.getId()).update();
+            log.info("Updating group worker");
+            workers.get(group.getId()).updateGroup(group);
+            workers.get(group.getId()).interrupt();
+        } else {
+            log.error("Group worker missing!");
         }
+
+        log.info("Group {} was updated", group.getId());
         return updatedGroup;
     }
 
-    public void deleteGroup(UUID id) throws ValidationException {
+    public void deleteGroup(UUID id) throws ValidationException, InterruptedException {
         if (id == null) {
             throw new ValidationException("Group's id is missing!");
         }
@@ -93,7 +98,9 @@ public class DashboardService {
         DashboardGroupWorker worker = workers.get(id);
         if (worker != null) {
             log.info("Trying to stop group worker");
+            worker.setRunning(false);
             worker.interrupt();
+            worker.join();
             workers.remove(id);
             log.info("Worker stopped and removed");
         }

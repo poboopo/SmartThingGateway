@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import ru.pobopo.smartthing.gateway.service.device.api.RestDeviceApi;
@@ -18,15 +19,19 @@ import ru.pobopo.smartthing.model.InternalHttpResponse;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 @Slf4j
 public class DashboardGroupWorker extends Thread {
     @Getter
-    private final DashboardGroup group;
+    private volatile DashboardGroup group;
     private final ObjectMapper objectMapper;
     private final RestDeviceApi deviceApi;
     private final Consumer<List<DashboardObservableValueUpdate>> updatesConsumer;
+
+    @Setter
+    private boolean running = true;
 
     @Getter
     private final Map<DashboardObservable, Deque<DashboardObservableValue>> values = new ConcurrentHashMap<>();
@@ -42,21 +47,27 @@ public class DashboardGroupWorker extends Thread {
         this.objectMapper = objectMapper;
         this.deviceApi = deviceApi;
         this.updatesConsumer = updatesConsumer;
+        // todo load old values
+    }
+
+    public void updateGroup(DashboardGroup group) {
+        Objects.requireNonNull(group);
+        this.group = group;
     }
 
     @Override
     public void run() {
         Objects.requireNonNull(group);
 
-        try {
-            // todo load old values
-            while (!Thread.interrupted()) {
+        while (running) {
+            try {
                 update();
                 Thread.sleep(group.getConfig().getUpdateDelay());
+            } catch (InterruptedException exception) {
+                log.warn("Worker {} interrupted", group.getId());
             }
-        } catch (InterruptedException exception) {
-            log.warn("Worker for group {} interrupted", group);
         }
+        log.info("Worker {} stopped", group.getId());
     }
 
     public synchronized void update() {
