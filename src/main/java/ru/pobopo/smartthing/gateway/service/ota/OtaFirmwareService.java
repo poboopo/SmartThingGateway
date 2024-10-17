@@ -144,12 +144,12 @@ public class OtaFirmwareService {
             throw new ValidationException("Can't find firmware info with given id");
         }
 
-        OtaFirmwareInfo firmwareInfo = info.get();
+        final OtaFirmwareInfo firmwareInfo = info.get();
         Path firmware = storageService.getFirmwareFile(firmwareInfo);
         if (firmware == null) {
             throw new ValidationException("Firmware file is missing!");
         }
-        byte[] data = Files.readAllBytes(firmware);
+        final byte[] data = Files.readAllBytes(firmware);
         if (!StringUtils.equals(firmwareInfo.getFileChecksum(), generateChecksum(data))) {
             throw new IllegalStateException("Firmware file corrupted!");
         }
@@ -166,7 +166,6 @@ public class OtaFirmwareService {
 
         return result;
     }
-
 
     public UUID uploadFirmware(UUID id, DeviceInfo deviceInfo) throws IOException {
         if (id == null) {
