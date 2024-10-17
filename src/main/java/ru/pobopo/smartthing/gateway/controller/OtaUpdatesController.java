@@ -67,6 +67,14 @@ public class OtaUpdatesController {
         return otaFirmwareService.uploadFirmware(id, deviceInfo);
     }
 
+    @PostMapping("/upload/batch")
+    public Map<String, UUID> uploadFirmwareBatch(
+            @RequestParam("id") UUID id,
+            @RequestBody List<DeviceInfo> targetDevices
+    ) throws IOException {
+        return otaFirmwareService.uploadFirmware(id, targetDevices);
+    }
+
     @DeleteMapping("/upload")
     public void abortUpload(
             @RequestParam("id") UUID id

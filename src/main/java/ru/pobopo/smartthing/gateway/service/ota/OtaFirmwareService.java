@@ -131,10 +131,68 @@ public class OtaFirmwareService {
         return info.map(storageService::getFirmwareFile).orElse(null);
     }
 
+    public Map<String, UUID> uploadFirmware(UUID id, List<DeviceInfo> targetDevices) throws IOException {
+        if (id == null) {
+            throw new ValidationException("Id is missing");
+        }
+        if (targetDevices == null) {
+            throw new ValidationException("Device info missing!");
+        }
+
+        Optional<OtaFirmwareInfo> info = repository.findById(id);
+        if (info.isEmpty()) {
+            throw new ValidationException("Can't find firmware info with given id");
+        }
+
+        OtaFirmwareInfo firmwareInfo = info.get();
+        Path firmware = storageService.getFirmwareFile(firmwareInfo);
+        if (firmware == null) {
+            throw new ValidationException("Firmware file is missing!");
+        }
+        byte[] data = Files.readAllBytes(firmware);
+        if (!StringUtils.equals(firmwareInfo.getFileChecksum(), generateChecksum(data))) {
+            throw new IllegalStateException("Firmware file corrupted!");
+        }
+
+        Map<String, UUID> result = new ConcurrentHashMap<>();
+        targetDevices.parallelStream().forEach((device) -> {
+            try {
+                result.put(device.getIp(), uploadFirmware(firmwareInfo, data, device));
+            } catch (Exception e) {
+                log.error("Upload to {} failed", device, e);
+                result.put(device.getIp(), null);
+            }
+        });
+
+        return result;
+    }
+
+
     public UUID uploadFirmware(UUID id, DeviceInfo deviceInfo) throws IOException {
+        if (id == null) {
+            throw new ValidationException("Id is missing");
+        }
+
+        Optional<OtaFirmwareInfo> info = repository.findById(id);
+        if (info.isEmpty()) {
+            throw new ValidationException("Can't find firmware info with given id");
+        }
+
+        Path firmware = storageService.getFirmwareFile(info.get());
+        if (firmware == null) {
+            throw new ValidationException("Firmware file is missing!");
+        }
+        return uploadFirmware(info.get(), Files.readAllBytes(firmware), deviceInfo);
+    }
+
+    private UUID uploadFirmware(OtaFirmwareInfo firmwareInfo, byte[] firmwareData, DeviceInfo deviceInfo) {
         if (deviceInfo == null) {
             throw new ValidationException("Device info missing!");
         }
+        if (!StringUtils.equals(firmwareInfo.getFileChecksum(), generateChecksum(firmwareData))) {
+            throw new IllegalStateException("Firmware file corrupted!");
+        }
+
         Optional<DeviceInfo> foundDevice = searchService.findDevice(deviceInfo.getName(), deviceInfo.getIp());
         if (foundDevice.isEmpty()) {
             throw new ValidationException("Can't find device");
@@ -148,20 +206,7 @@ public class OtaFirmwareService {
                 throw new ValidationException("There is already upload task running for this device");
             }
         }
-        Integer invitationPort = BOARD_INVITATION_PORT.get(targetDevice.getBoard());
-        if (invitationPort == null) {
-            throw new ValidationException("Board " + targetDevice.getBoard() + " not support yet (can't select port)");
-        }
 
-        if (id == null) {
-            throw new ValidationException("Id is missing");
-        }
-        Optional<OtaFirmwareInfo> info = repository.findById(id);
-        if (info.isEmpty()) {
-            throw new ValidationException("Can't find firmware info with given id");
-        }
-
-        OtaFirmwareInfo firmwareInfo = info.get();
         if (!StringUtils.equals(firmwareInfo.getBoard(), targetDevice.getBoard())) {
             throw new ValidationException(String.format(
                     "Firmware and target device board type are different! Expected %s, got %s",
@@ -169,16 +214,18 @@ public class OtaFirmwareService {
                     targetDevice.getBoard()
             ));
         }
-        Path firmware = storageService.getFirmwareFile(firmwareInfo);
-        if (firmware == null) {
-            throw new ValidationException("Firmware file is missing!");
-        }
-        byte[] data = Files.readAllBytes(firmware);
-        if (!StringUtils.equals(firmwareInfo.getFileChecksum(), generateChecksum(data))) {
-            throw new IllegalStateException("Firmware file corrupted!");
+        Integer invitationPort = BOARD_INVITATION_PORT.get(targetDevice.getBoard());
+        if (invitationPort == null) {
+            throw new ValidationException("Board " + targetDevice.getBoard() + " not support yet (can't select port)");
         }
 
-        OtaFirmwareUploadTask uploadTask = new OtaFirmwareUploadTask(firmwareInfo, targetDevice, data, invitationPort, messagingTemplate);
+        OtaFirmwareUploadTask uploadTask = new OtaFirmwareUploadTask(
+                firmwareInfo,
+                targetDevice,
+                firmwareData,
+                invitationPort,
+                messagingTemplate
+        );
         Future<?> future = executorService.submit(uploadTask);
         log.info("Upload task started (firmware={}, target={})", firmwareInfo, targetDevice);
         uploadTasks.put(targetDevice, Pair.of(future, uploadTask));
