@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.controller.model;
+package ru.pobopo.smartthing.gateway.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
