@@ -16,6 +16,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 
 @Slf4j
@@ -59,11 +60,17 @@ public class TcpLogsListener implements BackgroundJob {
                             ip,
                             clients.size()
                     );
+                } catch (SocketException exception) {
+                    if (StringUtils.equals(exception.getMessage(), "Socket closed")) {
+                        log.info("Socket closed");
+                    } else {
+                        log.error("Socket error: {}", exception.getMessage());
+                    }
                 } catch (Exception exception) {
                     log.error("Tcp logger error: {}", exception.getMessage());
                 }
             }
-            log.info("Tcp device logs listener stopped (socket closed)");
+            log.info("Tcp device logs listener stopped");
         } catch (Exception e) {
             log.error("Tcp logs listen exception: {}", e.getMessage(), e);
         }
