@@ -1,13 +1,16 @@
 package ru.pobopo.smartthing.gateway.service.cloud;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import ru.pobopo.smartthing.gateway.event.CloudLoginEvent;
 import ru.pobopo.smartthing.gateway.exception.CloudConfigMissingException;
 import ru.pobopo.smartthing.gateway.exception.StorageException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
@@ -22,6 +25,7 @@ public class CloudApiService {
 
     private final CloudDataRepository cloudDataRepository;
     private final RestTemplate restTemplate;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Getter
     private CloudIdentity cloudIdentity;
@@ -29,9 +33,10 @@ public class CloudApiService {
     private CloudConfig cloudConfig;
 
     @Autowired
-    public CloudApiService(CloudDataRepository cloudDataRepository, RestTemplate restTemplate) {
+    public CloudApiService(CloudDataRepository cloudDataRepository, RestTemplate restTemplate, ApplicationEventPublisher applicationEventPublisher) {
         this.cloudDataRepository = cloudDataRepository;
         this.restTemplate = restTemplate;
+        this.applicationEventPublisher = applicationEventPublisher;
 
         try {
             cloudConfig = cloudDataRepository.loadCloudConfig();
@@ -55,13 +60,11 @@ public class CloudApiService {
 
     public synchronized void login() {
         ResponseEntity<CloudIdentity> response = basicRequest(HttpMethod.GET, "/api/auth", null, CloudIdentity.class);
-        if (response == null) {
-            log.error("Failed to fetch authentication from cloud");
-            return;
-        }
+        cloudIdentity = response.getBody();
+
+        applicationEventPublisher.publishEvent(new CloudLoginEvent(this, cloudIdentity));
 
         try {
-            cloudIdentity = response.getBody();
             cloudDataRepository.saveCloudIdentity(cloudIdentity);
         } catch (StorageException exception) {
             log.error("Failed to save cloud identity in repository: {}", exception.getMessage());
@@ -131,7 +134,7 @@ public class CloudApiService {
         );
     }
 
-    @Nullable
+    @NotNull
     private <T, P> ResponseEntity<T> basicRequest(HttpMethod method, String path, P payload, Class<T> tClass) {
         if (path == null) {
             path = "";

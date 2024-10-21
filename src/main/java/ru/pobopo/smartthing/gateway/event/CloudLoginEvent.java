@@ -7,7 +7,6 @@ import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
 import java.util.Objects;
 
 
-// deprecated
 public class CloudLoginEvent extends ApplicationEvent {
     private final CloudIdentity cloudIdentity;
 
