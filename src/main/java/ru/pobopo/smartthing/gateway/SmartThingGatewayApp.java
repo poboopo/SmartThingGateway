@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import ru.pobopo.smartthing.gateway.exception.CloudConfigMissingException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConnectionStatus;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudMessageBrokerService;
@@ -46,6 +47,8 @@ public class SmartThingGatewayApp {
             }
             try {
                 cloudService.login();
+            } catch (CloudConfigMissingException exception) {
+                log.warn("No cloud config present");
             } catch (Throwable exception) {
                 log.error("Failed to login in cloud: {}", exception.getMessage());
             }

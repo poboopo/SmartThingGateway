@@ -13,6 +13,8 @@
     <groupId>ru.pobopo</groupId>
     <artifactId>smart_thing_gateway</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>smart_thing_gateway</name>
+    <description>SmartThing gateway backend</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

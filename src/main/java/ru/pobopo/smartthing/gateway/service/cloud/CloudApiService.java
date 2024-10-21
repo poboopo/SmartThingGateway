@@ -8,6 +8,7 @@ import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import ru.pobopo.smartthing.gateway.exception.CloudConfigMissingException;
 import ru.pobopo.smartthing.gateway.exception.StorageException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConfig;
@@ -46,23 +47,24 @@ public class CloudApiService {
             login();
             cloudDataRepository.saveCloudConfig(cloudConfig);
             return cloudIdentity;
-        } catch (Exception exception) {
+        } catch (Throwable t) {
             this.cloudConfig = null;
-            throw exception;
+            throw t;
         }
     }
 
     public synchronized void login() {
+        ResponseEntity<CloudIdentity> response = basicRequest(HttpMethod.GET, "/api/auth", null, CloudIdentity.class);
+        if (response == null) {
+            log.error("Failed to fetch authentication from cloud");
+            return;
+        }
+
         try {
-            ResponseEntity<CloudIdentity> response = basicRequest(HttpMethod.GET, "/api/auth", null, CloudIdentity.class);
-            if (response == null) {
-                log.error("Failed to fetch authentication from cloud");
-                return;
-            }
             cloudIdentity = response.getBody();
             cloudDataRepository.saveCloudIdentity(cloudIdentity);
         } catch (StorageException exception) {
-            log.error("Failed to save cloud identity: {}", exception.getMessage());
+            log.error("Failed to save cloud identity in repository: {}", exception.getMessage());
         }
     }
 
@@ -137,8 +139,7 @@ public class CloudApiService {
 
         try {
             if (cloudConfig == null || StringUtils.isBlank(cloudConfig.getToken())) {
-                log.error("No cloud token in cloud config found");
-                return null;
+                throw new CloudConfigMissingException();
             }
 
             HttpHeaders headers = new HttpHeaders();

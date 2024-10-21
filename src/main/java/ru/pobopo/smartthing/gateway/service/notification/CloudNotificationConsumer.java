@@ -15,6 +15,10 @@ public class CloudNotificationConsumer implements GatewayNotificationConsumer {
 
     @Override
     public void consume(GatewayNotification notification) {
+        if (cloudService.getCloudConfig() == null) {
+            // todo add to queue
+            return;
+        }
         cloudService.notification(notification);
         log.info("Notification sent to cloud!");
     }

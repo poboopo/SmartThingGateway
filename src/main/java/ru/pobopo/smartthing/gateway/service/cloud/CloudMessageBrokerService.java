@@ -60,14 +60,16 @@ public class CloudMessageBrokerService {
         }
 
         switch (status) {
+            case CONNECTION_LOST -> startReconnectThread();
             case CONNECTED -> {
                 stopReconnectThread();
                 reconnectFailed = false;
-                cloudService.event(GatewayEventType.CONNECTED);
+                if (cloudService.getCloudConfig() != null) {
+                    cloudService.event(GatewayEventType.CONNECTED);
+                }
             }
-            case CONNECTION_LOST -> startReconnectThread();
             case DISCONNECTED -> {
-                if (!connectionStatus.equals(CloudConnectionStatus.DISCONNECTED)) {
+                if (!connectionStatus.equals(CloudConnectionStatus.DISCONNECTED) && cloudService.getCloudConfig() != null) {
                     cloudService.event(GatewayEventType.DISCONNECTED);
                 }
             }

@@ -185,7 +185,7 @@ public class DeviceApiService {
         // add internal exception codes?
         ResponseEntity<String> response = cloudService.sendDeviceRequest(request);
         Objects.requireNonNull(response);
-        if (response.getStatusCode().equals(HttpStatus.FORBIDDEN)) {
+        if (HttpStatus.FORBIDDEN.equals(response.getStatusCode())) {
             throw new BadRequestException("Gateway with id=" + request.getGatewayId() + " not found!");
         }
         return InternalHttpResponse.builder()
