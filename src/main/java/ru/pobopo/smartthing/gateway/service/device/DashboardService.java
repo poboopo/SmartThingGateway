@@ -70,6 +70,7 @@ public class DashboardService {
                 .observables(group.getObservables().stream()
                         .filter((o) -> StringUtils.isNotBlank(o.getName()) && o.getType() != null)
                         .toList())
+                .actions(group.getActions())
                 .build();
         repository.update(updatedGroup);
 

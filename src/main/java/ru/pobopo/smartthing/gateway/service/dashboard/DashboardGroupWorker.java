@@ -53,6 +53,11 @@ public class DashboardGroupWorker extends Thread {
     public void updateGroup(DashboardGroup group) {
         Objects.requireNonNull(group);
         this.group = group;
+        this.values.keySet().forEach((obs) -> {
+            if (!this.group.getObservables().contains(obs)) {
+                values.remove(obs);
+            }
+        });
     }
 
     @Override
