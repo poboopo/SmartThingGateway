@@ -24,7 +24,8 @@ public class RestDeviceApi extends DeviceApi {
     public final static String HEALTH = "/health";
     public final static String SYSTEM_INFO = "/info/system";
     public final static String GET_ACTIONS = "/actions/info";
-    public final static String CALL_ACTION = "/actions";
+    public final static String CALL_ACTION = "/actions/call";
+    public final static String ACTION_SCHEDULE = "/actions/schedule";
     public final static String GET_CONFIG = "/config/info";
     public final static String CONFIG_VALUES = "/config/values";
     public final static String DELETE_ALL_CONFIG_VALUES = "/config/delete/all";
@@ -81,8 +82,17 @@ public class RestDeviceApi extends DeviceApi {
         return sendRequest(
                 info,
                 CALL_ACTION + "?action=" + action,
-                HttpMethod.PUT,
+                HttpMethod.GET,
                 null
+        );
+    }
+
+    public InternalHttpResponse actionSchedule(DeviceInfo info, String action, long callDelay) {
+        return sendRequest(
+                info,
+                ACTION_SCHEDULE,
+                HttpMethod.PUT,
+                Map.of("action", action, "callDelay", callDelay)
         );
     }
 
