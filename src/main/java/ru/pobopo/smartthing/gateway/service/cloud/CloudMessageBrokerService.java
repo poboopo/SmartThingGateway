@@ -187,10 +187,7 @@ public class CloudMessageBrokerService {
 
     @Scheduled(fixedDelayString = "${cloud.status.check.delay}")
     public void checkStatus() {
-        if (CloudConnectionStatus.CONNECTED.equals(connectionStatus)) {
-            return;
-        }
-        if (stompSession != null && !stompSession.isConnected()) {
+        if (CloudConnectionStatus.CONNECTED.equals(connectionStatus) && stompSession != null && !stompSession.isConnected()) {
             log.info("Connection lost detected!");
             setStatus(CloudConnectionStatus.CONNECTION_LOST);
         }
