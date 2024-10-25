@@ -78,21 +78,21 @@ public class RestDeviceApi extends DeviceApi {
     }
 
     @Override
-    public InternalHttpResponse callAction(DeviceInfo info, String action) {
+    public InternalHttpResponse callAction(DeviceInfo info, String name) {
         return sendRequest(
                 info,
-                CALL_ACTION + "?action=" + action,
+                CALL_ACTION + "?name=" + name,
                 HttpMethod.GET,
                 null
         );
     }
 
-    public InternalHttpResponse actionSchedule(DeviceInfo info, String action, long callDelay) {
+    public InternalHttpResponse actionSchedule(DeviceInfo info, String name, long callDelay) {
         return sendRequest(
                 info,
                 ACTION_SCHEDULE,
                 HttpMethod.PUT,
-                Map.of("action", action, "callDelay", callDelay)
+                Map.of("name", name, "callDelay", callDelay)
         );
     }
 
