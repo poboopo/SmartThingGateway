@@ -35,7 +35,7 @@ public class BuildInfoController {
         info.put("commonsVersion", buildProperties.get("commons.version"));
         info.put("javaVersion", buildProperties.get("java.version"));
         info.put("version", buildProperties.getVersion());
-        info.put("plugins", plugins);
+        info.put("plugins", plugins.isEmpty() ? "None" : plugins);
     }
 
     @AcceptCloudRequest

@@ -47,6 +47,11 @@ public class CustomPluginsConfig {
     @SneakyThrows
     public List<CustomPlugin> loadPlugins(@Value("${plugins.dir:}") String pluginsDir) {
         Path dirPath = StringUtils.isEmpty(pluginsDir) ? PLUGINS_DIR_DEFAULT : Path.of(pluginsDir);
+        if (!Files.exists(dirPath)) {
+            Files.createDirectory(dirPath);
+        } else if (!Files.isDirectory(dirPath)) {
+            throw new IllegalStateException("Can't use " + dirPath + " as plugins directory path - it's a file, dummy");
+        }
 
         log.info("Loading plugins from {}", pluginsDir);
         List<CustomPlugin> plugins = Files.list(dirPath)
