@@ -43,7 +43,7 @@ public class FileRepository<T> {
         }
         getIdMethod = method.get();
 
-        log.info("Using file repository directory {} (for {})", repoDirectory, clazz);
+        log.debug("Using file repository directory {} (for {})", repoDirectory, clazz);
         if (!Files.exists(repoDirectory)) {
             Files.createDirectories(repoDirectory);
         }

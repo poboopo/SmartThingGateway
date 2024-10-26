@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.gateway.service.device.api.RestDeviceApi;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
-import ru.pobopo.smartthing.model.gateway.dashboard.DashboardUpdatesConsumer;
+import ru.pobopo.smartthing.consumers.DashboardUpdatesConsumer;
 
 import java.util.List;
 
@@ -21,9 +21,7 @@ public class DashboardGroupWorkerFactory {
                 group,
                 restDeviceApi,
                 objectMapper,
-                updates -> {
-                    valuesConsumers.forEach(consumer -> consumer.consume(group, updates)); //todo async
-                }
+                updates -> valuesConsumers.forEach(consumer -> consumer.consume(group, updates)) //todo async
         );
     }
 }

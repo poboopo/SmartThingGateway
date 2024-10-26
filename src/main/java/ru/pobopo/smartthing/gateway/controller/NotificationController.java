@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.service.notification.NotificationService;
 import ru.pobopo.smartthing.model.DeviceInfo;
-import ru.pobopo.smartthing.model.stomp.GatewayNotification;
+import ru.pobopo.smartthing.model.DeviceNotification;
 
 @RestController
 @RequestMapping("/api/notification")
@@ -29,7 +29,7 @@ public class NotificationController {
             description = "Send notification from device to gateway and connected cloud"
     )
     @PostMapping
-    public void sendNotification(@RequestBody GatewayNotification notificationRequest) throws BadRequestException {
+    public void sendNotification(@RequestBody DeviceNotification notificationRequest) throws BadRequestException {
         DeviceInfo info = notificationRequest.getDevice();
         if (info == null || StringUtils.isEmpty(info.getIp()) || StringUtils.isEmpty(info.getName())) {
             throw new BadRequestException("Device info is required!");

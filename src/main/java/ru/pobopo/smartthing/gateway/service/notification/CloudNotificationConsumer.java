@@ -5,11 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smartthing.consumers.DeviceNotificationConsumer;
 import ru.pobopo.smartthing.gateway.event.CloudLoginEvent;
 import ru.pobopo.smartthing.gateway.event.CloudLogoutEvent;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
-import ru.pobopo.smartthing.model.GatewayNotificationConsumer;
-import ru.pobopo.smartthing.model.stomp.GatewayNotification;
+import ru.pobopo.smartthing.model.DeviceNotification;
 
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -17,13 +17,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class CloudNotificationConsumer implements GatewayNotificationConsumer {
+public class CloudNotificationConsumer implements DeviceNotificationConsumer {
     private final CloudApiService cloudService;
 
-    private final Queue<GatewayNotification> queue = new LinkedBlockingQueue<>(10);
+    private final Queue<DeviceNotification> queue = new LinkedBlockingQueue<>(10);
 
     @Override
-    public void consume(GatewayNotification notification) {
+    public void consume(DeviceNotification notification) {
         if (cloudService.getCloudConfig() == null) {
             return;
         }
@@ -52,7 +52,7 @@ public class CloudNotificationConsumer implements GatewayNotificationConsumer {
         log.warn("Cloud notifications queue cleared");
     }
 
-    @Scheduled(fixedDelay = 600000)
+    @Scheduled(fixedDelay = 10000)
     public void processQueue() {
         if (queue.isEmpty()) {
             return;
@@ -61,12 +61,12 @@ public class CloudNotificationConsumer implements GatewayNotificationConsumer {
         try {
             log.info("Trying to send notifications from queue");
             while (!queue.isEmpty()) {
-                GatewayNotification notification = queue.peek();
+                DeviceNotification notification = queue.peek();
                 cloudService.notification(notification);
                 queue.remove();
             }
         } catch (Exception e) {
-            log.error("Failed to process notification queue", e);
+            log.error("Failed to process notification queue (error message={})", e.getMessage());
         }
     }
 }

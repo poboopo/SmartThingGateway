@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.*;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smartthing.gateway.event.CloudLoginEvent;
@@ -15,6 +14,7 @@ import ru.pobopo.smartthing.gateway.exception.CloudConfigMissingException;
 import ru.pobopo.smartthing.gateway.exception.StorageException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConfig;
+import ru.pobopo.smartthing.model.DeviceNotification;
 import ru.pobopo.smartthing.model.stomp.*;
 
 // todo need refactor
@@ -116,7 +116,7 @@ public class CloudApiService {
         );
     }
 
-    public void notification(GatewayNotification notification) {
+    public void notification(DeviceNotification notification) {
         basicRequest(
                 HttpMethod.POST,
                 "/api/gateway/requests/notification",

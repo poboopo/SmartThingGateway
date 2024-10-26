@@ -56,3 +56,6 @@ ota:
       dir: ""
     info:
       file: ""
+
+plugins:
+  dir: ""

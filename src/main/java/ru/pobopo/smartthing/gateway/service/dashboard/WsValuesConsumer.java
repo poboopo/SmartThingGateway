@@ -5,7 +5,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardObservableValueUpdate;
-import ru.pobopo.smartthing.model.gateway.dashboard.DashboardUpdatesConsumer;
+import ru.pobopo.smartthing.consumers.DashboardUpdatesConsumer;
 
 import java.util.List;
 

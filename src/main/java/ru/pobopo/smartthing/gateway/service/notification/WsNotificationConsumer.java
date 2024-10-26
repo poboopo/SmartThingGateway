@@ -4,19 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smartthing.model.GatewayNotificationConsumer;
-import ru.pobopo.smartthing.model.stomp.GatewayNotification;
+import ru.pobopo.smartthing.consumers.DeviceNotificationConsumer;
+import ru.pobopo.smartthing.model.DeviceNotification;
 
 import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.NOTIFICATION_TOPIC;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class WsNotificationConsumer implements GatewayNotificationConsumer {
+public class WsNotificationConsumer implements DeviceNotificationConsumer {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void consume(GatewayNotification notification) {
+    public void consume(DeviceNotification notification) {
         messagingTemplate.convertAndSend(
                 NOTIFICATION_TOPIC,
                 notification
