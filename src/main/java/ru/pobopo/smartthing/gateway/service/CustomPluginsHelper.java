@@ -1,7 +1,7 @@
 package ru.pobopo.smartthing.gateway.service;
 
-import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import ru.pobopo.smartthing.consumers.DeviceNotificationConsumer;
 import ru.pobopo.smartthing.gateway.model.CustomPlugin;
 import ru.pobopo.smartthing.consumers.DashboardUpdatesConsumer;
@@ -22,16 +22,16 @@ public class CustomPluginsHelper {
             DashboardUpdatesConsumer.class
     );
 
-    public static <T> List<T> createBeansFromPlugins(List<CustomPlugin> plugins, Class<T> targetInterface) {
+    public static <T> List<T> createBeansFromPlugins(ApplicationContext applicationContext, List<CustomPlugin> plugins, Class<T> targetInterface) {
         List<T> loadedBeans = new ArrayList<>();
         for (CustomPlugin plugin: plugins) {
             for (Class<?> clazz: plugin.getClasses()) {
                 if (Arrays.stream(clazz.getInterfaces()).anyMatch(i -> i == targetInterface)) {
                     try {
                         // todo inject dependencies?
-                        loadedBeans.add((T) clazz.getConstructor().newInstance());
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                             NoSuchMethodException e) {
+                        // ApplicationContext.AutowireCapableBeanFactory.createBean()
+                        loadedBeans.add((T) applicationContext.getAutowireCapableBeanFactory().createBean(clazz));
+                    } catch (Exception e) {
                         log.error("Failed to create bean {} of plugin {} (error message: {})", clazz, plugin, e.getMessage());
                     }
                 }

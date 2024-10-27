@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.pobopo.smartthing.consumers.DeviceNotificationConsumer;
@@ -26,20 +27,22 @@ public class CustomPluginsConfig {
     @Bean
     @Qualifier("notification-consumers")
     public List<DeviceNotificationConsumer> consumersFromPlugin(
+            ApplicationContext applicationContext,
             List<DeviceNotificationConsumer> beans,
             List<CustomPlugin> plugins
     ) {
-        beans.addAll(CustomPluginsHelper.createBeansFromPlugins(plugins, DeviceNotificationConsumer.class));
+        beans.addAll(CustomPluginsHelper.createBeansFromPlugins(applicationContext, plugins, DeviceNotificationConsumer.class));
         return beans;
     }
 
     @Bean
     @Qualifier("dashboard-consumer")
     public List<DashboardUpdatesConsumer> dashboardUpdatesConsumers(
+            ApplicationContext applicationContext,
             List<DashboardUpdatesConsumer> beans,
             List<CustomPlugin> plugins
     ) {
-        beans.addAll(CustomPluginsHelper.createBeansFromPlugins(plugins, DashboardUpdatesConsumer.class));
+        beans.addAll(CustomPluginsHelper.createBeansFromPlugins(applicationContext, plugins, DashboardUpdatesConsumer.class));
         return beans;
     }
 
