@@ -13,7 +13,7 @@ import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
 import ru.pobopo.smartthing.gateway.model.logs.DeviceLogsFilter;
 import ru.pobopo.smartthing.gateway.service.device.DevicesSearchService;
-import ru.pobopo.smartthing.gateway.service.device.DeviceLogsService;
+import ru.pobopo.smartthing.gateway.service.device.log.DeviceLogsCacheService;
 import ru.pobopo.smartthing.gateway.service.device.SavedDevicesService;
 import ru.pobopo.smartthing.gateway.service.device.DeviceSettingsService;
 import ru.pobopo.smartthing.model.DeviceInfo;
@@ -33,7 +33,7 @@ import java.util.UUID;
 @Tag(name = "Devices controller", description = "Find and save devices, export and import device settings, get devices logs")
 public class DeviceController {
     private final DeviceSettingsService settingsService;
-    private final DeviceLogsService deviceLogsService;
+    private final DeviceLogsCacheService deviceLogsCacheService;
     private final DevicesSearchService searchJob;
     private final SavedDevicesService savedDevicesService;
 
@@ -108,7 +108,7 @@ public class DeviceController {
             @RequestParam(required = false) String message,
             @RequestParam(required = false) Level level
     ) {
-        return deviceLogsService.getLogs(DeviceLogsFilter.builder()
+        return deviceLogsCacheService.getLogs(DeviceLogsFilter.builder()
                 .device(device != null ? device.toLowerCase() : null)
                 .tag(tag != null ? tag.toLowerCase() : null)
                 .message(message != null ? message.toLowerCase() : null)

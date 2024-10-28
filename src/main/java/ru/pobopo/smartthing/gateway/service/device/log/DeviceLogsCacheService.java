@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.gateway.service.device;
+package ru.pobopo.smartthing.gateway.service.device.log;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -8,8 +8,8 @@ import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import ru.pobopo.smartthing.consumers.DeviceLogsConsumer;
 import ru.pobopo.smartthing.gateway.model.logs.DeviceLogsFilter;
-import ru.pobopo.smartthing.gateway.service.job.BackgroundJob;
 import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 
 import java.util.List;
@@ -20,14 +20,11 @@ import static ru.pobopo.smartthing.gateway.config.StompMessagingConfig.DEVICES_T
 
 @Service
 @RequiredArgsConstructor
-public class DeviceLogsService implements BackgroundJob {
+public class DeviceLogsCacheService implements DeviceLogsConsumer {
     public static final String DEVICES_LOGS_TOPIC = DEVICES_TOPIC + "/logs";
     private final Logger log = LoggerFactory.getLogger("device-logs");
 
-    private final BlockingQueue<DeviceLoggerMessage> processQueue = new LinkedBlockingQueue<>();
     private final ConcurrentLinkedDeque<DeviceLoggerMessage> logsQueue = new ConcurrentLinkedDeque<>();
-
-    private final SimpMessagingTemplate messagingTemplate;
 
     @Value("${device.logs.cache.size:200}")
     private int cacheSize;
@@ -57,35 +54,13 @@ public class DeviceLogsService implements BackgroundJob {
         }).toList();
     }
 
-    public void addLog(DeviceLoggerMessage message) {
-        if (message == null) {
-            return;
-        }
-        processQueue.add(message);
-    }
-
     @Override
-    public void run() {
-        while(!Thread.interrupted()) {
-            try {
-                DeviceLoggerMessage message = processQueue.take();
-                log.atLevel(message.getLevel()).log(message.toString());
-                if (logsQueue.size() > cacheSize) {
-                    logsQueue.remove();
-                }
-                logsQueue.addFirst(message);
-
-                try {
-                    messagingTemplate.convertAndSend(
-                            DEVICES_LOGS_TOPIC,
-                            message
-                    );
-                } catch (Exception exception) {
-                    log.error("Failed to send log message in topics", exception);
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+    public void accept(DeviceLoggerMessage message) {
+        // todo move from here?
+        log.atLevel(message.getLevel()).log(message.toString());
+        if (logsQueue.size() > cacheSize) {
+            logsQueue.remove();
         }
+        logsQueue.addFirst(message);
     }
 }

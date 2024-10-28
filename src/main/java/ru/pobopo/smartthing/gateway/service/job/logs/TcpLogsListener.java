@@ -6,9 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smartthing.consumers.DeviceLogsConsumer;
+import ru.pobopo.smartthing.gateway.service.AsyncQueuedConsumersProcessor;
 import ru.pobopo.smartthing.gateway.service.job.BackgroundJob;
-import ru.pobopo.smartthing.gateway.service.device.DeviceLogsService;
+import ru.pobopo.smartthing.gateway.service.device.log.DeviceLogsCacheService;
 import ru.pobopo.smartthing.model.DeviceLogSource;
+import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,7 +29,7 @@ public class TcpLogsListener implements BackgroundJob {
     @Value("${device.logs.tcp.port}")
     private String port;
 
-    private final DeviceLogsService logsProcessor;
+    private final AsyncQueuedConsumersProcessor<DeviceLogsConsumer, DeviceLoggerMessage> processor;
     private final DeviceLoggerMessageParser messageParser;
 
     private ServerSocket serverSocket;
@@ -51,7 +54,7 @@ public class TcpLogsListener implements BackgroundJob {
                         clients.remove(ip).stopClient();
                     }
 
-                    LogClient client = new LogClient(messageParser, logsProcessor, socketClient);
+                    LogClient client = new LogClient(socketClient, messageParser, processor);
                     client.setDaemon(true);
                     client.start();
                     clients.put(ip, client);
@@ -90,16 +93,11 @@ public class TcpLogsListener implements BackgroundJob {
         serverSocket.close();
     }
 
+    @RequiredArgsConstructor
     private static class LogClient extends Thread {
         private final Socket clientSocket;
         private final DeviceLoggerMessageParser messageParser;
-        private final DeviceLogsService logsProcessor;
-
-        public LogClient(DeviceLoggerMessageParser messageParser, DeviceLogsService logsProcessor, Socket clientSocket) {
-            this.messageParser = messageParser;
-            this.clientSocket = clientSocket;
-            this.logsProcessor = logsProcessor;
-        }
+        private final AsyncQueuedConsumersProcessor<DeviceLogsConsumer, DeviceLoggerMessage> processor;
 
         @Override
         public void run() {
@@ -109,7 +107,7 @@ public class TcpLogsListener implements BackgroundJob {
 
                 String message;
                 while ((message = in.readLine()) != null) {
-                    logsProcessor.addLog(
+                    processor.process(
                             messageParser.parse(DeviceLogSource.TCP, message, address.getHostAddress())
                     );
                 }

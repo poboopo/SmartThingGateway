@@ -1,11 +1,13 @@
 package ru.pobopo.smartthing.gateway.service.dashboard;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardObservableValueUpdate;
 import ru.pobopo.smartthing.consumers.DashboardUpdatesConsumer;
+import ru.pobopo.smartthing.model.gateway.dashboard.DashboardValuesUpdate;
 
 import java.util.List;
 
@@ -17,10 +19,10 @@ public class WsValuesConsumer implements DashboardUpdatesConsumer {
     private final SimpMessagingTemplate template;
 
     @Override
-    public void consume(DashboardGroup group, List<DashboardObservableValueUpdate> updates) {
+    public void accept(DashboardValuesUpdate update) {
         template.convertAndSend(
-                DASHBOARD_TOPIC_PREFIX + "/" + group.getId(),
-                updates
+                DASHBOARD_TOPIC_PREFIX + "/" + update.getGroup().getId(),
+                update.getValues()
         );
     }
 }

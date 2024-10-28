@@ -23,7 +23,7 @@ public class CloudNotificationConsumer implements DeviceNotificationConsumer {
     private final Queue<DeviceNotification> queue = new LinkedBlockingQueue<>(10);
 
     @Override
-    public void consume(DeviceNotification notification) {
+    public void accept(DeviceNotification notification) {
         if (cloudService.getCloudConfig() == null) {
             return;
         }

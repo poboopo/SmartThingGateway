@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ru.pobopo.smartthing.consumers.DeviceLogsConsumer;
+import ru.pobopo.smartthing.gateway.service.AsyncQueuedConsumersProcessor;
 import ru.pobopo.smartthing.gateway.service.job.BackgroundJob;
-import ru.pobopo.smartthing.gateway.service.device.DeviceLogsService;
+import ru.pobopo.smartthing.gateway.service.device.log.DeviceLogsCacheService;
 import ru.pobopo.smartthing.model.DeviceLogSource;
+import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 
 import java.net.*;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +25,7 @@ public class MulticastLogsListener implements BackgroundJob {
     @Value("${device.logs.multicast.port}")
     private String port;
 
-    private final DeviceLogsService logsProcessor;
+    private final AsyncQueuedConsumersProcessor<DeviceLogsConsumer, DeviceLoggerMessage> processor;
     private final DeviceLoggerMessageParser messageParser;
 
     @Override
@@ -50,7 +53,7 @@ public class MulticastLogsListener implements BackgroundJob {
                             packet.getLength(),
                             StandardCharsets.UTF_8
                     );
-                    logsProcessor.addLog(
+                    processor.process(
                             messageParser.parse(DeviceLogSource.MULTICAST, message, null)
                     );
                 }

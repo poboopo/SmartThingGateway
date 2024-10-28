@@ -16,7 +16,7 @@ public class WsNotificationConsumer implements DeviceNotificationConsumer {
     private final SimpMessagingTemplate messagingTemplate;
 
     @Override
-    public void consume(DeviceNotification notification) {
+    public void accept(DeviceNotification notification) {
         messagingTemplate.convertAndSend(
                 NOTIFICATION_TOPIC,
                 notification
