@@ -69,7 +69,7 @@ public class CloudMessageBrokerService {
                 }
             }
             case DISCONNECTED -> {
-                if (!connectionStatus.equals(CloudConnectionStatus.DISCONNECTED) && cloudService.getCloudConfig() != null) {
+                if (!connectionStatus.equals(CloudConnectionStatus.NOT_CONNECTED) && cloudService.getCloudConfig() != null) {
                     cloudService.event(GatewayEventType.DISCONNECTED);
                 }
             }

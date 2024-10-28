@@ -17,6 +17,7 @@ public class WsNotificationConsumer implements DeviceNotificationConsumer {
 
     @Override
     public void accept(DeviceNotification notification) {
+        log.info("Sending notification in ws {}", notification.getNotification().getMessage());
         messagingTemplate.convertAndSend(
                 NOTIFICATION_TOPIC,
                 notification

@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import ru.pobopo.smartthing.consumers.DeviceLogsConsumer;
 import ru.pobopo.smartthing.gateway.model.logs.DeviceLogsFilter;
@@ -24,7 +23,7 @@ public class DeviceLogsCacheService implements DeviceLogsConsumer {
     public static final String DEVICES_LOGS_TOPIC = DEVICES_TOPIC + "/logs";
     private final Logger log = LoggerFactory.getLogger("device-logs");
 
-    private final ConcurrentLinkedDeque<DeviceLoggerMessage> logsQueue = new ConcurrentLinkedDeque<>();
+    private final ConcurrentLinkedDeque<DeviceLoggerMessage> logsCache = new ConcurrentLinkedDeque<>();
 
     @Value("${device.logs.cache.size:200}")
     private int cacheSize;
@@ -32,7 +31,7 @@ public class DeviceLogsCacheService implements DeviceLogsConsumer {
     private Level logLevel;
 
     public List<DeviceLoggerMessage> getLogs(DeviceLogsFilter filter) {
-        Stream<DeviceLoggerMessage> messageStream = logsQueue.stream();
+        Stream<DeviceLoggerMessage> messageStream = logsCache.stream();
         if (filter == null || filter.isEmpty()) {
             return messageStream.toList();
         }
@@ -58,9 +57,9 @@ public class DeviceLogsCacheService implements DeviceLogsConsumer {
     public void accept(DeviceLoggerMessage message) {
         // todo move from here?
         log.atLevel(message.getLevel()).log(message.toString());
-        if (logsQueue.size() > cacheSize) {
-            logsQueue.remove();
+        if (logsCache.size() > cacheSize) {
+            logsCache.remove();
         }
-        logsQueue.addFirst(message);
+        logsCache.addFirst(message);
     }
 }

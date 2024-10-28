@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
 import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareInfo;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
+import ru.pobopo.smartthing.gateway.repository.SavedDeviceNotification;
 import ru.pobopo.smartthing.model.SavedDeviceInfo;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
 
@@ -23,15 +24,20 @@ public class RepositoriesConfig {
     private static final Path SAVED_DEVICES_DEFAULT = Paths.get(DEFAULT_APP_DIR.toString(), "saved_devices");
     private static final Path DASHBOARD_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "dashboard_config");
     private static final Path FIRMWARE_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "firmware_info");
+    private static final Path NOTIFICATIONS_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "notifications");
 
     @Value("${device.settings.dir:}")
     private String deviceSettingsPath;
-    @Value("${device.saved.file:}")
+    @Value("${device.saved.dir:}")
     private String savedDevicesPath;
-    @Value("${dashboard.settings.file:}")
+    @Value("${dashboard.settings.dir:}")
     private String dashboardConfigPath;
-    @Value("${ota.firmware.info.file:}")
+    @Value("${ota.firmware.info.dir:}")
     private String firmwareInfoPath;
+    @Value("${notifications.dir:}")
+    private String notificationsPath;
+
+    // todo factory?
 
     @Bean
     public FileRepository<DeviceSettings> deviceSettingsFileRepository(ObjectMapper objectMapper) throws IOException {
@@ -65,6 +71,15 @@ public class RepositoriesConfig {
         return new FileRepository<>(
                 OtaFirmwareInfo.class,
                 StringUtils.isEmpty(firmwareInfoPath) ? FIRMWARE_DEFAULT_PATH : Paths.get(firmwareInfoPath),
+                objectMapper
+        );
+    }
+
+    @Bean
+    public FileRepository<SavedDeviceNotification> notificationRepository(ObjectMapper objectMapper) throws IOException {
+        return new FileRepository<>(
+                SavedDeviceNotification.class,
+                StringUtils.isEmpty(notificationsPath) ? NOTIFICATIONS_DEFAULT_PATH : Paths.get(notificationsPath),
                 objectMapper
         );
     }

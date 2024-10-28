@@ -18,7 +18,7 @@ cloud:
 
 dashboard:
   settings:
-    file: ""
+    dir: ""
 
 device:
   search:
@@ -36,7 +36,7 @@ device:
   settings:
     dir: ""
   saved:
-    file: ""
+    dir: ""
   api:
     cache:
       enabled: true
@@ -55,7 +55,10 @@ ota:
     storage:
       dir: ""
     info:
-      file: ""
+      dir: ""
 
 plugins:
   dir: ""
+
+notifications:
+  dir: "s"
