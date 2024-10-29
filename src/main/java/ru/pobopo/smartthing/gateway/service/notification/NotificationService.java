@@ -6,12 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.consumers.DeviceNotificationConsumer;
-import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
-import ru.pobopo.smartthing.gateway.repository.SavedDeviceNotification;
 import ru.pobopo.smartthing.gateway.service.AsyncQueuedConsumersProcessor;
 import ru.pobopo.smartthing.model.DeviceInfo;
-import ru.pobopo.smartthing.model.DeviceNotification;
+import ru.pobopo.smartthing.model.stomp.DeviceNotification;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -22,31 +20,30 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationService {
     private final AsyncQueuedConsumersProcessor<DeviceNotificationConsumer, DeviceNotification> processor;
-    private final FileRepository<SavedDeviceNotification> repository;
+    private final FileRepository<DeviceNotification> repository;
 
-    public Collection<SavedDeviceNotification> getNotifications() {
+    public Collection<DeviceNotification> getNotifications() {
         return repository.getAll();
     }
 
-    public UUID sendNotification(DeviceNotification notification) {
-        DeviceInfo info = notification.getDevice();
+    public UUID sendNotification(DeviceNotification deviceNotification) {
+        DeviceInfo info = deviceNotification.getDevice();
         if (info == null || StringUtils.isEmpty(info.getIp()) || StringUtils.isEmpty(info.getName())) {
             throw new ValidationException("Device info is required!");
         }
-        if (notification.getNotification() == null || StringUtils.isEmpty(notification.getNotification().getMessage())) {
+        if (deviceNotification.getNotification() == null || StringUtils.isEmpty(deviceNotification.getNotification().getMessage())) {
             throw new ValidationException("Notification message is required!");
         }
 
-        notification.setDateTime(LocalDateTime.now());
-
-        log.info("Saving notification from device: {}", notification);
-
-        SavedDeviceNotification deviceNotification = SavedDeviceNotification.fromNotification(notification);
+        deviceNotification.setDateTime(LocalDateTime.now());
         deviceNotification.setId(UUID.randomUUID());
+
+        log.info("Saving notification from device: {}", deviceNotification);
+
         repository.add(deviceNotification);
         log.info("Notification saved, id={}", deviceNotification.getId());
 
-        if (processor.process(notification)) {
+        if (processor.process(deviceNotification)) {
             log.info("Notification added in processing queue");
         } else {
             log.error("Failed to add notification in processing queue");

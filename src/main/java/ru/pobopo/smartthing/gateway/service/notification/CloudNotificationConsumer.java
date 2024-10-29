@@ -9,7 +9,7 @@ import ru.pobopo.smartthing.consumers.DeviceNotificationConsumer;
 import ru.pobopo.smartthing.gateway.event.CloudLoginEvent;
 import ru.pobopo.smartthing.gateway.event.CloudLogoutEvent;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
-import ru.pobopo.smartthing.model.DeviceNotification;
+import ru.pobopo.smartthing.model.stomp.DeviceNotification;
 
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;

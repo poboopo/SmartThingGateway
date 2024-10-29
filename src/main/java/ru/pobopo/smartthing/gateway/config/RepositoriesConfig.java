@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
 import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareInfo;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
-import ru.pobopo.smartthing.gateway.repository.SavedDeviceNotification;
 import ru.pobopo.smartthing.model.SavedDeviceInfo;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardGroup;
+import ru.pobopo.smartthing.model.stomp.DeviceNotification;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -76,9 +76,9 @@ public class RepositoriesConfig {
     }
 
     @Bean
-    public FileRepository<SavedDeviceNotification> notificationRepository(ObjectMapper objectMapper) throws IOException {
+    public FileRepository<DeviceNotification> notificationRepository(ObjectMapper objectMapper) throws IOException {
         return new FileRepository<>(
-                SavedDeviceNotification.class,
+                DeviceNotification.class,
                 StringUtils.isEmpty(notificationsPath) ? NOTIFICATIONS_DEFAULT_PATH : Paths.get(notificationsPath),
                 objectMapper
         );

@@ -3,15 +3,11 @@ package ru.pobopo.smartthing.gateway.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smartthing.gateway.aspect.AcceptCloudRequest;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
-import ru.pobopo.smartthing.gateway.repository.SavedDeviceNotification;
 import ru.pobopo.smartthing.gateway.service.notification.NotificationService;
-import ru.pobopo.smartthing.model.DeviceInfo;
-import ru.pobopo.smartthing.model.DeviceNotification;
+import ru.pobopo.smartthing.model.stomp.DeviceNotification;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -37,7 +33,7 @@ public class NotificationController {
     )
     @AcceptCloudRequest
     @GetMapping
-    public Collection<SavedDeviceNotification> getNotification() {
+    public Collection<DeviceNotification> getNotification() {
         return notificationService.getNotifications();
     }
 

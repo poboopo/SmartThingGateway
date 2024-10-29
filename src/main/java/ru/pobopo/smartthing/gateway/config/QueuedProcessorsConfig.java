@@ -9,7 +9,7 @@ import ru.pobopo.smartthing.consumers.DeviceNotificationConsumer;
 import ru.pobopo.smartthing.gateway.service.CustomPluginsService;
 import ru.pobopo.smartthing.gateway.service.AsyncQueuedConsumersProcessor;
 import ru.pobopo.smartthing.model.DeviceLoggerMessage;
-import ru.pobopo.smartthing.model.DeviceNotification;
+import ru.pobopo.smartthing.model.stomp.DeviceNotification;
 import ru.pobopo.smartthing.model.gateway.dashboard.DashboardValuesUpdate;
 
 import java.util.List;

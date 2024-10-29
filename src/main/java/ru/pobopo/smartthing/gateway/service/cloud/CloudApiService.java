@@ -14,7 +14,7 @@ import ru.pobopo.smartthing.gateway.exception.CloudConfigMissingException;
 import ru.pobopo.smartthing.gateway.exception.StorageException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConfig;
-import ru.pobopo.smartthing.model.DeviceNotification;
+import ru.pobopo.smartthing.model.stomp.DeviceNotification;
 import ru.pobopo.smartthing.model.stomp.*;
 
 // todo need refactor
