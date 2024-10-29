@@ -36,7 +36,7 @@ public class DeviceLogsCacheService implements DeviceLogsConsumer {
             return messageStream.toList();
         }
         return messageStream.filter(message -> {
-            if (filter.getLevel() != null && !message.getLevel().equals(filter.getLevel())) {
+            if (filter.getLevel() != null && message.getLevel().toInt() < filter.getLevel().toInt()) {
                 return false;
             }
             if (StringUtils.isNotBlank(filter.getMessage()) && !StringUtils.contains(message.getMessage().toLowerCase(), filter.getMessage())) {
