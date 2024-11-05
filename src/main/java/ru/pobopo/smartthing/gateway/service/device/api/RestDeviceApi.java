@@ -222,7 +222,7 @@ public class RestDeviceApi extends DeviceApi {
                 info,
                 String.format(
                         "%s?type=%s&name=%s&id=%s",
-                        HOOKS_BY_ID,
+                        HOOKS,
                         observable.getType(),
                         observable.getName(),
                         id
