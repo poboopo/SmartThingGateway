@@ -110,7 +110,7 @@ public class CloudMessageBrokerService {
             throw new IncompatibleConfigurationException("Can't find cloud ul or auth token in cloud config!");
         }
 
-        String wsUrl = cloudConfig.getCloudUrl().replace("http", "ws") + "/api/smt-ws";
+        String wsUrl = cloudConfig.getCloudUrl().replace("http", "ws") + "/api/st-ws";
         log.info("Connecting to {}", wsUrl);
 
         WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
