@@ -19,9 +19,10 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class RestDeviceApi extends DeviceApi {
-    private final static List<String> SUPPORTED_VERSIONS = List.of("0.5", "0.6", "0.7");
+    private final static List<String> SUPPORTED_VERSIONS = List.of("0.7");
 
     public final static String HEALTH = "/health";
+    public final static String WIFI = "/wifi";
     public final static String SYSTEM_INFO = "/info/system";
     public final static String GET_ACTIONS = "/actions/info";
     public final static String CALL_ACTION = "/actions/call";
@@ -47,7 +48,7 @@ public class RestDeviceApi extends DeviceApi {
 
     @Override
     public boolean accept(DeviceInfo deviceInfo) {
-        if (StringUtils.isBlank(deviceInfo.getIp())) {
+        if (StringUtils.isBlank(deviceInfo.getVersion())) {
             return false;
         }
         return SUPPORTED_VERSIONS.contains(deviceInfo.getVersion());
@@ -56,6 +57,23 @@ public class RestDeviceApi extends DeviceApi {
     @Override
     public InternalHttpResponse health(DeviceInfo info) {
         return sendRequest(info, HEALTH);
+    }
+
+    public InternalHttpResponse getWiFi(DeviceInfo info) {
+        return sendRequest(info, WIFI);
+    }
+
+    public InternalHttpResponse setWiFi(DeviceInfo info, String ssid, String password, Integer mode) {
+        return sendRequest(
+                info,
+                WIFI,
+                HttpMethod.POST,
+                Map.of(
+                        "ssid", ssid,
+                        "password", password,
+                        "mode", mode
+                )
+        );
     }
 
     @Override
