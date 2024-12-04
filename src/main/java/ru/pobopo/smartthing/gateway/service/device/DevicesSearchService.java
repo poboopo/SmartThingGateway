@@ -91,7 +91,7 @@ public class DevicesSearchService implements BackgroundJob {
                 if (deviceInfo != null) {
                     cache.put(deviceInfo);
                 } else {
-                    log.error("Can't build device info from {}", message);
+                    log.debug("Can't build device info from {}", message);
                 }
             }
         } catch (Exception exception) {

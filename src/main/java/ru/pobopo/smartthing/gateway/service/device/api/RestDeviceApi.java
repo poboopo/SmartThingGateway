@@ -48,10 +48,10 @@ public class RestDeviceApi extends DeviceApi {
 
     @Override
     public boolean accept(DeviceInfo deviceInfo) {
-        if (StringUtils.isBlank(deviceInfo.getVersion())) {
+        if (StringUtils.isBlank(deviceInfo.getStVersion())) {
             return false;
         }
-        return SUPPORTED_VERSIONS.contains(deviceInfo.getVersion());
+        return SUPPORTED_VERSIONS.contains(deviceInfo.getStVersion());
     }
 
     @Override
@@ -251,7 +251,7 @@ public class RestDeviceApi extends DeviceApi {
     }
 
     public InternalHttpResponse getFeatures(DeviceInfo info) {
-        if (info.getVersion().equals("0.5")) {
+        if (info.getStVersion().equals("0.5")) {
             return InternalHttpResponse.builder()
                     .status(HttpStatus.OK)
                     .data("{\"web\":true,\"actions\":true,\"sensors\":true,\"states\":true,\"hooks\":true,\"logger\":true}")
