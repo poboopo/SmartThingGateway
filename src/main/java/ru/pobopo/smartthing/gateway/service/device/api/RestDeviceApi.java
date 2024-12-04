@@ -276,12 +276,18 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse importSettings(DeviceInfo info, Map<String, Object> settings) {
+    public InternalHttpResponse importSettings(DeviceInfo info, String settings) {
+        if (StringUtils.isBlank(settings) || settings.charAt(0) < '0' || settings.charAt(0) > '9') {
+            return InternalHttpResponse.builder()
+                    .status(HttpStatus.BAD_REQUEST)
+                    .data("Bad settings dump")
+                    .build();
+        }
         return sendRequest(
                 info,
                 SETTINGS,
                 HttpMethod.POST,
-                settings
+                settings.trim()
         );
     }
 

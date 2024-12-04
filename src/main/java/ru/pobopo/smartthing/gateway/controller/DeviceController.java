@@ -8,9 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.event.Level;
 import org.springframework.web.bind.annotation.*;
 import ru.pobopo.smartthing.gateway.aspect.AcceptCloudRequest;
-import ru.pobopo.smartthing.gateway.model.UpdateDeviceSettings;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
-import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
+import ru.pobopo.smartthing.gateway.model.device.DeviceSettingsDump;
 import ru.pobopo.smartthing.gateway.model.logs.DeviceLogsFilter;
 import ru.pobopo.smartthing.gateway.service.device.DevicesSearchService;
 import ru.pobopo.smartthing.gateway.service.device.log.DeviceLogsCacheService;
@@ -30,7 +29,7 @@ import java.util.UUID;
 @RequestMapping("/api/devices")
 @AcceptCloudRequest
 @RequiredArgsConstructor
-@Tag(name = "Devices controller", description = "Find and save devices, export and import device settings, get devices logs")
+@Tag(name = "Devices controller", description = "Find and save devices, export and import device settings dumps, get devices logs")
 public class DeviceController {
     private final DeviceSettingsService settingsService;
     private final DeviceLogsCacheService deviceLogsCacheService;
@@ -69,32 +68,26 @@ public class DeviceController {
     }
 
     @Operation(
-            summary = "Get saved devices settings",
+            summary = "Get saved devices settings dumps",
             description = "Loads saved settings from .json files from directory. Directory path loads from env variable " +
-                    "device.settings.dir or uses default path $HOME/.smartthing/device/settings/"
+                    "device.settings.dir or uses default path $HOME/.smartthing/device_settings/"
     )
     @GetMapping("/settings")
-    public Collection<DeviceSettings> getSettings() {
+    public Collection<DeviceSettingsDump> getSettings() {
         return settingsService.getSettings();
     }
 
     @Operation(
-            summary = "Save device settings",
-            description = "Saves settings in .json file directory from env variable device.settings.dir or in default " +
-                    "directory $HOME/.smartthing/device/settings/"
+            summary = "Save device settings dump",
+            description = "Saves settings dump in .json file. Files stored in directory from env variable device.settings.dir or in default " +
+                    "directory $HOME/.smartthing/device_settings/"
     )
     @PostMapping("/settings")
-    public DeviceSettings createSettings(@RequestBody DeviceSettings settings) {
+    public DeviceSettingsDump createSettings(@RequestBody DeviceSettingsDump settings) {
         return settingsService.createSettings(settings);
     }
 
-    @Operation(summary = "Update existing settings")
-    @PutMapping("/settings")
-    public DeviceSettings updateSettings(@RequestBody UpdateDeviceSettings settings) {
-        return settingsService.updateSettings(settings);
-    }
-
-    @Operation(summary = "Delete saved settings")
+    @Operation(summary = "Delete saved settings dump")
     @DeleteMapping("/settings/{id}")
     public void deleteSettings(@PathVariable("id") @Parameter(description = "Settings id") UUID id) {
         settingsService.deleteSettings(id);

@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.pobopo.smartthing.gateway.model.device.DeviceSettings;
+import ru.pobopo.smartthing.gateway.model.device.DeviceSettingsDump;
 import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareInfo;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
 import ru.pobopo.smartthing.model.SavedDeviceInfo;
@@ -20,7 +20,7 @@ import static ru.pobopo.smartthing.gateway.SmartThingGatewayApp.DEFAULT_APP_DIR;
 
 @Configuration
 public class RepositoriesConfig {
-    private static final Path SETTINGS_FILE_DEFAULT = Paths.get(DEFAULT_APP_DIR.toString(), "device_settings");
+    private static final Path SETTINGS_DUMPS_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "device_settings");
     private static final Path SAVED_DEVICES_DEFAULT = Paths.get(DEFAULT_APP_DIR.toString(), "saved_devices");
     private static final Path DASHBOARD_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "dashboard_config");
     private static final Path FIRMWARE_DEFAULT_PATH = Paths.get(DEFAULT_APP_DIR.toString(), "firmware_info");
@@ -38,12 +38,11 @@ public class RepositoriesConfig {
     private String notificationsPath;
 
     // todo factory?
-
     @Bean
-    public FileRepository<DeviceSettings> deviceSettingsFileRepository(ObjectMapper objectMapper) throws IOException {
+    public FileRepository<DeviceSettingsDump> deviceSettingsFileRepository(ObjectMapper objectMapper) throws IOException {
         return new FileRepository<>(
-                DeviceSettings.class,
-                StringUtils.isEmpty(deviceSettingsPath) ? SETTINGS_FILE_DEFAULT : Paths.get(deviceSettingsPath),
+                DeviceSettingsDump.class,
+                StringUtils.isEmpty(deviceSettingsPath) ? SETTINGS_DUMPS_DEFAULT_PATH : Paths.get(deviceSettingsPath),
                 objectMapper
         );
     }
