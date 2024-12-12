@@ -1,6 +1,5 @@
-package ru.pobopo.smartthing.gateway.service;
+package ru.pobopo.smartthing.gateway.service.plugins;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,7 +8,6 @@ import org.springframework.stereotype.Service;
 import ru.pobopo.smartthing.consumers.DeviceLogsConsumer;
 import ru.pobopo.smartthing.consumers.DeviceNotificationConsumer;
 import ru.pobopo.smartthing.gateway.model.CustomPlugin;
-import ru.pobopo.smartthing.consumers.DashboardUpdatesConsumer;
 
 import java.io.IOException;
 import java.net.URL;
@@ -29,7 +27,6 @@ public class CustomPluginsService {
 
     private static final List<Class<?>> ALLOWED_INTERFACES = List.of(
             DeviceNotificationConsumer.class,
-            DashboardUpdatesConsumer.class,
             DeviceLogsConsumer.class
     );
 

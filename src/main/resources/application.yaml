@@ -16,10 +16,6 @@ cloud:
   config:
     dir: ""
 
-dashboard:
-  settings:
-    dir: ""
-
 device:
   search:
     group: 224.1.1.1

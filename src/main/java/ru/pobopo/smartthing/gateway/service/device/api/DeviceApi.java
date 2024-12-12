@@ -26,9 +26,4 @@ public abstract class DeviceApi {
         log.info("Calling default getSensors method");
         return new InternalHttpResponse(HttpStatus.OK, "[]", null);
     }
-
-    public InternalHttpResponse getStates(DeviceInfo info) {
-        log.info("Calling default getStates method");
-        return new InternalHttpResponse(HttpStatus.OK, "[]", null);
-    }
 }

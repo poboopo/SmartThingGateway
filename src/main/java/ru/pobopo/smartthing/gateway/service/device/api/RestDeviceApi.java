@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
-import ru.pobopo.smartthing.model.gateway.Observable;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
+import ru.pobopo.smartthing.model.device.SensorInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -31,8 +31,7 @@ public class RestDeviceApi extends DeviceApi {
     public final static String CONFIG_VALUES = "/config/values";
     public final static String DELETE_ALL_CONFIG_VALUES = "/config/delete/all";
     public final static String SENSORS = "/sensors";
-    public final static String SENSORS_TYPES = "/sensors/types";
-    public final static String STATES = "/states";
+    public final static String SENSORS_FULL = "/sensors/full";
 
     public final static String HOOKS = "/hooks";
     public final static String HOOKS_BY_OBSERVABLE = HOOKS + "/by/observable";
@@ -122,18 +121,10 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse getSensorsTypes(DeviceInfo info) {
+    public InternalHttpResponse getSensorsFull(DeviceInfo info) {
         return sendRequest(
                 info,
-                SENSORS_TYPES
-        );
-    }
-
-    @Override
-    public InternalHttpResponse getStates(DeviceInfo info) {
-        return sendRequest(
-                info,
-                STATES
+                SENSORS_FULL
         );
     }
 
@@ -179,7 +170,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse getHooks(DeviceInfo info, Observable observable) {
+    public InternalHttpResponse getHooks(DeviceInfo info, SensorInfo observable) {
         return sendRequest(
                 info,
                 String.format(
@@ -191,7 +182,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse getHookById(DeviceInfo info, Observable observable, String id) {
+    public InternalHttpResponse getHookById(DeviceInfo info, SensorInfo observable, String id) {
         return sendRequest(
                 info,
                 String.format(
@@ -211,7 +202,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse createHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
+    public InternalHttpResponse createHook(DeviceInfo info, SensorInfo observable, Map<String, Object> hook) {
         return sendRequest(
                 info,
                 HOOKS,
@@ -223,7 +214,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse updateHook(DeviceInfo info, Observable observable, Map<String, Object> hook) {
+    public InternalHttpResponse updateHook(DeviceInfo info, SensorInfo observable, Map<String, Object> hook) {
         return sendRequest(
                 info,
                 HOOKS,
@@ -235,7 +226,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse deleteHook(DeviceInfo info, Observable observable, String id) {
+    public InternalHttpResponse deleteHook(DeviceInfo info, SensorInfo observable, String id) {
         return sendRequest(
                 info,
                 String.format(
@@ -291,7 +282,7 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse testHook(DeviceInfo info, Observable observable, String id, String value) {
+    public InternalHttpResponse testHook(DeviceInfo info, SensorInfo observable, String id, String value) {
         return this.sendRequest(
                 info,
                 String.format(

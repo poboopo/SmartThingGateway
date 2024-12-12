@@ -18,7 +18,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
     public static final String NOTIFICATION_TOPIC = "/notifications";
     public static final String CONNECTION_STATUS_TOPIC = "/connection/status";
-    public static final String DASHBOARD_TOPIC_PREFIX = "/dashboard";
     public static final String DEVICES_TOPIC = "/devices";
     public static final String OTA_PROGRESS_TOPIC = "/ota";
 
@@ -28,7 +27,6 @@ public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
                 DEVICES_TOPIC,
                 NOTIFICATION_TOPIC,
                 CONNECTION_STATUS_TOPIC,
-                DASHBOARD_TOPIC_PREFIX,
                 OTA_PROGRESS_TOPIC
         ).setTaskScheduler(taskScheduler());
     }
