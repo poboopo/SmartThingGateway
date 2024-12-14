@@ -10,7 +10,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import ru.pobopo.smartthing.model.DeviceInfo;
 import ru.pobopo.smartthing.model.InternalHttpResponse;
-import ru.pobopo.smartthing.model.device.SensorInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -31,10 +30,9 @@ public class RestDeviceApi extends DeviceApi {
     public final static String CONFIG_VALUES = "/config/values";
     public final static String DELETE_ALL_CONFIG_VALUES = "/config/delete/all";
     public final static String SENSORS = "/sensors";
-    public final static String SENSORS_FULL = "/sensors/full";
 
     public final static String HOOKS = "/hooks";
-    public final static String HOOKS_BY_OBSERVABLE = HOOKS + "/by/observable";
+    public final static String HOOKS_BY_OBSERVABLE = HOOKS + "/by/sensor";
     public final static String HOOKS_BY_ID = HOOKS + "/by/id";
     public final static String HOOKS_TEMPLATES = HOOKS + "/templates";
     public final static String HOOK_TEST = HOOKS + "/test";
@@ -121,13 +119,6 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse getSensorsFull(DeviceInfo info) {
-        return sendRequest(
-                info,
-                SENSORS_FULL
-        );
-    }
-
     public InternalHttpResponse getConfigInfo(DeviceInfo info) {
         return sendRequest(info, GET_CONFIG);
     }
@@ -170,70 +161,67 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse getHooks(DeviceInfo info, SensorInfo observable) {
+    public InternalHttpResponse getHooks(DeviceInfo info, String sensor) {
         return sendRequest(
                 info,
                 String.format(
-                        "%s?type=%s&name=%s",
+                        "%s?sensor=%s",
                         HOOKS_BY_OBSERVABLE,
-                        observable.getType(),
-                        observable.getName()
+                        sensor
                 )
         );
     }
 
-    public InternalHttpResponse getHookById(DeviceInfo info, SensorInfo observable, String id) {
+    public InternalHttpResponse getHookById(DeviceInfo info, String sensor, String id) {
         return sendRequest(
                 info,
                 String.format(
-                        "%s?type=%s&name=%s&id=%s",
+                        "%s?sensor=%s&id=%s",
                         HOOKS_BY_ID,
-                        observable.getType(),
-                        observable.getName(),
+                        sensor,
                         id
                 )
         );
     }
 
-    public InternalHttpResponse getHooksTemplates(DeviceInfo info, String type) {
+    public InternalHttpResponse getHooksTemplates(DeviceInfo info, String sensor) {
         return sendRequest(
                 info,
-                HOOKS_TEMPLATES + "?type=" + type
+                HOOKS_TEMPLATES + "?sensor=" + sensor
         );
     }
 
-    public InternalHttpResponse createHook(DeviceInfo info, SensorInfo observable, Map<String, Object> hook) {
+    public InternalHttpResponse createHook(DeviceInfo info, String sensor, Map<String, Object> hook) {
         return sendRequest(
                 info,
                 HOOKS,
                 HttpMethod.POST,
                 Map.of(
-                        "observable", observable,
+                        "sensor", sensor,
                         "hook", hook
                 )
         );
     }
 
-    public InternalHttpResponse updateHook(DeviceInfo info, SensorInfo observable, Map<String, Object> hook) {
+    public InternalHttpResponse updateHook(DeviceInfo info, String sensor, Map<String, Object> hook) {
         return sendRequest(
                 info,
                 HOOKS,
                 HttpMethod.PUT,
                 Map.of(
-                        "observable", observable,
+                        "sensor", sensor,
                         "hook", hook
                 )
         );
     }
 
-    public InternalHttpResponse deleteHook(DeviceInfo info, SensorInfo observable, String id) {
+    public InternalHttpResponse deleteHook(DeviceInfo info, String sensor, String id) {
         return sendRequest(
                 info,
                 String.format(
-                        "%s?type=%s&name=%s&id=%s",
+                        "%s?sensor=%s&id=%s",
                         HOOKS,
-                        observable.getType(),
-                        observable.getName(),
+                        sensor,
                         id
                 ),
                 HttpMethod.DELETE,
@@ -282,14 +270,13 @@ public class RestDeviceApi extends DeviceApi {
         );
     }
 
-    public InternalHttpResponse testHook(DeviceInfo info, SensorInfo observable, String id, String value) {
+    public InternalHttpResponse testHook(DeviceInfo info, String sensor, String id, String value) {
         return this.sendRequest(
                 info,
                 String.format(
-                        "%s?type=%s&name=%s&id=%s&value=%s",
+                        "%s?sensor=%s&id=%s&value=%s",
                         HOOK_TEST,
-                        observable.getType(),
-                        observable.getName(),
+                        sensor,
                         id,
                         value == null ? "" : value
                 )
