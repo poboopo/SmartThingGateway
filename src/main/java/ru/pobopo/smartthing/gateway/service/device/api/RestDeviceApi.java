@@ -32,7 +32,6 @@ public class RestDeviceApi extends DeviceApi {
     public final static String SENSORS = "/sensors";
 
     public final static String HOOKS = "/hooks";
-    public final static String HOOKS_BY_OBSERVABLE = HOOKS + "/by/sensor";
     public final static String HOOKS_BY_ID = HOOKS + "/by/id";
     public final static String HOOKS_TEMPLATES = HOOKS + "/templates";
     public final static String HOOK_TEST = HOOKS + "/test";
@@ -166,7 +165,7 @@ public class RestDeviceApi extends DeviceApi {
                 info,
                 String.format(
                         "%s?sensor=%s",
-                        HOOKS_BY_OBSERVABLE,
+                        HOOKS,
                         sensor
                 )
         );
