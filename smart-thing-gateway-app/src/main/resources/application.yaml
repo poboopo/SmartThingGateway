@@ -1,0 +1,60 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+
+server:
+  port: ${port:8080}
+
+cloud:
+  reconnect:
+    attempts: -1
+    pause: 10000
+  status:
+    check:
+      delay: 30000
+  config:
+    dir: ""
+
+device:
+  search:
+    group: 224.1.1.1
+    port: 7778
+  logs:
+    multicast:
+      group: 224.1.1.1
+      port: 7779
+    tcp:
+      port: 7779
+    cache:
+      size: 100
+    level: DEBUG
+  settings:
+    dir: ""
+  saved:
+    dir: ""
+  api:
+    cache:
+      enabled: true
+      ttl: 1500
+
+logging:
+  file:
+    name: /var/log/st_gateway.log
+  max-size: 20GB
+
+ota:
+  tasks:
+    cleanup:
+      delay: 10000
+  firmware:
+    storage:
+      dir: ""
+    info:
+      dir: ""
+
+plugins:
+  dir: ""
+
+notifications:
+  dir: ""
