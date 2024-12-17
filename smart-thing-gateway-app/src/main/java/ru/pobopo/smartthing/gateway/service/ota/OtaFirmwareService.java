@@ -14,7 +14,7 @@ import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareInfo;
 import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareUploadProgress;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
 import ru.pobopo.smartthing.gateway.service.device.DeviceService;
-import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.io.IOException;
 import java.math.BigInteger;

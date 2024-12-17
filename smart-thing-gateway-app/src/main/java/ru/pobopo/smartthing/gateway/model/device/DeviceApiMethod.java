@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;

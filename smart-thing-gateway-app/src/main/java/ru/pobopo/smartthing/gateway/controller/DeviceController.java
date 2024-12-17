@@ -15,7 +15,7 @@ import ru.pobopo.smartthing.gateway.service.device.DeviceSettingsService;
 import ru.pobopo.smartthing.gateway.service.device.DevicesSearchService;
 import ru.pobopo.smartthing.gateway.service.device.SavedDevicesService;
 import ru.pobopo.smartthing.gateway.service.device.log.DeviceLogsCacheService;
-import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 import ru.pobopo.smartthing.model.DeviceLoggerMessage;
 import ru.pobopo.smartthing.model.SavedDeviceInfo;
 

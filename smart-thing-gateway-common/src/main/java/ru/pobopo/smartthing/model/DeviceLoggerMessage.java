@@ -6,6 +6,7 @@ import lombok.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;

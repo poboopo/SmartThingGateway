@@ -24,7 +24,7 @@
     </modules>
 
     <properties>
-        <revision>0.0.1</revision>
+        <revision>0.0.2</revision>
         <java.veersion>17</java.veersion>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -70,7 +70,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <!--<version>1.6.0</version>-->
+                <version>1.6.0</version>
                 <configuration>
                 </configuration>
                 <executions>

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import ru.pobopo.smartthing.annotation.FileRepoId;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.util.UUID;
 

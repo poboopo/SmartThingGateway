@@ -7,7 +7,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareInfo;
 import ru.pobopo.smartthing.gateway.model.ota.OtaFirmwareTaskStatus;
 import ru.pobopo.smartthing.gateway.model.ota.OtaUploadProgressShort;
-import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.io.IOException;
 import java.io.InputStream;

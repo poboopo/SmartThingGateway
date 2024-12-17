@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.gateway.cache.ConcurrentSetCache;
 import ru.pobopo.smartthing.gateway.service.job.BackgroundJob;
-import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.io.IOException;
 import java.net.*;

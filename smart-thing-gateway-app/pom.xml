@@ -65,7 +65,6 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <finalName>st-gateway</finalName>
         <plugins>

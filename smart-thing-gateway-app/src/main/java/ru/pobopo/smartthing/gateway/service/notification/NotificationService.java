@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import ru.pobopo.smartthing.consumers.DeviceNotificationConsumer;
 import ru.pobopo.smartthing.gateway.repository.FileRepository;
 import ru.pobopo.smartthing.gateway.service.AsyncQueuedConsumersProcessor;
-import ru.pobopo.smartthing.model.DeviceInfo;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 import ru.pobopo.smartthing.model.stomp.DeviceNotification;
 
 import java.time.LocalDateTime;

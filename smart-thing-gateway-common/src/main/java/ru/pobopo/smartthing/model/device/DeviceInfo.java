@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.model;
+package ru.pobopo.smartthing.model.device;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
