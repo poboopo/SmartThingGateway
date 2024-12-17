@@ -15,4 +15,4 @@ services:
       - gateway-data:/app
 
 volumes:
-  gateway-data: {}
+  gateway-data: { }

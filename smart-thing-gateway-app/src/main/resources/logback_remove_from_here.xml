@@ -5,19 +5,19 @@
     <property name="LOGS" value="/home/pobopo/projects/smart-thing-gateway/logs"/>
 
     <appender name="MAIN_LOGS_FILE"
-        class="ch.qos.logback.core.rolling.RollingFileAppender">
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS}/smartthing-gateway.log</file>
         <encoder
-            class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+                class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>${FILE_LOG_PATTERN}</pattern>
         </encoder>
 
         <rollingPolicy
-            class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily and when the file reaches 10 MegaBytes -->
             <fileNamePattern>${LOGS}/smartthing-gateway-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
-                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
@@ -30,11 +30,11 @@
         </encoder>
 
         <rollingPolicy
-            class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- rollover daily and when the file reaches 10 MegaBytes -->
             <fileNamePattern>${LOGS}/device-logs-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
-                class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>10MB</maxFileSize>
             </timeBasedFileNamingAndTriggeringPolicy>
         </rollingPolicy>
@@ -45,7 +45,7 @@
     </logger>
 
     <root level="INFO">
-        <appender-ref ref="MAIN_LOGS_FILE" />
+        <appender-ref ref="MAIN_LOGS_FILE"/>
         <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>

@@ -44,7 +44,7 @@ public class TcpLogsListener implements BackgroundJob {
             serverSocket = new ServerSocket(Integer.parseInt(port));
             log.info("TCP logs started, waiting for connections...");
 
-            while(!serverSocket.isClosed()) {
+            while (!serverSocket.isClosed()) {
                 try {
                     Socket socketClient = serverSocket.accept();
                     String ip = socketClient.getInetAddress().getHostAddress();

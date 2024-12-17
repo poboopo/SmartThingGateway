@@ -53,13 +53,13 @@ public class CustomPluginsService {
             log.info("Loading plugin {} ({})", pluginName, pathToJar);
 
             Enumeration<JarEntry> e = jarFile.entries();
-            URL[] urls = { new URL("jar:file:" + pathToJar + "!/") };
+            URL[] urls = {new URL("jar:file:" + pathToJar + "!/")};
             URLClassLoader cl = URLClassLoader.newInstance(urls);
 
             List<Class<?>> loadedClasses = new ArrayList<>();
             while (e.hasMoreElements()) {
                 JarEntry je = e.nextElement();
-                if(je.isDirectory() || !je.getName().endsWith(".class")) {
+                if (je.isDirectory() || !je.getName().endsWith(".class")) {
                     continue;
                 }
                 String className = je.getName()
@@ -102,8 +102,8 @@ public class CustomPluginsService {
 
     public <T> List<T> createBeansFromPlugins(Class<T> targetInterface) {
         List<T> loadedBeans = new ArrayList<>();
-        for (CustomPlugin plugin: plugins) {
-            for (Class<?> clazz: plugin.getClasses()) {
+        for (CustomPlugin plugin : plugins) {
+            for (Class<?> clazz : plugin.getClasses()) {
                 if (Arrays.stream(clazz.getInterfaces()).anyMatch(i -> i == targetInterface)) {
                     try {
                         loadedBeans.add((T) applicationContext.getAutowireCapableBeanFactory().createBean(clazz));

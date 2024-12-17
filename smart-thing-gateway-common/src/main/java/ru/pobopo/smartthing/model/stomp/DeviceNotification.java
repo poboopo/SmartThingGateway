@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.pobopo.smartthing.annotation.FileRepoId;
-import ru.pobopo.smartthing.model.device.DeviceInfo;
 import ru.pobopo.smartthing.model.Notification;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

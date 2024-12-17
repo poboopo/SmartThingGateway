@@ -45,7 +45,7 @@ public class OtaUpdatesController {
 
     @PutMapping
     public OtaFirmwareInfo updateFirmwareInfo(
-           @RequestBody OtaFirmwareInfo otaFirmwareInfo
+            @RequestBody OtaFirmwareInfo otaFirmwareInfo
     ) {
         return otaFirmwareService.updateFirmwareInfo(otaFirmwareInfo);
     }

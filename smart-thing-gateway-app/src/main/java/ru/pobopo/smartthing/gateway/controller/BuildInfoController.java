@@ -19,7 +19,7 @@ import java.util.Map;
 @RequestMapping("/api/build")
 public class BuildInfoController {
 
-    private final Map<String, Object> info  = new HashMap<>();
+    private final Map<String, Object> info = new HashMap<>();
 
     public BuildInfoController(
             BuildProperties buildProperties,

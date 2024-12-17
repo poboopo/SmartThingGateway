@@ -6,7 +6,7 @@ import lombok.Data;
 public class GatewayStatus {
     private boolean cloudAvailable = false;
     private boolean gatewayInfoLoaded = false;
-    private boolean connectedToBroker =  false;
+    private boolean connectedToBroker = false;
     private boolean subscribedToQueue = false;
 
     public void connectionClosed() {

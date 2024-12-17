@@ -3,9 +3,9 @@ package ru.pobopo.smartthing.gateway.service.job.logs;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.event.Level;
 import org.springframework.stereotype.Component;
-import ru.pobopo.smartthing.model.device.DeviceInfo;
 import ru.pobopo.smartthing.model.DeviceLogSource;
 import ru.pobopo.smartthing.model.DeviceLoggerMessage;
+import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.time.LocalDateTime;
 import java.util.regex.Matcher;

@@ -35,16 +35,16 @@ public class PluginsLoader {
             List<Class<?>> result = new ArrayList<>();
             Enumeration<JarEntry> e = jarFile.entries();
 
-            URL[] urls = { new URL("jar:file:" + pathToJar +"!/") };
+            URL[] urls = {new URL("jar:file:" + pathToJar + "!/")};
             URLClassLoader cl = URLClassLoader.newInstance(urls);
 
             while (e.hasMoreElements()) {
                 JarEntry je = e.nextElement();
-                if(je.isDirectory() || !je.getName().endsWith(".class")) {
+                if (je.isDirectory() || !je.getName().endsWith(".class")) {
                     continue;
                 }
                 // -6 because of .class
-                String className = je.getName().substring(0,je.getName().length()-6);
+                String className = je.getName().substring(0, je.getName().length() - 6);
                 className = className.replace('/', '.');
                 result.add(cl.loadClass(className));
             }

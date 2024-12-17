@@ -19,7 +19,8 @@ import java.lang.reflect.Method;
 @Component
 public class ExternalRestCallAspect {
     @Pointcut("within(ru.pobopo.smartthing.gateway.controller.*)")
-    public void inPackage(){}
+    public void inPackage() {
+    }
 
     @Before("inPackage()")
     public void accessCheck(final JoinPoint joinPoint) {

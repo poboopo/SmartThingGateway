@@ -18,7 +18,7 @@ public class BackgroundJobsService {
         this.threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(jobList.size());
         log.info("Total background jobs: {}", jobList.size());
 
-        for (BackgroundJob job: jobList) {
+        for (BackgroundJob job : jobList) {
             log.info("Starting job {}", job.getClass());
             threadPoolExecutor.submit(job);
         }

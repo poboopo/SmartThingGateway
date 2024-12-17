@@ -134,7 +134,7 @@ public class OtaFirmwareUploadTask implements Runnable {
 
     private boolean sendInvitationMessage(int uploadPort) throws IOException {
         setStatus(OtaFirmwareTaskStatus.INVITATION);
-        String invitation =  String.format(
+        String invitation = String.format(
                 "%d %d %d %s",
                 UPLOAD_COMMAND,
                 uploadPort,

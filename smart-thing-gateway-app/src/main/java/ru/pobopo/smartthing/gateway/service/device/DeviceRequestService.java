@@ -82,7 +82,7 @@ public class DeviceRequestService {
         if (StringUtils.isNotBlank(params)) {
             Map<String, Object> paramsMap = new HashMap<>();
             String[] paramsArray = params.split(";");
-            for (String param: paramsArray) {
+            for (String param : paramsArray) {
                 if (StringUtils.isBlank(param)) {
                     continue;
                 }
@@ -156,7 +156,7 @@ public class DeviceRequestService {
             );
 
             List<Object> args = new ArrayList<>();
-            for (Parameter parameter: targetMethod.getParameters()) {
+            for (Parameter parameter : targetMethod.getParameters()) {
                 if (parameter.getType().equals(DeviceInfo.class)) {
                     args.add(deviceInfo.get());
                 } else if (parameter.getType().equals(DeviceRequest.class)) {

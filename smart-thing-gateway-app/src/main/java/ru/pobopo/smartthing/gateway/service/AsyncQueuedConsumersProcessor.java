@@ -36,7 +36,7 @@ public class AsyncQueuedConsumersProcessor<C extends Consumer<D>, D> extends Thr
             try {
                 D data = processingQueue.take();
                 log.debug("Processing {}", data);
-                for (Consumer<D> consumer: consumers) {
+                for (Consumer<D> consumer : consumers) {
                     try {
                         log.debug("Calling consumer {}", consumer.getClass());
                         consumer.accept(data);

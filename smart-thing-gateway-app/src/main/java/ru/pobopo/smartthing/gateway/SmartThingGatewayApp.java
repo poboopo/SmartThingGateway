@@ -39,7 +39,7 @@ public class SmartThingGatewayApp {
     CommandLineRunner run(
             CloudApiService cloudService,
             CloudMessageBrokerService brokerService
-    )  {
+    ) {
         return args -> {
             if (cloudService.getCloudConfig() == null || StringUtils.isBlank(cloudService.getCloudConfig().getCloudUrl())) {
                 log.info("No cloud config present");

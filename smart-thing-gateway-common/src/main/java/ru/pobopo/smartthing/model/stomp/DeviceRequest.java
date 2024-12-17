@@ -1,7 +1,6 @@
 package ru.pobopo.smartthing.model.stomp;
 
 import lombok.*;
-import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.util.HashMap;
 import java.util.Map;

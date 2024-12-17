@@ -43,6 +43,7 @@ public class StompMessagingConfig implements WebSocketMessageBrokerConfigurer {
         messageConverters.add(messageConverter());
         return false;
     }
+
     private MessageConverter messageConverter() {
         DefaultContentTypeResolver resolver = new DefaultContentTypeResolver();
         resolver.setDefaultMimeType(MimeTypeUtils.APPLICATION_JSON);
