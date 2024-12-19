@@ -25,8 +25,7 @@ public class RestDeviceApi implements DeviceApi {
     public final static String GET_ACTIONS = "/actions/info";
     public final static String CALL_ACTION = "/actions/call";
     public final static String ACTION_SCHEDULE = "/actions/schedule";
-    public final static String GET_CONFIG = "/config/info";
-    public final static String CONFIG_VALUES = "/config/values";
+    public final static String CONFIG_VALUES = "/config";
     public final static String DELETE_ALL_CONFIG_VALUES = "/config/delete/all";
     public final static String SENSORS = "/sensors";
 
@@ -110,10 +109,6 @@ public class RestDeviceApi implements DeviceApi {
                 info,
                 SENSORS
         );
-    }
-
-    public ResponseEntity<String> getConfigInfo(DeviceInfo info) {
-        return sendRequest(info, GET_CONFIG);
     }
 
     public ResponseEntity<String> getConfigValues(DeviceInfo info) {
