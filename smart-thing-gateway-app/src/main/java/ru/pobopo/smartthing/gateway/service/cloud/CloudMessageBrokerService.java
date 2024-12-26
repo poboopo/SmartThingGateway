@@ -125,7 +125,7 @@ public class CloudMessageBrokerService {
     public void disconnect() {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
-            log.info("Stop session disconnected");
+            log.info("Stomp session disconnected");
         }
         setStatus(CloudConnectionStatus.DISCONNECTED);
     }
