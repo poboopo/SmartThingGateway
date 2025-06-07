@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(of = {"ip", "name", "type"})
+@EqualsAndHashCode(of = {"ip"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Device information")
 public class DeviceInfo {
