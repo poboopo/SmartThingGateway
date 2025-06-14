@@ -71,7 +71,7 @@ public class DeviceRequestService {
 
         String deviceInfo;
         if (spl.length == 2) {
-            requestBuilder.gatewayId(spl[0]);
+            requestBuilder.gatewayName(spl[0]);
             deviceInfo = spl[1];
         } else {
             deviceInfo = spl[0];
@@ -96,11 +96,11 @@ public class DeviceRequestService {
     }
 
     private ResponseEntity<String> sendRequest(DeviceRequest request) {
-        if (StringUtils.isBlank(request.getGatewayId()) || isSameGateway(request.getGatewayId())) {
+        if (StringUtils.isBlank(request.getGatewayName()) || isSameGateway(request.getGatewayName())) {
             log.info("Executing local request");
             return sendLocalRequest(request);
         }
-        log.info("Sending request to gateway id={}", request.getGatewayId());
+        log.info("Sending request to gateway name={}", request.getGatewayName());
         return sendRemoteRequest(request);
     }
 
@@ -190,7 +190,7 @@ public class DeviceRequestService {
         ResponseEntity<String> response = cloudService.sendDeviceRequest(request);
         Objects.requireNonNull(response);
         if (HttpStatus.FORBIDDEN.equals(response.getStatusCode())) {
-            throw new BadRequestException("Gateway with id=" + request.getGatewayId() + " not found!");
+            throw new BadRequestException("Gateway with name=" + request.getGatewayName() + " not found!");
         }
         return response;
     }
@@ -213,6 +213,6 @@ public class DeviceRequestService {
         if (cloudIdentity == null || cloudIdentity.getGateway() == null) {
             return true;
         }
-        return StringUtils.equals(cloudIdentity.getGateway().getId(), gatewayId);
+        return StringUtils.equals(cloudIdentity.getGateway().getName(), gatewayId);
     }
 }

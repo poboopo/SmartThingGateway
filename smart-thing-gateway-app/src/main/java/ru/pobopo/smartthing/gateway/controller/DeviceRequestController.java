@@ -46,8 +46,8 @@ public class DeviceRequestController {
                     @Parameter(
                             name = "target",
                             description = "Target device, it can be from other gateway. Can be used device name or ip." +
-                                    "Example values: window - target device 'window' in current local network." +
-                                    "home@window - target device 'window' in user gateway named 'home'." +
+                                    "Example values: window - target device 'window' in current gateway network." +
+                                    "home@window - target device 'window' in gateway's network named 'home'." +
                                     "Requires cloud connection"
                     ),
                     @Parameter(

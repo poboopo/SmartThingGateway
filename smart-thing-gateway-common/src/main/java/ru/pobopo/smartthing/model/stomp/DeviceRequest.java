@@ -12,7 +12,7 @@ import java.util.Map;
 @Builder
 @EqualsAndHashCode
 public class DeviceRequest {
-    private String gatewayId;
+    private String gatewayName;
     private String device;
     private String command;
     @Builder.Default
