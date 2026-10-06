@@ -3,6 +3,13 @@ spring:
     multipart:
       max-file-size: 10MB
 
+springdoc:
+  swagger-ui:
+    tagsSorter: alpha
+    operationsSorter: alpha
+    url: ${SWAGGER_DOC_URL:/v3/api-docs}
+    config-url: ${SWAGGER_CONFIG_URL:/v3/api-docs/swagger-config}
+
 server:
   port: ${port:8080}
 
