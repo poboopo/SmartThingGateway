@@ -32,7 +32,6 @@ public class BuildInfoController {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         info.put("buildTime", formatter.format(Date.from(buildProperties.getTime())));
 
-        info.put("commonsVersion", buildProperties.get("commons.version"));
         info.put("javaVersion", buildProperties.get("java.version"));
         info.put("version", buildProperties.getVersion());
         info.put("plugins", plugins.isEmpty() ? "None" : plugins);

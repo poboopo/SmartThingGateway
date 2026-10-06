@@ -1,8 +1,8 @@
 package ru.pobopo.smartthing.gateway.config;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
@@ -11,9 +11,12 @@ import java.time.Duration;
 public class RestTemplateConfig {
     @Bean
     public RestTemplate restTemplate() {
-        return new RestTemplateBuilder()
-                .setConnectTimeout(Duration.ofMillis(5000))
-                .setReadTimeout(Duration.ofMillis(5000))
-                .build();
+        Duration timeout = Duration.ofMillis(5000); // todo properties
+
+        HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+        httpRequestFactory.setConnectionRequestTimeout(timeout);
+        httpRequestFactory.setReadTimeout(timeout);
+
+        return new RestTemplate(httpRequestFactory);
     }
 }
