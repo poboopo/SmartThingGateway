@@ -21,7 +21,6 @@ import ru.pobopo.smartthing.model.device.DeviceInfo;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -43,7 +42,7 @@ public class DeviceController {
 
     @Operation(summary = "Get recent found devices in local network")
     @GetMapping("/found")
-    public Set<DeviceInfo> getDevices() {
+    public Collection<DeviceInfo> getDevices() {
         return searchJob.getRecentFoundDevices();
     }
 

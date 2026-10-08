@@ -1,16 +1,16 @@
 package ru.pobopo.smartthing.gateway.service.device;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.pobopo.smartthing.gateway.cache.CacheItem;
 import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.exception.DeviceApiException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
@@ -23,43 +23,28 @@ import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DeviceRequestService {
+    private final static int GET_RESPONSE_TIMEOUT_MS = 500;
+
     private final List<DeviceApi> apis;
     private final ObjectMapper objectMapper;
     private final CloudApiService cloudService;
     private final DeviceService deviceService;
 
-    @Value("${device.api.cache.enabled:true}")
-    private boolean cacheEnabled;
-    @Value("${device.api.cache.ttl:1500}")
-    private int cacheTtl;
-
-    private final Map<DeviceRequest, CacheItem<ResponseEntity<String>>> cache = new ConcurrentHashMap<>();
-
-    public ResponseEntity<String> execute(DeviceRequest request) {
-        Objects.requireNonNull(request, "Incoming request can't be null!");
-        log.info("Executing device request: {}", request);
-        ResponseEntity<String> fromCache = getFromCache(request);
-        if (fromCache != null) {
-            log.info("Got request {} result from cache: {}", request, fromCache);
-            return fromCache;
-        }
-
-        ResponseEntity<String> result = sendRequest(request);
-        if (cacheEnabled) {
-            log.info("Saving request {} result {} in cache", request, result);
-            cache.put(request, new CacheItem<>(result, LocalDateTime.now()));
-        }
-        return result;
-    }
+    private final AsyncLoadingCache<DeviceRequest, ResponseEntity<String>> responseCache = Caffeine.newBuilder()
+            .expireAfterWrite(1500, TimeUnit.MILLISECONDS)
+            .buildAsync(
+                    (token, executor) -> CompletableFuture.supplyAsync(() -> sendRequest(token), executor)
+            );
 
     public ResponseEntity<String> execute(String target, String command, String params) throws BadRequestException {
         if (StringUtils.isBlank(target)) {
@@ -93,6 +78,18 @@ public class DeviceRequestService {
         }
 
         return execute(requestBuilder.build());
+    }
+
+    public ResponseEntity<String> execute(DeviceRequest request) {
+        Objects.requireNonNull(request, "Incoming request can't be null!");
+        log.info("Executing device request: {}", request);
+
+        try {
+            CompletableFuture<ResponseEntity<String>> future = responseCache.get(request);
+            return future.get(GET_RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException | TimeoutException | ExecutionException e) {
+            throw new IllegalStateException("Failed to execute request to device: " + e.getMessage(), e);
+        }
     }
 
     private ResponseEntity<String> sendRequest(DeviceRequest request) {
@@ -193,19 +190,6 @@ public class DeviceRequestService {
             throw new BadRequestException("Gateway with name=" + request.getGatewayName() + " not found!");
         }
         return response;
-    }
-
-    private ResponseEntity<String> getFromCache(DeviceRequest request) {
-        if (!cacheEnabled) {
-            return null;
-        }
-
-        CacheItem<ResponseEntity<String>> cacheItem = cache.get(request);
-        if (cacheItem == null || cacheItem.getAddedTime().until(LocalDateTime.now(), ChronoUnit.MILLIS) > cacheTtl) {
-            cache.remove(request);
-            return null;
-        }
-        return cacheItem.getItem();
     }
 
     private boolean isSameGateway(String gatewayId) {

@@ -24,6 +24,7 @@ public class DeviceService {
         return deviceInfo;
     }
 
+    // todo get by ip as a key? If not found - search by name
     public Optional<DeviceInfo> findDevice(String device) {
         return Stream.concat(
                         searchJob.getRecentFoundDevices().stream(),
