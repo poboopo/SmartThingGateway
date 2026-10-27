@@ -1,7 +1,7 @@
 package ru.pobopo.smartthing.gateway.service.device;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -24,10 +24,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
@@ -41,11 +38,9 @@ public class DeviceRequestService {
     private final DeviceService deviceService;
 
     //    todo expire time to properties
-    private final AsyncLoadingCache<DeviceRequest, ResponseEntity<String>> responseCache = Caffeine.newBuilder()
+    private final Cache<DeviceRequest, ResponseEntity<String>> responseCache = Caffeine.newBuilder()
             .expireAfterWrite(1500, TimeUnit.MILLISECONDS)
-            .buildAsync(
-                    (token, executor) -> CompletableFuture.supplyAsync(() -> sendRequest(token), executor)
-            );
+            .build();
 
     public ResponseEntity<String> execute(String device, String command, String params) throws BadRequestException {
         if (StringUtils.isBlank(device)) {
@@ -85,12 +80,7 @@ public class DeviceRequestService {
         Objects.requireNonNull(request, "Incoming request can't be null!");
         log.info("Executing device request: {}", request);
 
-        try {
-            CompletableFuture<ResponseEntity<String>> future = responseCache.get(request);
-            return future.get(GET_RESPONSE_TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException | TimeoutException | ExecutionException e) {
-            throw new IllegalStateException("Failed to execute request to device: " + e.getMessage(), e);
-        }
+        return responseCache.get(request, this::sendRequest);
     }
 
     private ResponseEntity<String> sendRequest(DeviceRequest request) {
