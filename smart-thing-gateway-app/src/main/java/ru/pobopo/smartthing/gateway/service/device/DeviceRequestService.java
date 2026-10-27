@@ -18,7 +18,7 @@ import ru.pobopo.smartthing.gateway.model.device.DeviceApiMethod;
 import ru.pobopo.smartthing.gateway.service.cloud.CloudApiService;
 import ru.pobopo.smartthing.gateway.service.device.api.DeviceApi;
 import ru.pobopo.smartthing.model.device.DeviceInfo;
-import ru.pobopo.smartthing.model.stomp.DeviceRequest;
+import ru.pobopo.smartthing.model.device.DeviceRequest;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -40,18 +40,19 @@ public class DeviceRequestService {
     private final CloudApiService cloudService;
     private final DeviceService deviceService;
 
+    //    todo expire time to properties
     private final AsyncLoadingCache<DeviceRequest, ResponseEntity<String>> responseCache = Caffeine.newBuilder()
             .expireAfterWrite(1500, TimeUnit.MILLISECONDS)
             .buildAsync(
                     (token, executor) -> CompletableFuture.supplyAsync(() -> sendRequest(token), executor)
             );
 
-    public ResponseEntity<String> execute(String target, String command, String params) throws BadRequestException {
-        if (StringUtils.isBlank(target)) {
-            throw new BadRequestException("Target can't be blank");
+    public ResponseEntity<String> execute(String device, String command, String params) throws BadRequestException {
+        if (StringUtils.isBlank(device)) {
+            throw new BadRequestException("Device can't be blank");
         }
-        log.info("Parsing request: target={}, command={}, params={}", target, command, params);
-        String[] spl = target.split("@");
+        log.info("Parsing request: device={}, command={}, params={}", device, command, params);
+        String[] spl = device.split("@");
         DeviceRequest.DeviceRequestBuilder requestBuilder = DeviceRequest.builder().command(command);
 
         String deviceInfo;

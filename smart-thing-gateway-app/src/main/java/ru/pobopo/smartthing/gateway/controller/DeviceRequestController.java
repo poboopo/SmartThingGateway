@@ -14,7 +14,7 @@ import ru.pobopo.smartthing.gateway.exception.BadRequestException;
 import ru.pobopo.smartthing.gateway.model.device.DeviceApiMethod;
 import ru.pobopo.smartthing.gateway.service.device.DeviceRequestService;
 import ru.pobopo.smartthing.model.device.DeviceInfo;
-import ru.pobopo.smartthing.model.stomp.DeviceRequest;
+import ru.pobopo.smartthing.model.device.DeviceRequest;
 
 import java.util.List;
 
@@ -26,6 +26,8 @@ import java.util.List;
 public class DeviceRequestController {
     private final DeviceRequestService deviceRequestService;
 
+    // i don't like impl and i don't know how gonna be better
+
     @Operation(
             summary = "Call device api method",
             description = "Api for target device will be selected from possible implementations." +
@@ -34,7 +36,7 @@ public class DeviceRequestController {
                     description = "Returns device api call response"
             )
     )
-    @PostMapping
+    @PostMapping("/{device}")
     public ResponseEntity<String> callApi(@RequestBody DeviceRequest request) {
         return deviceRequestService.execute(request);
     }
@@ -63,13 +65,13 @@ public class DeviceRequestController {
                     )
             }
     )
-    @GetMapping
+    @GetMapping("/{device}")
     public ResponseEntity<String> callApiByTarget(
-            @RequestParam String target,
+            @PathVariable String device,
             @RequestParam String command,
             @RequestParam(required = false) String params
     ) throws BadRequestException {
-        return deviceRequestService.execute(target, command, params);
+        return deviceRequestService.execute(device, command, params);
     }
 
     @AcceptCloudRequest

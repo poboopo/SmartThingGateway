@@ -1,4 +1,4 @@
-package ru.pobopo.smartthing.model.stomp;
+package ru.pobopo.smartthing.model.device;
 
 import lombok.*;
 

@@ -17,8 +17,8 @@ import ru.pobopo.smartthing.gateway.exception.CloudConfigMissingException;
 import ru.pobopo.smartthing.gateway.exception.StorageException;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudConfig;
 import ru.pobopo.smartthing.gateway.model.cloud.CloudIdentity;
+import ru.pobopo.smartthing.model.device.DeviceRequest;
 import ru.pobopo.smartthing.model.stomp.DeviceNotification;
-import ru.pobopo.smartthing.model.stomp.DeviceRequest;
 import ru.pobopo.smartthing.model.stomp.GatewayEventType;
 import ru.pobopo.smartthing.model.stomp.ResponseMessage;
 

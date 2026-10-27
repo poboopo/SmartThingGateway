@@ -3,6 +3,7 @@ package ru.pobopo.smartthing.model.stomp;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import ru.pobopo.smartthing.model.device.DeviceRequest;
 
 @Getter
 @Setter
